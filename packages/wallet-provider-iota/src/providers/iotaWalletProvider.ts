@@ -2,12 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0.
 import { Guards } from "@gtsc/core";
 import { nameof } from "@gtsc/nameof";
-import {
-	type IWalletProvider
-} from "@gtsc/wallet-provider-models";
-import {
-	Client
-} from "@iota/sdk-wasm/node";
+import type { IWalletProvider } from "@gtsc/wallet-provider-models";
+import { Client } from "@iota/sdk-wasm/node";
 import type { IIotaWalletProviderConfig } from "../models/IIotaWalletProviderConfig";
 
 /**
@@ -51,12 +47,23 @@ export class IotaWalletProvider implements IWalletProvider {
 		this._config = config;
 	}
 
-		/**
+	/**
 	 * Get the balance for an address in a wallet.
 	 * @param address The bech32 encoded address.
 	 * @returns The created document.
 	 */
 	public async getBalance(address: string): Promise<bigint> {
 		return 0n;
+	}
+
+	/**
+	 * Create a client for the IOTA network.
+	 * @returns The client.
+	 */
+	private createClient(): Client {
+		if (!this._client) {
+			this._client = new Client(this._config.clientOptions);
+		}
+		return this._client;
 	}
 }
