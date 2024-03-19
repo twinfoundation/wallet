@@ -59,6 +59,7 @@ export class IotaWalletProvider implements IWalletProvider {
 	/**
 	 * Create a client for the IOTA network.
 	 * @returns The client.
+	 * @internal
 	 */
 	private createClient(): Client {
 		if (!this._client) {
