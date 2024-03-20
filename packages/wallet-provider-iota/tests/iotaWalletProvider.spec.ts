@@ -1,8 +1,7 @@
 // Copyright 2024 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
-import { FaucetFactory } from "@gtsc/wallet-provider-models";
 import { CoinType, SecretManager } from "@iota/sdk-wasm/node";
-import { IotaFaucet } from "../src";
+import { IotaFaucet } from "../src/iotaFaucet";
 import { IotaWalletProvider } from "../src/iotaWalletProvider";
 import type { IIotaWalletProviderConfig } from "../src/models/IIotaWalletProviderConfig";
 
@@ -78,24 +77,21 @@ describe("IotaWalletProvider", () => {
 			`https://explorer.shimmer.network/testnet/addr/${defaultAddresses[0]}`
 		);
 
-		FaucetFactory.Instance.register(
-			"iota",
-			() =>
-				new IotaFaucet({
-					clientOptions: {
-						nodes: [NODE_ENDPOINT],
-						localPow: true
-					},
-					endpoint: FAUCET_ENDPOINT
-				})
+		const wallet = new IotaWalletProvider(
+			{
+				clientOptions: {
+					nodes: [NODE_ENDPOINT],
+					localPow: true
+				}
+			},
+			new IotaFaucet({
+				clientOptions: {
+					nodes: [NODE_ENDPOINT],
+					localPow: true
+				},
+				endpoint: FAUCET_ENDPOINT
+			})
 		);
-
-		const wallet = new IotaWalletProvider({
-			clientOptions: {
-				nodes: [NODE_ENDPOINT],
-				localPow: true
-			}
-		});
 
 		const ensured = await wallet.ensureBalance(defaultAddresses[0], 1000000000n);
 

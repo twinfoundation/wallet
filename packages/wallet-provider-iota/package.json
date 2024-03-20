@@ -28,7 +28,6 @@
 	},
 	"dependencies": {
 		"@gtsc/core": "^0.0.3",
-		"@gtsc/crypto": "^0.0.3",
 		"@gtsc/nameof": "^0.0.3",
 		"@gtsc/wallet-provider-models": "^0.0.3",
 		"@iota/sdk-wasm": "^1.1.3"
