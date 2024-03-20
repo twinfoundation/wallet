@@ -15,6 +15,6 @@
 		".eslintrc.cjs",
 		"**/wordlists/**"
 	],
-	"words": ["bech", "gtsc", "nameof", "Stiftung"],
+	"words": ["bech", "faucet", "faucets", "gtsc", "nameof", "Stiftung", "Timelock"],
 	"ignoreRegExpList": ["/from\\s+(['\"]).*\\1/", "/eslint-disable.*/"]
 }

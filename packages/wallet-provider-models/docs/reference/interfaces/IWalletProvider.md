@@ -1,6 +1,6 @@
 # Interface: IWalletProvider
 
-Interface describing an identify provider.
+Interface describing a wallet provider.
 
 ## Hierarchy
 
@@ -34,6 +34,27 @@ IService.bootstrap
 
 ___
 
+### ensureBalance
+
+▸ **ensureBalance**(`address`, `balance`): `Promise`\<`boolean`\>
+
+Ensure the balance for an address in a wallet.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `address` | `string` | The bech32 encoded address. |
+| `balance` | `bigint` | The balance to ensure on the address. |
+
+#### Returns
+
+`Promise`\<`boolean`\>
+
+True if the balance has been ensured.
+
+___
+
 ### getBalance
 
 ▸ **getBalance**(`address`): `Promise`\<`bigint`\>
@@ -50,7 +71,27 @@ Get the balance for an address in a wallet.
 
 `Promise`\<`bigint`\>
 
-The created document.
+The balance of the wallet address.
+
+___
+
+### getStorageCosts
+
+▸ **getStorageCosts**(`address`): `Promise`\<`bigint`\>
+
+Get the storage costs for an address in a wallet.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `address` | `string` | The bech32 encoded address. |
+
+#### Returns
+
+`Promise`\<`bigint`\>
+
+The storage costs for the address.
 
 ___
 
