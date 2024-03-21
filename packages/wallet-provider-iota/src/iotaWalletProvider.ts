@@ -61,6 +61,11 @@ export class IotaWalletProvider implements IWalletProvider {
 			nameof(config.clientOptions),
 			config.clientOptions
 		);
+		Guards.object<IIotaWalletProviderConfig>(
+			IotaWalletProvider._CLASS_NAME,
+			nameof(config.secretManager),
+			config.secretManager
+		);
 
 		this._config = config;
 		this._faucet = faucet;
@@ -146,6 +151,25 @@ export class IotaWalletProvider implements IWalletProvider {
 		}
 
 		return false;
+	}
+
+	/**
+	 * Transfer funds to an address.
+	 * @param address The bech32 encoded address to send the funds to.
+	 * @param amount The amount to transfer.
+	 * @returns The block created.
+	 */
+	public async transfer(address: string, amount: bigint): Promise<string> {
+		const client = await this.createClient();
+
+		const blockIdAndBlock = await client.buildAndPostBlock(this._config.secretManager, {
+			output: {
+				address,
+				amount
+			}
+		});
+
+		return blockIdAndBlock[0];
 	}
 
 	/**

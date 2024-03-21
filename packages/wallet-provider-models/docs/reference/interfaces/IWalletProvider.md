@@ -128,3 +128,24 @@ Nothing.
 #### Inherited from
 
 IService.stop
+
+___
+
+### transfer
+
+▸ **transfer**(`address`, `amount`): `Promise`\<`string`\>
+
+Transfer funds to an address.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `address` | `string` | The bech32 encoded address to send the funds to. |
+| `amount` | `bigint` | The amount to transfer. |
+
+#### Returns
+
+`Promise`\<`string`\>
+
+The block created.

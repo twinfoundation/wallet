@@ -27,4 +27,12 @@ export interface IWalletProvider extends IService {
 	 * @returns True if the balance has been ensured.
 	 */
 	ensureBalance(address: string, balance: bigint): Promise<boolean>;
+
+	/**
+	 * Transfer funds to an address.
+	 * @param address The bech32 encoded address to send the funds to.
+	 * @param amount The amount to transfer.
+	 * @returns The block created.
+	 */
+	transfer(address: string, amount: bigint): Promise<string>;
 }

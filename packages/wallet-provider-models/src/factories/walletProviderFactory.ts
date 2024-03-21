@@ -1,7 +1,7 @@
 // Copyright 2024 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
 import { FactoryInstance } from "@gtsc/core";
-import type { IWalletProvider } from "../models/provider/IWalletProvider";
+import type { IWalletProvider } from "../models/IWalletProvider";
 
 /**
  * Factory for creating wallet providers.
