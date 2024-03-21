@@ -27,11 +27,18 @@ export const TEST_WALLET_PROVIDER = new IotaWalletProvider(
 		endpoint: TEST_FAUCET_ENDPOINT
 	})
 );
-export let TEST_WALLET_KEY_PAIR: {
-	publicKey: Uint8Array;
-	privateKey: Uint8Array;
-};
-export let TEST_ADDRESS_BECH32: string = "";
+const seed = Bip39.mnemonicToSeed(TEST_MNEMONIC);
+const addressKeyPair = Bip44.addressBech32(
+	seed,
+	AddressType.Ed25519,
+	TEST_BECH32_HRP,
+	TEST_COIN_TYPE,
+	0,
+	false,
+	0
+);
+export const TEST_WALLET_KEY_PAIR = addressKeyPair.keyPair;
+export const TEST_ADDRESS_BECH32 = addressKeyPair.address;
 
 export const TEST_EXPLORER_ADDRESS = "https://explorer.shimmer.network/testnet/addr/";
 export const TEST_EXPLORER_SEARCH = "https://explorer.shimmer.network/testnet/search/";
@@ -40,20 +47,6 @@ export const TEST_EXPLORER_SEARCH = "https://explorer.shimmer.network/testnet/se
  * Initialise the test wallet.
  */
 export async function initTestWallet(): Promise<void> {
-	const seed = Bip39.mnemonicToSeed(TEST_MNEMONIC);
-	const addressKeyPair = Bip44.addressBech32(
-		seed,
-		AddressType.Ed25519,
-		TEST_BECH32_HRP,
-		TEST_COIN_TYPE,
-		0,
-		false,
-		0
-	);
-
-	TEST_WALLET_KEY_PAIR = addressKeyPair.keyPair;
-	TEST_ADDRESS_BECH32 = addressKeyPair.address;
-
 	console.log("Wallet Address", `${TEST_EXPLORER_ADDRESS}${TEST_ADDRESS_BECH32}`);
 	await TEST_WALLET_PROVIDER.ensureBalance(TEST_ADDRESS_BECH32, 1000000000n);
 }
