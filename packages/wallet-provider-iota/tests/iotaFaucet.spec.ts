@@ -61,7 +61,7 @@ describe("IotaFaucet", () => {
 		expect(faucet).toBeDefined();
 	});
 
-	test("can fund an address from the faucet", { timeout: 60000 }, async () => {
+	test("can fund an address from the faucet", async () => {
 		const faucet = new IotaFaucet({
 			clientOptions: TEST_CLIENT_OPTIONS,
 			endpoint: TEST_FAUCET_ENDPOINT

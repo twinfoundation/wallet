@@ -75,7 +75,7 @@ describe("IotaWalletProvider", () => {
 		expect(ensured).toBeFalsy();
 	});
 
-	test("can ensure a balance on an address", { timeout: 120000 }, async () => {
+	test("can ensure a balance on an address", async () => {
 		const wallet = new IotaWalletProvider(
 			{
 				clientOptions: TEST_CLIENT_OPTIONS,
