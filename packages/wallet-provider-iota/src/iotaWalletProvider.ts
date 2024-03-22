@@ -129,14 +129,19 @@ export class IotaWalletProvider implements IWalletProvider {
 	 * Ensure the balance for an address in a wallet.
 	 * @param address The bech32 encoded address.
 	 * @param balance The balance to ensure on the address.
+	 * @param timeoutInSeconds The timeout in seconds to wait for the funding to complete.
 	 * @returns True if the balance has been ensured.
 	 */
-	public async ensureBalance(address: string, balance: bigint): Promise<boolean> {
+	public async ensureBalance(
+		address: string,
+		balance: bigint,
+		timeoutInSeconds?: number
+	): Promise<boolean> {
 		if (this._faucet) {
 			let currentBalance = await this.getBalance(address);
 
 			while (currentBalance < balance) {
-				const newBalance = await this._faucet.fundAddress(address);
+				const newBalance = await this._faucet.fundAddress(address, timeoutInSeconds);
 				if (newBalance === currentBalance) {
 					// The balance has not increased, so return.
 					return false;
