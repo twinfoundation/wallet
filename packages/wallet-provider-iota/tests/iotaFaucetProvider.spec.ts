@@ -1,13 +1,9 @@
 // Copyright 2024 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
-import {
-	TEST_ADDRESS_BECH32,
-	TEST_CLIENT_OPTIONS,
-	TEST_FAUCET_ENDPOINT,
-	initTestWallet
-} from "./testWallet";
-import { IotaFaucet } from "../src/iotaFaucet";
+import { TEST_ADDRESS_BECH32, TEST_CLIENT_OPTIONS, initTestWallet } from "./testWallet";
+import { IotaFaucetProvider } from "../src/iotaFaucetProvider";
 import type { IIotaFaucetConfig } from "../src/models/IIotaFaucetConfig";
+import "dotenv/config";
 
 describe("IotaFaucet", () => {
 	beforeAll(async () => {
@@ -15,7 +11,7 @@ describe("IotaFaucet", () => {
 	});
 
 	test("can fail to construct a faucet with no config", () => {
-		expect(() => new IotaFaucet(undefined as unknown as IIotaFaucetConfig)).toThrow(
+		expect(() => new IotaFaucetProvider(undefined as unknown as IIotaFaucetConfig)).toThrow(
 			expect.objectContaining({
 				name: "GuardError",
 				message: "guard.objectUndefined",
@@ -28,7 +24,7 @@ describe("IotaFaucet", () => {
 	});
 
 	test("can fail to construct a faucet with no config client options", () => {
-		expect(() => new IotaFaucet({} as unknown as IIotaFaucetConfig)).toThrow(
+		expect(() => new IotaFaucetProvider({} as unknown as IIotaFaucetConfig)).toThrow(
 			expect.objectContaining({
 				name: "GuardError",
 				message: "guard.objectUndefined",
@@ -41,7 +37,9 @@ describe("IotaFaucet", () => {
 	});
 
 	test("can fail to construct a faucet with no endpoint", () => {
-		expect(() => new IotaFaucet({ clientOptions: {} } as unknown as IIotaFaucetConfig)).toThrow(
+		expect(
+			() => new IotaFaucetProvider({ clientOptions: {} } as unknown as IIotaFaucetConfig)
+		).toThrow(
 			expect.objectContaining({
 				name: "GuardError",
 				message: "guard.string",
@@ -54,17 +52,17 @@ describe("IotaFaucet", () => {
 	});
 
 	test("can construct a faucet with details", () => {
-		const faucet = new IotaFaucet({
+		const faucet = new IotaFaucetProvider({
 			clientOptions: TEST_CLIENT_OPTIONS,
-			endpoint: TEST_FAUCET_ENDPOINT
+			endpoint: process.env.TEST_FAUCET_ENDPOINT ?? ""
 		});
 		expect(faucet).toBeDefined();
 	});
 
 	test("can fund an address from the faucet", async () => {
-		const faucet = new IotaFaucet({
+		const faucet = new IotaFaucetProvider({
 			clientOptions: TEST_CLIENT_OPTIONS,
-			endpoint: TEST_FAUCET_ENDPOINT
+			endpoint: process.env.TEST_FAUCET_ENDPOINT ?? ""
 		});
 
 		const amount = await faucet.fundAddress(TEST_ADDRESS_BECH32);

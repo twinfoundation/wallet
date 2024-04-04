@@ -2,14 +2,14 @@
 // SPDX-License-Identifier: Apache-2.0.
 import { Guards } from "@gtsc/core";
 import { nameof } from "@gtsc/nameof";
-import type { IFaucet } from "@gtsc/wallet-provider-models";
+import type { IFaucetProvider } from "@gtsc/wallet-provider-models";
 import { Client } from "@iota/sdk-wasm/node";
 import type { IIotaFaucetConfig } from "./models/IIotaFaucetConfig";
 
 /**
  * Class for performing faucet operations on IOTA.
  */
-export class IotaFaucet implements IFaucet {
+export class IotaFaucetProvider implements IFaucetProvider {
 	/**
 	 * The namespace supported by the wallet provider.
 	 */
@@ -19,7 +19,7 @@ export class IotaFaucet implements IFaucet {
 	 * Runtime name for the class.
 	 * @internal
 	 */
-	private static readonly _CLASS_NAME: string = nameof<IotaFaucet>();
+	private static readonly _CLASS_NAME: string = nameof<IotaFaucetProvider>();
 
 	/**
 	 * The configuration to use for tangle operations.
@@ -38,13 +38,13 @@ export class IotaFaucet implements IFaucet {
 	 * @param config The configuration to use.
 	 */
 	constructor(config: IIotaFaucetConfig) {
-		Guards.object<IIotaFaucetConfig>(IotaFaucet._CLASS_NAME, nameof(config), config);
+		Guards.object<IIotaFaucetConfig>(IotaFaucetProvider._CLASS_NAME, nameof(config), config);
 		Guards.object<IIotaFaucetConfig>(
-			IotaFaucet._CLASS_NAME,
+			IotaFaucetProvider._CLASS_NAME,
 			nameof(config.clientOptions),
 			config.clientOptions
 		);
-		Guards.stringValue(IotaFaucet._CLASS_NAME, nameof(config.endpoint), config.endpoint);
+		Guards.stringValue(IotaFaucetProvider._CLASS_NAME, nameof(config.endpoint), config.endpoint);
 
 		this._config = config;
 	}

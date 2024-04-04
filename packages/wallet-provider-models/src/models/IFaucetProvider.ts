@@ -4,7 +4,7 @@
 /**
  * Interface describing a faucet.
  */
-export interface IFaucet {
+export interface IFaucetProvider {
 	/**
 	 * Fund the wallet from the faucet.
 	 * @param address The bech32 encoded address of the address to fund.

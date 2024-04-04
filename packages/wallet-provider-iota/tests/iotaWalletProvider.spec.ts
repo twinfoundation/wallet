@@ -3,13 +3,13 @@
 import {
 	TEST_ADDRESS_BECH32,
 	TEST_CLIENT_OPTIONS,
-	TEST_FAUCET_ENDPOINT,
 	TEST_SECRET_MANAGER,
 	initTestWallet
 } from "./testWallet";
-import { IotaFaucet } from "../src/iotaFaucet";
+import { IotaFaucetProvider } from "../src/iotaFaucetProvider";
 import { IotaWalletProvider } from "../src/iotaWalletProvider";
 import type { IIotaWalletProviderConfig } from "../src/models/IIotaWalletProviderConfig";
+import "dotenv/config";
 
 describe("IotaWalletProvider", () => {
 	beforeAll(async () => {
@@ -81,9 +81,9 @@ describe("IotaWalletProvider", () => {
 				clientOptions: TEST_CLIENT_OPTIONS,
 				secretManager: TEST_SECRET_MANAGER
 			},
-			new IotaFaucet({
+			new IotaFaucetProvider({
 				clientOptions: TEST_CLIENT_OPTIONS,
-				endpoint: TEST_FAUCET_ENDPOINT
+				endpoint: process.env.TEST_FAUCET_ENDPOINT ?? ""
 			})
 		);
 
