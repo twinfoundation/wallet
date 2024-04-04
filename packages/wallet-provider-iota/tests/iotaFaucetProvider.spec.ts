@@ -3,7 +3,6 @@
 import { TEST_ADDRESS_BECH32, TEST_CLIENT_OPTIONS, initTestWallet } from "./testWallet";
 import { IotaFaucetProvider } from "../src/iotaFaucetProvider";
 import type { IIotaFaucetProviderConfig } from "../src/models/IIotaFaucetProviderConfig";
-import "dotenv/config";
 
 describe("IotaFaucet", () => {
 	beforeAll(async () => {

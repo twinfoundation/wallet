@@ -38,7 +38,11 @@ export class IotaFaucetProvider implements IFaucetProvider {
 	 * @param config The configuration to use.
 	 */
 	constructor(config: IIotaFaucetProviderConfig) {
-		Guards.object<IIotaFaucetProviderConfig>(IotaFaucetProvider._CLASS_NAME, nameof(config), config);
+		Guards.object<IIotaFaucetProviderConfig>(
+			IotaFaucetProvider._CLASS_NAME,
+			nameof(config),
+			config
+		);
 		Guards.object<IIotaFaucetProviderConfig>(
 			IotaFaucetProvider._CLASS_NAME,
 			nameof(config.clientOptions),

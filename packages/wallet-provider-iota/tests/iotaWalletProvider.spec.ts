@@ -9,7 +9,6 @@ import {
 import { IotaFaucetProvider } from "../src/iotaFaucetProvider";
 import { IotaWalletProvider } from "../src/iotaWalletProvider";
 import type { IIotaWalletProviderConfig } from "../src/models/IIotaWalletProviderConfig";
-import "dotenv/config";
 
 describe("IotaWalletProvider", () => {
 	beforeAll(async () => {
