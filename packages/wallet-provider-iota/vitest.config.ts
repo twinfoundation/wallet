@@ -15,8 +15,8 @@ export default defineConfig({
 	test: {
 		include: ["./tests/**/*.spec.ts"],
 		globals: true,
-		testTimeout: 120000,
 		bail: 1,
+		testTimeout: 120000,
 		coverage: {
 			provider: "v8",
 			reporter: ["text", "lcov"],

@@ -3,7 +3,7 @@
 import { Guards } from "@gtsc/core";
 import { nameof } from "@gtsc/nameof";
 import type { IFaucetProvider, IWalletProvider } from "@gtsc/wallet-provider-models";
-import { Client, Utils, type IRent } from "@iota/sdk-wasm/node";
+import { Client, Utils, type IRent } from "@iota/sdk-wasm/node/lib/index.js";
 import type { IIotaWalletProviderConfig } from "./models/IIotaWalletProviderConfig";
 
 /**
