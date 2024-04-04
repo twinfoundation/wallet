@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0.
 import { TEST_ADDRESS_BECH32, TEST_CLIENT_OPTIONS, initTestWallet } from "./testWallet";
 import { IotaFaucetProvider } from "../src/iotaFaucetProvider";
-import type { IIotaFaucetConfig } from "../src/models/IIotaFaucetConfig";
+import type { IIotaFaucetProviderConfig } from "../src/models/IIotaFaucetProviderConfig";
 import "dotenv/config";
 
 describe("IotaFaucet", () => {
@@ -11,7 +11,7 @@ describe("IotaFaucet", () => {
 	});
 
 	test("can fail to construct a faucet with no config", () => {
-		expect(() => new IotaFaucetProvider(undefined as unknown as IIotaFaucetConfig)).toThrow(
+		expect(() => new IotaFaucetProvider(undefined as unknown as IIotaFaucetProviderConfig)).toThrow(
 			expect.objectContaining({
 				name: "GuardError",
 				message: "guard.objectUndefined",
@@ -24,7 +24,7 @@ describe("IotaFaucet", () => {
 	});
 
 	test("can fail to construct a faucet with no config client options", () => {
-		expect(() => new IotaFaucetProvider({} as unknown as IIotaFaucetConfig)).toThrow(
+		expect(() => new IotaFaucetProvider({} as unknown as IIotaFaucetProviderConfig)).toThrow(
 			expect.objectContaining({
 				name: "GuardError",
 				message: "guard.objectUndefined",
@@ -38,7 +38,7 @@ describe("IotaFaucet", () => {
 
 	test("can fail to construct a faucet with no endpoint", () => {
 		expect(
-			() => new IotaFaucetProvider({ clientOptions: {} } as unknown as IIotaFaucetConfig)
+			() => new IotaFaucetProvider({ clientOptions: {} } as unknown as IIotaFaucetProviderConfig)
 		).toThrow(
 			expect.objectContaining({
 				name: "GuardError",

@@ -4,7 +4,7 @@ import { Guards } from "@gtsc/core";
 import { nameof } from "@gtsc/nameof";
 import type { IFaucetProvider } from "@gtsc/wallet-provider-models";
 import { Client } from "@iota/sdk-wasm/node";
-import type { IIotaFaucetConfig } from "./models/IIotaFaucetConfig";
+import type { IIotaFaucetProviderConfig } from "./models/IIotaFaucetProviderConfig";
 
 /**
  * Class for performing faucet operations on IOTA.
@@ -25,7 +25,7 @@ export class IotaFaucetProvider implements IFaucetProvider {
 	 * The configuration to use for tangle operations.
 	 * @internal
 	 */
-	private readonly _config: IIotaFaucetConfig;
+	private readonly _config: IIotaFaucetProviderConfig;
 
 	/**
 	 * The IOTA Wallet client.
@@ -37,9 +37,9 @@ export class IotaFaucetProvider implements IFaucetProvider {
 	 * Create a new instance of IotaWalletProvider.
 	 * @param config The configuration to use.
 	 */
-	constructor(config: IIotaFaucetConfig) {
-		Guards.object<IIotaFaucetConfig>(IotaFaucetProvider._CLASS_NAME, nameof(config), config);
-		Guards.object<IIotaFaucetConfig>(
+	constructor(config: IIotaFaucetProviderConfig) {
+		Guards.object<IIotaFaucetProviderConfig>(IotaFaucetProvider._CLASS_NAME, nameof(config), config);
+		Guards.object<IIotaFaucetProviderConfig>(
 			IotaFaucetProvider._CLASS_NAME,
 			nameof(config.clientOptions),
 			config.clientOptions
