@@ -1,6 +1,6 @@
 {
 	"name": "@gtsc/wallet-provider-iota",
-	"version": "0.0.3",
+	"version": "0.0.3-next.1",
 	"description": "Wallet provider implementation using IOTA.",
 	"repository": {
 		"type": "git",
@@ -27,13 +27,13 @@
 		"dist": "npm run clean && npm run build && npm run test && npm run bundle && npm run docs"
 	},
 	"dependencies": {
-		"@gtsc/core": "^0.0.3",
-		"@gtsc/nameof": "^0.0.3",
-		"@gtsc/wallet-provider-models": "^0.0.3",
+		"@gtsc/core": "next",
+		"@gtsc/nameof": "next",
+		"@gtsc/wallet-provider-models": "0.0.3-next.1",
 		"@iota/sdk-wasm": "^1.1.3"
 	},
 	"devDependencies": {
-		"@gtsc/nameof-transformer": "^0.0.3",
+		"@gtsc/nameof-transformer": "next",
 		"@vitest/coverage-v8": "^1.4.0",
 		"copyfiles": "^2.4.1",
 		"rimraf": "^5.0.5",
