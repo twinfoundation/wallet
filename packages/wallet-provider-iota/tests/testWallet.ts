@@ -3,12 +3,18 @@
 
 import path from "path";
 import { Bip39, Bip44, KeyType } from "@gtsc/crypto";
-import { CoinType, type IClientOptions, type MnemonicSecretManager } from "@iota/sdk-wasm/node";
+import {
+	CoinType,
+	type IClientOptions,
+	type MnemonicSecretManager
+} from "@iota/sdk-wasm/node/lib/index.js";
 import * as dotenv from "dotenv";
 import { IotaFaucetProvider } from "../src/iotaFaucetProvider";
 import { IotaWalletProvider } from "../src/iotaWalletProvider";
 
-dotenv.config({ path: path.join(__dirname, ".env") });
+const configFile = process.env.GITHUB_ACTIONS ? ".env.ci" : ".env";
+console.log(`Using config file: ${configFile}`);
+dotenv.config({ path: path.join(__dirname, configFile) });
 
 export const TEST_SECRET_MANAGER: MnemonicSecretManager = {
 	mnemonic: process.env.TEST_MNEMONIC ?? ""
