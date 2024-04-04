@@ -2,10 +2,10 @@
 
 ## Classes
 
-- [FaucetFactory](classes/FaucetFactory.md)
+- [FaucetProviderFactory](classes/FaucetProviderFactory.md)
 - [WalletProviderFactory](classes/WalletProviderFactory.md)
 
 ## Interfaces
 
-- [IFaucet](interfaces/IFaucet.md)
+- [IFaucetProvider](interfaces/IFaucetProvider.md)
 - [IWalletProvider](interfaces/IWalletProvider.md)

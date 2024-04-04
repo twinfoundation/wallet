@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0.
 import { Guards } from "@gtsc/core";
 import { nameof } from "@gtsc/nameof";
-import type { IFaucet, IWalletProvider } from "@gtsc/wallet-provider-models";
+import type { IFaucetProvider, IWalletProvider } from "@gtsc/wallet-provider-models";
 import { Client, Utils, type IRent } from "@iota/sdk-wasm/node";
 import type { IIotaWalletProviderConfig } from "./models/IIotaWalletProviderConfig";
 
@@ -37,7 +37,7 @@ export class IotaWalletProvider implements IWalletProvider {
 	 * The IOTA faucet.
 	 * @internal
 	 */
-	private readonly _faucet?: IFaucet;
+	private readonly _faucet?: IFaucetProvider;
 
 	/**
 	 * Information about the rent structure.
@@ -50,7 +50,7 @@ export class IotaWalletProvider implements IWalletProvider {
 	 * @param config The configuration to use.
 	 * @param faucet Optional faucet for requesting funds.
 	 */
-	constructor(config: IIotaWalletProviderConfig, faucet?: IFaucet) {
+	constructor(config: IIotaWalletProviderConfig, faucet?: IFaucetProvider) {
 		Guards.object<IIotaWalletProviderConfig>(
 			IotaWalletProvider._CLASS_NAME,
 			nameof(config),

@@ -1,4 +1,4 @@
-# Interface: IFaucet
+# Interface: IFaucetProvider
 
 Interface describing a faucet.
 

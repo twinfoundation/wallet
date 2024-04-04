@@ -1,16 +1,16 @@
-# Class: IotaFaucet
+# Class: IotaFaucetProvider
 
 Class for performing faucet operations on IOTA.
 
 ## Implements
 
-- `IFaucet`
+- `IFaucetProvider`
 
 ## Constructors
 
 ### constructor
 
-• **new IotaFaucet**(`config`): [`IotaFaucet`](IotaFaucet.md)
+• **new IotaFaucetProvider**(`config`): [`IotaFaucetProvider`](IotaFaucetProvider.md)
 
 Create a new instance of IotaWalletProvider.
 
@@ -18,11 +18,11 @@ Create a new instance of IotaWalletProvider.
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `config` | [`IIotaFaucetConfig`](../interfaces/IIotaFaucetConfig.md) | The configuration to use. |
+| `config` | [`IIotaFaucetProviderConfig`](../interfaces/IIotaFaucetProviderConfig.md) | The configuration to use. |
 
 #### Returns
 
-[`IotaFaucet`](IotaFaucet.md)
+[`IotaFaucetProvider`](IotaFaucetProvider.md)
 
 ## Properties
 
@@ -55,7 +55,7 @@ The amount available on the wallet address.
 
 #### Implementation of
 
-IFaucet.fundAddress
+IFaucetProvider.fundAddress
 
 ___
 

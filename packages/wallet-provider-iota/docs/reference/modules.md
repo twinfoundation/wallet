@@ -2,10 +2,10 @@
 
 ## Classes
 
-- [IotaFaucet](classes/IotaFaucet.md)
+- [IotaFaucetProvider](classes/IotaFaucetProvider.md)
 - [IotaWalletProvider](classes/IotaWalletProvider.md)
 
 ## Interfaces
 
-- [IIotaFaucetConfig](interfaces/IIotaFaucetConfig.md)
+- [IIotaFaucetProviderConfig](interfaces/IIotaFaucetProviderConfig.md)
 - [IIotaWalletProviderConfig](interfaces/IIotaWalletProviderConfig.md)

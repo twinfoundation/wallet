@@ -19,7 +19,7 @@ Create a new instance of IotaWalletProvider.
 | Name | Type | Description |
 | :------ | :------ | :------ |
 | `config` | [`IIotaWalletProviderConfig`](../interfaces/IIotaWalletProviderConfig.md) | The configuration to use. |
-| `faucet?` | `IFaucet` | Optional faucet for requesting funds. |
+| `faucet?` | `IFaucetProvider` | Optional faucet for requesting funds. |
 
 #### Returns
 

@@ -1,6 +1,6 @@
-# Interface: IIotaFaucetConfig
+# Interface: IIotaFaucetProviderConfig
 
-Configuration for the IOTA Faucet.
+Configuration for the IOTA Faucet Provider.
 
 ## Properties
 

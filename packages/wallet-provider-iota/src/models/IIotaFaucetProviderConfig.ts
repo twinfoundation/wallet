@@ -3,9 +3,9 @@
 import type { IClientOptions } from "@iota/sdk-wasm/node";
 
 /**
- * Configuration for the IOTA Faucet.
+ * Configuration for the IOTA Faucet Provider.
  */
-export interface IIotaFaucetConfig {
+export interface IIotaFaucetProviderConfig {
 	/**
 	 * The configuration for the client.
 	 */
