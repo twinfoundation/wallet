@@ -11,8 +11,7 @@ jobs:
     strategy:
       max-parallel: 1
       matrix:
-        package:
-          [wallet-provider-models, wallet-provider-iota]
+        package: [wallet-provider-models, wallet-provider-iota]
 
     steps:
       - name: Checkout

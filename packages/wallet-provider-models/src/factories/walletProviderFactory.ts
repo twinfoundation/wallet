@@ -8,4 +8,3 @@ import type { IWalletProvider } from "../models/IWalletProvider";
  */
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export const WalletProviderFactory = new Factory<IWalletProvider>("walletProvider");
-
