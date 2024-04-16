@@ -1,7 +1,8 @@
 // Copyright 2024 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
-import { Guards } from "@gtsc/core";
+import { GeneralError, Guards } from "@gtsc/core";
 import { nameof } from "@gtsc/nameof";
+import type { IVaultProvider } from "@gtsc/vault-provider-models";
 import type { IFaucetProvider, IWalletProvider } from "@gtsc/wallet-provider-models";
 import { Client, Utils, type IRent } from "@iota/sdk-wasm/node/lib/index.js";
 import type { IIotaWalletProviderConfig } from "./models/IIotaWalletProviderConfig";
@@ -34,10 +35,16 @@ export class IotaWalletProvider implements IWalletProvider {
 	private _client?: Client;
 
 	/**
+	 * The vault for the mnemonic.
+	 * @internal
+	 */
+	private readonly _vaultProvider: IVaultProvider;
+
+	/**
 	 * The IOTA faucet.
 	 * @internal
 	 */
-	private readonly _faucet?: IFaucetProvider;
+	private readonly _faucetProvider?: IFaucetProvider;
 
 	/**
 	 * Information about the rent structure.
@@ -48,9 +55,14 @@ export class IotaWalletProvider implements IWalletProvider {
 	/**
 	 * Create a new instance of IotaWalletProvider.
 	 * @param config The configuration to use.
-	 * @param faucet Optional faucet for requesting funds.
+	 * @param vaultProvider Vault provider to use for wallet secrets.
+	 * @param faucetProvider Optional faucet for requesting funds.
 	 */
-	constructor(config: IIotaWalletProviderConfig, faucet?: IFaucetProvider) {
+	constructor(
+		config: IIotaWalletProviderConfig,
+		vaultProvider: IVaultProvider,
+		faucetProvider?: IFaucetProvider
+	) {
 		Guards.object<IIotaWalletProviderConfig>(
 			IotaWalletProvider._CLASS_NAME,
 			nameof(config),
@@ -61,14 +73,20 @@ export class IotaWalletProvider implements IWalletProvider {
 			nameof(config.clientOptions),
 			config.clientOptions
 		);
+		Guards.string(
+			IotaWalletProvider._CLASS_NAME,
+			nameof(config.walletMnemonicId),
+			config.walletMnemonicId
+		);
 		Guards.object<IIotaWalletProviderConfig>(
 			IotaWalletProvider._CLASS_NAME,
-			nameof(config.secretManager),
-			config.secretManager
+			nameof(vaultProvider),
+			vaultProvider
 		);
 
 		this._config = config;
-		this._faucet = faucet;
+		this._vaultProvider = vaultProvider;
+		this._faucetProvider = faucetProvider;
 	}
 
 	/**
@@ -137,11 +155,11 @@ export class IotaWalletProvider implements IWalletProvider {
 		balance: bigint,
 		timeoutInSeconds?: number
 	): Promise<boolean> {
-		if (this._faucet) {
+		if (this._faucetProvider) {
 			let currentBalance = await this.getBalance(address);
 
 			while (currentBalance < balance) {
-				const newBalance = await this._faucet.fundAddress(address, timeoutInSeconds);
+				const newBalance = await this._faucetProvider.fundAddress(address, timeoutInSeconds);
 				if (newBalance === currentBalance) {
 					// The balance has not increased, so return.
 					return false;
@@ -165,16 +183,25 @@ export class IotaWalletProvider implements IWalletProvider {
 	 * @returns The block created.
 	 */
 	public async transfer(address: string, amount: bigint): Promise<string> {
-		const client = await this.createClient();
+		try {
+			const client = await this.createClient();
 
-		const blockIdAndBlock = await client.buildAndPostBlock(this._config.secretManager, {
-			output: {
-				address,
-				amount
-			}
-		});
+			const mnemonic = await this._vaultProvider.get<string>(this._config.walletMnemonicId);
 
-		return blockIdAndBlock[0];
+			const blockIdAndBlock = await client.buildAndPostBlock(
+				{ mnemonic },
+				{
+					output: {
+						address,
+						amount
+					}
+				}
+			);
+
+			return blockIdAndBlock[0];
+		} catch (error) {
+			throw new GeneralError(IotaWalletProvider._CLASS_NAME, "transferFailed", undefined, error);
+		}
 	}
 
 	/**

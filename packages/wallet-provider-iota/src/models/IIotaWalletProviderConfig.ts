@@ -1,6 +1,6 @@
 // Copyright 2024 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
-import type { IClientOptions, SecretManagerType } from "@iota/sdk-wasm/node/lib/index.js";
+import type { IClientOptions } from "@iota/sdk-wasm/node/lib/index.js";
 
 /**
  * Configuration for the IOTA Wallet Provider.
@@ -12,7 +12,7 @@ export interface IIotaWalletProviderConfig {
 	clientOptions: IClientOptions;
 
 	/**
-	 * The secret manager to use for proving ownership when signing transactions.
+	 * The id of the entry in the vault containing the wallet mnemonic.
 	 */
-	secretManager: SecretManagerType;
+	walletMnemonicId: string;
 }

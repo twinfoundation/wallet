@@ -3,22 +3,29 @@
 
 import path from "path";
 import { Bip39, Bip44, KeyType } from "@gtsc/crypto";
-import {
-	CoinType,
-	type IClientOptions,
-	type MnemonicSecretManager
-} from "@iota/sdk-wasm/node/lib/index.js";
+import { MemoryVaultProvider } from "@gtsc/vault-provider-memory";
+import { CoinType, type IClientOptions } from "@iota/sdk-wasm/node/lib/index.js";
 import * as dotenv from "dotenv";
 import { IotaFaucetProvider } from "../src/iotaFaucetProvider";
 import { IotaWalletProvider } from "../src/iotaWalletProvider";
 
-const configFile = process.env.GITHUB_ACTIONS ? ".env.ci" : ".env";
-console.log(`Using config file: ${configFile}`);
-dotenv.config({ path: path.join(__dirname, configFile) });
+dotenv.config({ path: [path.join(__dirname, ".env"), path.join(__dirname, ".env.dev")] });
 
-export const TEST_SECRET_MANAGER: MnemonicSecretManager = {
-	mnemonic: process.env.TEST_MNEMONIC ?? ""
-};
+if (!process.env.TEST_MNEMONIC) {
+	// eslint-disable-next-line no-restricted-syntax
+	throw new Error(
+		"Please define TEST_MNEMONIC as a 24 word mnemonic either as an environment variable or inside an .env.dev file"
+	);
+}
+
+export const TEST_MNEMONIC_ID = "test-mnemonic";
+
+export const TEST_VAULT: MemoryVaultProvider = new MemoryVaultProvider({
+	initialValues: {
+		[TEST_MNEMONIC_ID]: process.env.TEST_MNEMONIC ?? ""
+	}
+});
+
 export const TEST_CLIENT_OPTIONS: IClientOptions = {
 	nodes: [process.env.TEST_NODE_ENDPOINT ?? ""],
 	localPow: true
@@ -27,8 +34,9 @@ export const TEST_CLIENT_OPTIONS: IClientOptions = {
 export const TEST_WALLET_PROVIDER = new IotaWalletProvider(
 	{
 		clientOptions: TEST_CLIENT_OPTIONS,
-		secretManager: TEST_SECRET_MANAGER
+		walletMnemonicId: TEST_MNEMONIC_ID
 	},
+	TEST_VAULT,
 	new IotaFaucetProvider({
 		clientOptions: TEST_CLIENT_OPTIONS,
 		endpoint: process.env.TEST_FAUCET_ENDPOINT ?? ""

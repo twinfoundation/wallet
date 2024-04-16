@@ -1,6 +1,6 @@
 {
 	"name": "@gtsc/wallet-provider-iota",
-	"version": "0.0.3-next.3",
+	"version": "0.0.3-next.4",
 	"description": "Wallet provider implementation using IOTA.",
 	"repository": {
 		"type": "git",
@@ -30,7 +30,9 @@
 		"@gtsc/core": "next",
 		"@gtsc/crypto": "next",
 		"@gtsc/nameof": "next",
-		"@gtsc/wallet-provider-models": "0.0.3-next.3",
+		"@gtsc/vault-provider-models": "next",
+		"@gtsc/vault-provider-memory": "next",
+		"@gtsc/wallet-provider-models": "0.0.3-next.4",
 		"@iota/sdk-wasm": "^1.1.3"
 	},
 	"devDependencies": {

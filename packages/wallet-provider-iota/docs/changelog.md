@@ -1,4 +1,4 @@
-# @gtsc/wallet-provider-models - Changelog
+# @gtsc/wallet-provider-iota - Changelog
 
 ## v0.0.1
 

@@ -1,9 +1,9 @@
-# @gtsc/wallet-provider-models - Overview
+# @gtsc/wallet-provider-iota - Overview
 
-Models which define the structure of the service implementations.
+Wallet provider implementation using IOTA.
 
 ## Installation
 
 ```shell
-npm install @gtsc/wallet-provider-models
+npm install @gtsc/wallet-provider-iota
 ```
