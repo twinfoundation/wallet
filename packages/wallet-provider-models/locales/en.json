@@ -1,9 +1,1 @@
-{
-	"error": {
-		"walletProviderFactory": {
-			"noProviderUnregister": "There is no wallet provider registered with the type \"{type}\"",
-			"noProviderAlias": "There is no wallet provider registered with the name \"{type}\" that can be aliased",
-			"noProviderGet": "The requested wallet provider \"{type}\" does not exist in the factory"
-		}
-	}
-}
+{}

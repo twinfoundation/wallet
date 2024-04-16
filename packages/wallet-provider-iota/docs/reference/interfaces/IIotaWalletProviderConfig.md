@@ -12,8 +12,8 @@ The configuration for the client.
 
 ___
 
-### secretManager
+### walletMnemonicId
 
-• **secretManager**: `SecretManagerType`
+• **walletMnemonicId**: `string`
 
-The secret manager to use for proving ownership when signing transactions.
+The id of the entry in the vault containing the wallet mnemonic.

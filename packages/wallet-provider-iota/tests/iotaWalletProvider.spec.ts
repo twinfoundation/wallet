@@ -1,9 +1,11 @@
 // Copyright 2024 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
+import type { IVaultProvider } from "@gtsc/vault-provider-models";
 import {
 	TEST_ADDRESS_BECH32,
 	TEST_CLIENT_OPTIONS,
-	TEST_SECRET_MANAGER,
+	TEST_MNEMONIC_ID,
+	TEST_VAULT,
 	initTestWallet
 } from "./testWallet";
 import { IotaFaucetProvider } from "../src/iotaFaucetProvider";
@@ -15,8 +17,14 @@ describe("IotaWalletProvider", () => {
 		await initTestWallet();
 	});
 
-	test("can fail to construct a faucet with no config", () => {
-		expect(() => new IotaWalletProvider(undefined as unknown as IIotaWalletProviderConfig)).toThrow(
+	test("can fail to construct a wallet with no config", () => {
+		expect(
+			() =>
+				new IotaWalletProvider(
+					undefined as unknown as IIotaWalletProviderConfig,
+					undefined as unknown as IVaultProvider
+				)
+		).toThrow(
 			expect.objectContaining({
 				name: "GuardError",
 				message: "guard.objectUndefined",
@@ -28,8 +36,14 @@ describe("IotaWalletProvider", () => {
 		);
 	});
 
-	test("can fail to construct a faucet with no config client options", () => {
-		expect(() => new IotaWalletProvider({} as unknown as IIotaWalletProviderConfig)).toThrow(
+	test("can fail to construct a wallet with no config client options", () => {
+		expect(
+			() =>
+				new IotaWalletProvider(
+					{} as unknown as IIotaWalletProviderConfig,
+					undefined as unknown as IVaultProvider
+				)
+		).toThrow(
 			expect.objectContaining({
 				name: "GuardError",
 				message: "guard.objectUndefined",
@@ -41,34 +55,66 @@ describe("IotaWalletProvider", () => {
 		);
 	});
 
-	test("can fail to construct a faucet with no config secret manager options", () => {
+	test("can fail to construct a wallet with no wallet mnemonic id", () => {
 		expect(
-			() => new IotaWalletProvider({ clientOptions: {} } as unknown as IIotaWalletProviderConfig)
+			() =>
+				new IotaWalletProvider(
+					{ clientOptions: {} } as unknown as IIotaWalletProviderConfig,
+					undefined as unknown as IVaultProvider
+				)
 		).toThrow(
 			expect.objectContaining({
 				name: "GuardError",
-				message: "guard.objectUndefined",
+				message: "guard.string",
 				properties: {
-					property: "config.secretManager",
+					property: "config.walletMnemonicId",
 					value: "undefined"
 				}
 			})
 		);
 	});
 
-	test("can construct a faucet with details", () => {
-		const faucet = new IotaWalletProvider({
-			clientOptions: TEST_CLIENT_OPTIONS,
-			secretManager: TEST_SECRET_MANAGER
-		});
+	test("can fail to construct a wallet with no vault", () => {
+		expect(
+			() =>
+				new IotaWalletProvider(
+					{
+						clientOptions: TEST_CLIENT_OPTIONS,
+						walletMnemonicId: TEST_MNEMONIC_ID
+					},
+					undefined as unknown as IVaultProvider
+				)
+		).toThrow(
+			expect.objectContaining({
+				name: "GuardError",
+				message: "guard.objectUndefined",
+				properties: {
+					property: "vaultProvider",
+					value: "undefined"
+				}
+			})
+		);
+	});
+
+	test("can construct a wallet with details", () => {
+		const faucet = new IotaWalletProvider(
+			{
+				clientOptions: TEST_CLIENT_OPTIONS,
+				walletMnemonicId: TEST_MNEMONIC_ID
+			},
+			TEST_VAULT
+		);
 		expect(faucet).toBeDefined();
 	});
 
 	test("can fail to ensure a balance on an address with no faucet available", async () => {
-		const wallet = new IotaWalletProvider({
-			clientOptions: TEST_CLIENT_OPTIONS,
-			secretManager: TEST_SECRET_MANAGER
-		});
+		const wallet = new IotaWalletProvider(
+			{
+				clientOptions: TEST_CLIENT_OPTIONS,
+				walletMnemonicId: TEST_MNEMONIC_ID
+			},
+			TEST_VAULT
+		);
 
 		const ensured = await wallet.ensureBalance(TEST_ADDRESS_BECH32, 1000000000n);
 		expect(ensured).toBeFalsy();
@@ -78,8 +124,9 @@ describe("IotaWalletProvider", () => {
 		const wallet = new IotaWalletProvider(
 			{
 				clientOptions: TEST_CLIENT_OPTIONS,
-				secretManager: TEST_SECRET_MANAGER
+				walletMnemonicId: TEST_MNEMONIC_ID
 			},
+			TEST_VAULT,
 			new IotaFaucetProvider({
 				clientOptions: TEST_CLIENT_OPTIONS,
 				endpoint: process.env.TEST_FAUCET_ENDPOINT ?? ""
@@ -92,10 +139,13 @@ describe("IotaWalletProvider", () => {
 	});
 
 	test("can get a balance for an address", async () => {
-		const wallet = new IotaWalletProvider({
-			clientOptions: TEST_CLIENT_OPTIONS,
-			secretManager: TEST_SECRET_MANAGER
-		});
+		const wallet = new IotaWalletProvider(
+			{
+				clientOptions: TEST_CLIENT_OPTIONS,
+				walletMnemonicId: TEST_MNEMONIC_ID
+			},
+			TEST_VAULT
+		);
 
 		const balance = await wallet.getBalance(TEST_ADDRESS_BECH32);
 		console.log("balance", balance);
@@ -104,10 +154,13 @@ describe("IotaWalletProvider", () => {
 	});
 
 	test("can get storage costs for an address", async () => {
-		const wallet = new IotaWalletProvider({
-			clientOptions: TEST_CLIENT_OPTIONS,
-			secretManager: TEST_SECRET_MANAGER
-		});
+		const wallet = new IotaWalletProvider(
+			{
+				clientOptions: TEST_CLIENT_OPTIONS,
+				walletMnemonicId: TEST_MNEMONIC_ID
+			},
+			TEST_VAULT
+		);
 
 		const storageCosts = await wallet.getStorageCosts(TEST_ADDRESS_BECH32);
 		console.log("storageCosts", storageCosts);

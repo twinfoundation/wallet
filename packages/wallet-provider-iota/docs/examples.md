@@ -1,1 +1,1 @@
-# @gtsc/wallet-provider-models - Examples
+# @gtsc/wallet-provider-iota - Examples
