@@ -38,14 +38,16 @@ export const TEST_CLIENT_OPTIONS: IClientOptions = {
 
 export const TEST_WALLET_PROVIDER = new IotaWalletProvider(
 	{
+		vaultProvider: TEST_VAULT,
+		faucetProvider: new IotaFaucetProvider({
+			clientOptions: TEST_CLIENT_OPTIONS,
+			endpoint: process.env.TEST_FAUCET_ENDPOINT ?? ""
+		})
+	},
+	{
 		clientOptions: TEST_CLIENT_OPTIONS,
 		walletMnemonicId: TEST_MNEMONIC_ID
-	},
-	TEST_VAULT,
-	new IotaFaucetProvider({
-		clientOptions: TEST_CLIENT_OPTIONS,
-		endpoint: process.env.TEST_FAUCET_ENDPOINT ?? ""
-	})
+	}
 );
 const seed = Bip39.mnemonicToSeed(process.env.TEST_MNEMONIC ?? "");
 const coinType = process.env.TEST_COIN_TYPE

@@ -55,15 +55,29 @@ export class IotaWalletProvider implements IWalletProvider {
 
 	/**
 	 * Create a new instance of IotaWalletProvider.
+	 * @param dependencies The dependencies for the wallet provider.
+	 * @param dependencies.vaultProvider Vault provider to use for wallet secrets.
+	 * @param dependencies.faucetProvider Optional faucet for requesting funds.
 	 * @param config The configuration to use.
-	 * @param vaultProvider Vault provider to use for wallet secrets.
-	 * @param faucetProvider Optional faucet for requesting funds.
 	 */
 	constructor(
-		config: IIotaWalletProviderConfig,
-		vaultProvider: IVaultProvider,
-		faucetProvider?: IFaucetProvider
+		dependencies: {
+			vaultProvider: IVaultProvider;
+			faucetProvider?: IFaucetProvider;
+		},
+		config: IIotaWalletProviderConfig
 	) {
+		Guards.object<IIotaWalletProviderConfig>(
+			IotaWalletProvider._CLASS_NAME,
+			nameof(dependencies),
+			dependencies
+		);
+		Guards.object<IIotaWalletProviderConfig>(
+			IotaWalletProvider._CLASS_NAME,
+			nameof(dependencies.vaultProvider),
+			dependencies.vaultProvider
+		);
+
 		Guards.object<IIotaWalletProviderConfig>(
 			IotaWalletProvider._CLASS_NAME,
 			nameof(config),
@@ -79,15 +93,10 @@ export class IotaWalletProvider implements IWalletProvider {
 			nameof(config.walletMnemonicId),
 			config.walletMnemonicId
 		);
-		Guards.object<IIotaWalletProviderConfig>(
-			IotaWalletProvider._CLASS_NAME,
-			nameof(vaultProvider),
-			vaultProvider
-		);
 
 		this._config = config;
-		this._vaultProvider = vaultProvider;
-		this._faucetProvider = faucetProvider;
+		this._vaultProvider = dependencies.vaultProvider;
+		this._faucetProvider = dependencies.faucetProvider;
 	}
 
 	/**

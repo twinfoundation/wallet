@@ -10,7 +10,7 @@ Class for performing wallet operations on IOTA.
 
 ### constructor
 
-• **new IotaWalletProvider**(`config`, `vaultProvider`, `faucetProvider?`): [`IotaWalletProvider`](IotaWalletProvider.md)
+• **new IotaWalletProvider**(`dependencies`, `config`): [`IotaWalletProvider`](IotaWalletProvider.md)
 
 Create a new instance of IotaWalletProvider.
 
@@ -18,9 +18,10 @@ Create a new instance of IotaWalletProvider.
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
+| `dependencies` | `Object` | The dependencies for the wallet provider. |
+| `dependencies.faucetProvider?` | `IFaucetProvider` | Optional faucet for requesting funds. |
+| `dependencies.vaultProvider` | `IVaultProvider` | Vault provider to use for wallet secrets. |
 | `config` | [`IIotaWalletProviderConfig`](../interfaces/IIotaWalletProviderConfig.md) | The configuration to use. |
-| `vaultProvider` | `IVaultProvider` | Vault provider to use for wallet secrets. |
-| `faucetProvider?` | `IFaucetProvider` | Optional faucet for requesting funds. |
 
 #### Returns
 
