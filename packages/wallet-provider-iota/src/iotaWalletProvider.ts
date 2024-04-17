@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0.
 import { GeneralError, Guards } from "@gtsc/core";
 import { nameof } from "@gtsc/nameof";
+import type { IRequestContext } from "@gtsc/services";
 import type { IVaultProvider } from "@gtsc/vault-provider-models";
 import type { IFaucetProvider, IWalletProvider } from "@gtsc/wallet-provider-models";
 import { Client, Utils, type IRent } from "@iota/sdk-wasm/node/lib/index.js";
@@ -91,10 +92,11 @@ export class IotaWalletProvider implements IWalletProvider {
 
 	/**
 	 * Get the balance for an address in a wallet.
+	 * @param requestContext The context for the request.
 	 * @param address The bech32 encoded address.
 	 * @returns The balance of the wallet address.
 	 */
-	public async getBalance(address: string): Promise<bigint> {
+	public async getBalance(requestContext: IRequestContext, address: string): Promise<bigint> {
 		const client = await this.createClient();
 
 		const outputIds = await client.basicOutputIds([
@@ -116,10 +118,11 @@ export class IotaWalletProvider implements IWalletProvider {
 
 	/**
 	 * Get the storage costs for an address in a wallet.
+	 * @param requestContext The context for the request.
 	 * @param address The bech32 encoded address.
 	 * @returns The storage costs for the address.
 	 */
-	public async getStorageCosts(address: string): Promise<bigint> {
+	public async getStorageCosts(requestContext: IRequestContext, address: string): Promise<bigint> {
 		const client = await this.createClient();
 
 		if (this._rentInfo) {
@@ -145,21 +148,27 @@ export class IotaWalletProvider implements IWalletProvider {
 
 	/**
 	 * Ensure the balance for an address in a wallet.
+	 * @param requestContext The context for the request.
 	 * @param address The bech32 encoded address.
 	 * @param balance The balance to ensure on the address.
 	 * @param timeoutInSeconds The timeout in seconds to wait for the funding to complete.
 	 * @returns True if the balance has been ensured.
 	 */
 	public async ensureBalance(
+		requestContext: IRequestContext,
 		address: string,
 		balance: bigint,
 		timeoutInSeconds?: number
 	): Promise<boolean> {
 		if (this._faucetProvider) {
-			let currentBalance = await this.getBalance(address);
+			let currentBalance = await this.getBalance(requestContext, address);
 
 			while (currentBalance < balance) {
-				const newBalance = await this._faucetProvider.fundAddress(address, timeoutInSeconds);
+				const newBalance = await this._faucetProvider.fundAddress(
+					requestContext,
+					address,
+					timeoutInSeconds
+				);
 				if (newBalance === currentBalance) {
 					// The balance has not increased, so return.
 					return false;
@@ -178,15 +187,23 @@ export class IotaWalletProvider implements IWalletProvider {
 
 	/**
 	 * Transfer funds to an address.
+	 * @param requestContext The context for the request.
 	 * @param address The bech32 encoded address to send the funds to.
 	 * @param amount The amount to transfer.
 	 * @returns The block created.
 	 */
-	public async transfer(address: string, amount: bigint): Promise<string> {
+	public async transfer(
+		requestContext: IRequestContext,
+		address: string,
+		amount: bigint
+	): Promise<string> {
 		try {
 			const client = await this.createClient();
 
-			const mnemonic = await this._vaultProvider.get<string>(this._config.walletMnemonicId);
+			const mnemonic = await this._vaultProvider.get<string>(
+				requestContext,
+				this._config.walletMnemonicId
+			);
 
 			const blockIdAndBlock = await client.buildAndPostBlock(
 				{ mnemonic },

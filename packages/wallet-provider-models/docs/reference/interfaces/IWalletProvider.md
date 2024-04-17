@@ -12,7 +12,7 @@ Interface describing a wallet provider.
 
 ### bootstrap
 
-▸ **bootstrap**(`requestContext`): `Promise`\<`ILogEntry`[]\>
+▸ **bootstrap**(`requestContext`): `Promise`\<`void`\>
 
 Bootstrap the service by creating and initializing any resources it needs.
 
@@ -24,9 +24,9 @@ Bootstrap the service by creating and initializing any resources it needs.
 
 #### Returns
 
-`Promise`\<`ILogEntry`[]\>
+`Promise`\<`void`\>
 
-The response of the bootstrapping as log entries.
+Nothing.
 
 #### Inherited from
 
@@ -36,7 +36,7 @@ ___
 
 ### ensureBalance
 
-▸ **ensureBalance**(`address`, `balance`, `timeoutInSeconds?`): `Promise`\<`boolean`\>
+▸ **ensureBalance**(`requestContext`, `address`, `balance`, `timeoutInSeconds?`): `Promise`\<`boolean`\>
 
 Ensure the balance for an address in a wallet.
 
@@ -44,6 +44,7 @@ Ensure the balance for an address in a wallet.
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
+| `requestContext` | `IRequestContext` | The context for the request. |
 | `address` | `string` | The bech32 encoded address. |
 | `balance` | `bigint` | The balance to ensure on the address. |
 | `timeoutInSeconds?` | `number` | The timeout in seconds to wait for the funding to complete. |
@@ -58,7 +59,7 @@ ___
 
 ### getBalance
 
-▸ **getBalance**(`address`): `Promise`\<`bigint`\>
+▸ **getBalance**(`requestContext`, `address`): `Promise`\<`bigint`\>
 
 Get the balance for an address in a wallet.
 
@@ -66,6 +67,7 @@ Get the balance for an address in a wallet.
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
+| `requestContext` | `IRequestContext` | The context for the request. |
 | `address` | `string` | The bech32 encoded address. |
 
 #### Returns
@@ -78,7 +80,7 @@ ___
 
 ### getStorageCosts
 
-▸ **getStorageCosts**(`address`): `Promise`\<`bigint`\>
+▸ **getStorageCosts**(`requestContext`, `address`): `Promise`\<`bigint`\>
 
 Get the storage costs for an address in a wallet.
 
@@ -86,6 +88,7 @@ Get the storage costs for an address in a wallet.
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
+| `requestContext` | `IRequestContext` | The context for the request. |
 | `address` | `string` | The bech32 encoded address. |
 
 #### Returns
@@ -134,7 +137,7 @@ ___
 
 ### transfer
 
-▸ **transfer**(`address`, `amount`): `Promise`\<`string`\>
+▸ **transfer**(`requestContext`, `address`, `amount`): `Promise`\<`string`\>
 
 Transfer funds to an address.
 
@@ -142,6 +145,7 @@ Transfer funds to an address.
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
+| `requestContext` | `IRequestContext` | The context for the request. |
 | `address` | `string` | The bech32 encoded address to send the funds to. |
 | `amount` | `bigint` | The amount to transfer. |
 

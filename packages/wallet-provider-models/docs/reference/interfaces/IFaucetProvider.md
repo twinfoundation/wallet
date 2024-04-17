@@ -12,7 +12,7 @@ Interface describing a faucet.
 
 ### bootstrap
 
-▸ **bootstrap**(`requestContext`): `Promise`\<`ILogEntry`[]\>
+▸ **bootstrap**(`requestContext`): `Promise`\<`void`\>
 
 Bootstrap the service by creating and initializing any resources it needs.
 
@@ -24,9 +24,9 @@ Bootstrap the service by creating and initializing any resources it needs.
 
 #### Returns
 
-`Promise`\<`ILogEntry`[]\>
+`Promise`\<`void`\>
 
-The response of the bootstrapping as log entries.
+Nothing.
 
 #### Inherited from
 
@@ -36,7 +36,7 @@ ___
 
 ### fundAddress
 
-▸ **fundAddress**(`address`, `timeoutInSeconds?`): `Promise`\<`bigint`\>
+▸ **fundAddress**(`requestContext`, `address`, `timeoutInSeconds?`): `Promise`\<`bigint`\>
 
 Fund the wallet from the faucet.
 
@@ -44,6 +44,7 @@ Fund the wallet from the faucet.
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
+| `requestContext` | `IRequestContext` | The context for the request. |
 | `address` | `string` | The bech32 encoded address of the address to fund. |
 | `timeoutInSeconds?` | `number` | The timeout in seconds to wait for the funding to complete. |
 
