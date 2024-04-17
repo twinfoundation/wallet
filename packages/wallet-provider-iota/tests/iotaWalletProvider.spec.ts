@@ -4,6 +4,7 @@ import type { IVaultProvider } from "@gtsc/vault-provider-models";
 import {
 	TEST_ADDRESS_BECH32,
 	TEST_CLIENT_OPTIONS,
+	TEST_CONTEXT,
 	TEST_MNEMONIC_ID,
 	TEST_VAULT,
 	initTestWallet
@@ -116,7 +117,7 @@ describe("IotaWalletProvider", () => {
 			TEST_VAULT
 		);
 
-		const ensured = await wallet.ensureBalance(TEST_ADDRESS_BECH32, 1000000000n);
+		const ensured = await wallet.ensureBalance(TEST_CONTEXT, TEST_ADDRESS_BECH32, 1000000000n);
 		expect(ensured).toBeFalsy();
 	});
 
@@ -133,7 +134,7 @@ describe("IotaWalletProvider", () => {
 			})
 		);
 
-		const ensured = await wallet.ensureBalance(TEST_ADDRESS_BECH32, 1000000000n);
+		const ensured = await wallet.ensureBalance(TEST_CONTEXT, TEST_ADDRESS_BECH32, 1000000000n);
 
 		expect(ensured).toBeTruthy();
 	});
@@ -147,7 +148,7 @@ describe("IotaWalletProvider", () => {
 			TEST_VAULT
 		);
 
-		const balance = await wallet.getBalance(TEST_ADDRESS_BECH32);
+		const balance = await wallet.getBalance(TEST_CONTEXT, TEST_ADDRESS_BECH32);
 		console.log("balance", balance);
 
 		expect(balance).toBeGreaterThan(0n);
@@ -162,7 +163,7 @@ describe("IotaWalletProvider", () => {
 			TEST_VAULT
 		);
 
-		const storageCosts = await wallet.getStorageCosts(TEST_ADDRESS_BECH32);
+		const storageCosts = await wallet.getStorageCosts(TEST_CONTEXT, TEST_ADDRESS_BECH32);
 		console.log("storageCosts", storageCosts);
 
 		expect(storageCosts).toBeGreaterThan(0);

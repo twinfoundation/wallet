@@ -1,6 +1,6 @@
 {
 	"name": "@gtsc/wallet-provider-models",
-	"version": "0.0.3-next.5",
+	"version": "0.0.3-next.6",
 	"description": "Models which define the structure of the provider implementations.",
 	"repository": {
 		"type": "git",

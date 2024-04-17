@@ -36,7 +36,7 @@ The namespace supported by the wallet provider.
 
 ### fundAddress
 
-▸ **fundAddress**(`address`, `timeoutInSeconds?`): `Promise`\<`bigint`\>
+▸ **fundAddress**(`requestContext`, `address`, `timeoutInSeconds?`): `Promise`\<`bigint`\>
 
 Fund the wallet from the faucet.
 
@@ -44,6 +44,7 @@ Fund the wallet from the faucet.
 
 | Name | Type | Default value | Description |
 | :------ | :------ | :------ | :------ |
+| `requestContext` | `IRequestContext` | `undefined` | The context for the request. |
 | `address` | `string` | `undefined` | The bech32 encoded address of the address to fund. |
 | `timeoutInSeconds` | `number` | `60` | The timeout in seconds to wait for the funding to complete. |
 

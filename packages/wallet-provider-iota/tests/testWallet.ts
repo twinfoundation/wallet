@@ -3,6 +3,7 @@
 
 import path from "path";
 import { Bip39, Bip44, KeyType } from "@gtsc/crypto";
+import type { IRequestContext } from "@gtsc/services";
 import { MemoryVaultProvider } from "@gtsc/vault-provider-memory";
 import { CoinType, type IClientOptions } from "@iota/sdk-wasm/node/lib/index.js";
 import * as dotenv from "dotenv";
@@ -14,15 +15,19 @@ dotenv.config({ path: [path.join(__dirname, ".env"), path.join(__dirname, ".env.
 if (!process.env.TEST_MNEMONIC) {
 	// eslint-disable-next-line no-restricted-syntax
 	throw new Error(
-		"Please define TEST_MNEMONIC as a 24 word mnemonic either as an environment variable or inside an .env.dev file"
+		`Please define TEST_MNEMONIC as a 24 word mnemonic either as an environment variable or inside an .env.dev file
+		 e.g. TEST_MNEMONIC="word0 word1 ... word23"`
 	);
 }
 
+export const TEST_TENANT_ID = "test-tenant";
 export const TEST_MNEMONIC_ID = "test-mnemonic";
 
 export const TEST_VAULT: MemoryVaultProvider = new MemoryVaultProvider({
 	initialValues: {
-		[TEST_MNEMONIC_ID]: process.env.TEST_MNEMONIC ?? ""
+		[TEST_TENANT_ID]: {
+			[TEST_MNEMONIC_ID]: process.env.TEST_MNEMONIC ?? ""
+		}
 	}
 });
 
@@ -57,11 +62,14 @@ const addressKeyPair = Bip44.addressBech32(
 );
 export const TEST_WALLET_KEY_PAIR = addressKeyPair.keyPair;
 export const TEST_ADDRESS_BECH32 = addressKeyPair.address;
+export const TEST_CONTEXT: IRequestContext = {
+	tenantId: TEST_TENANT_ID
+};
 
 /**
  * Initialise the test wallet.
  */
 export async function initTestWallet(): Promise<void> {
 	console.log("Wallet Address", `${process.env.TEST_EXPLORER_ADDRESS}${TEST_ADDRESS_BECH32}`);
-	await TEST_WALLET_PROVIDER.ensureBalance(TEST_ADDRESS_BECH32, 1000000000n);
+	await TEST_WALLET_PROVIDER.ensureBalance(TEST_CONTEXT, TEST_ADDRESS_BECH32, 1000000000n);
 }

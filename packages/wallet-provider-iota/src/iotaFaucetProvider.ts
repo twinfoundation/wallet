@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0.
 import { Guards } from "@gtsc/core";
 import { nameof } from "@gtsc/nameof";
+import type { IRequestContext } from "@gtsc/services";
 import type { IFaucetProvider } from "@gtsc/wallet-provider-models";
 import { Client } from "@iota/sdk-wasm/node/lib/index.js";
 import type { IIotaFaucetProviderConfig } from "./models/IIotaFaucetProviderConfig";
@@ -55,11 +56,16 @@ export class IotaFaucetProvider implements IFaucetProvider {
 
 	/**
 	 * Fund the wallet from the faucet.
+	 * @param requestContext The context for the request.
 	 * @param address The bech32 encoded address of the address to fund.
 	 * @param timeoutInSeconds The timeout in seconds to wait for the funding to complete.
 	 * @returns The amount available on the wallet address.
 	 */
-	public async fundAddress(address: string, timeoutInSeconds: number = 60): Promise<bigint> {
+	public async fundAddress(
+		requestContext: IRequestContext,
+		address: string,
+		timeoutInSeconds: number = 60
+	): Promise<bigint> {
 		const client = await this.createClient();
 
 		const oldBalance = await this.getBalance(address);

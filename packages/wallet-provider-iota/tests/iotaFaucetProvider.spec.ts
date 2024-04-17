@@ -1,6 +1,11 @@
 // Copyright 2024 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
-import { TEST_ADDRESS_BECH32, TEST_CLIENT_OPTIONS, initTestWallet } from "./testWallet";
+import {
+	TEST_ADDRESS_BECH32,
+	TEST_CLIENT_OPTIONS,
+	TEST_CONTEXT,
+	initTestWallet
+} from "./testWallet";
 import { IotaFaucetProvider } from "../src/iotaFaucetProvider";
 import type { IIotaFaucetProviderConfig } from "../src/models/IIotaFaucetProviderConfig";
 
@@ -64,7 +69,7 @@ describe("IotaFaucet", () => {
 			endpoint: process.env.TEST_FAUCET_ENDPOINT ?? ""
 		});
 
-		const amount = await faucet.fundAddress(TEST_ADDRESS_BECH32);
+		const amount = await faucet.fundAddress(TEST_CONTEXT, TEST_ADDRESS_BECH32);
 
 		expect(amount).toBeGreaterThan(0);
 	});
