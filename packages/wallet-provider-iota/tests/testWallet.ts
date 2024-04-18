@@ -1,7 +1,7 @@
 // Copyright 2024 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
 
-import path from "path";
+import path from "node:path";
 import { Bip39, Bip44, KeyType } from "@gtsc/crypto";
 import type { IRequestContext } from "@gtsc/services";
 import { MemoryVaultProvider } from "@gtsc/vault-provider-memory";
