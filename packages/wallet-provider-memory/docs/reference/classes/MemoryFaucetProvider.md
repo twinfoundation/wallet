@@ -1,6 +1,6 @@
-# Class: IotaFaucetProvider
+# Class: MemoryFaucetProvider
 
-Class for performing faucet operations on IOTA.
+Class for performing faucet operations using in-memory storage.
 
 ## Implements
 
@@ -10,7 +10,7 @@ Class for performing faucet operations on IOTA.
 
 ### constructor
 
-• **new IotaFaucetProvider**(`config`): [`IotaFaucetProvider`](IotaFaucetProvider.md)
+• **new MemoryFaucetProvider**(`config?`): [`MemoryFaucetProvider`](MemoryFaucetProvider.md)
 
 Create a new instance of IotaWalletProvider.
 
@@ -18,17 +18,17 @@ Create a new instance of IotaWalletProvider.
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `config` | [`IIotaFaucetProviderConfig`](../interfaces/IIotaFaucetProviderConfig.md) | The configuration to use. |
+| `config?` | [`IMemoryFaucetProviderConfig`](../interfaces/IMemoryFaucetProviderConfig.md) | The configuration to use. |
 
 #### Returns
 
-[`IotaFaucetProvider`](IotaFaucetProvider.md)
+[`MemoryFaucetProvider`](MemoryFaucetProvider.md)
 
 ## Properties
 
 ### NAMESPACE
 
-▪ `Static` **NAMESPACE**: `string` = `"iota"`
+▪ `Static` **NAMESPACE**: `string` = `"mem"`
 
 The namespace supported by the wallet provider.
 
@@ -57,23 +57,3 @@ The amount added to the address by the faucet.
 #### Implementation of
 
 IFaucetProvider.fundAddress
-
-___
-
-### getBalance
-
-▸ **getBalance**(`address`): `Promise`\<`bigint`\>
-
-Calculate the balance on an address.
-
-#### Parameters
-
-| Name | Type | Description |
-| :------ | :------ | :------ |
-| `address` | `string` | The bech32 encoded address to get the balance. |
-
-#### Returns
-
-`Promise`\<`bigint`\>
-
-The amount available on the wallet address.

@@ -16,11 +16,12 @@ export default defineConfig({
 		include: ["./tests/**/*.spec.ts"],
 		globals: true,
 		testTimeout: 120000,
+		hookTimeout: 120000,
 		bail: 1,
 		coverage: {
 			provider: "v8",
 			reporter: ["text", "lcov"],
-			exclude: ["**/index.ts", "**/models/**/*.ts"]
+			exclude: ["**/index.ts", "**/models/**/*.ts", "**/tests/**/*.ts"]
 		}
 	}
 });

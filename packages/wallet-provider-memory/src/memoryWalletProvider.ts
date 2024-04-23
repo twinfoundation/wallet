@@ -1,39 +1,27 @@
 // Copyright 2024 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
-import { GeneralError, Guards } from "@gtsc/core";
+import { Converter, Guards, Is, RandomHelper } from "@gtsc/core";
+import { Bip39, Bip44, KeyType } from "@gtsc/crypto";
 import { nameof } from "@gtsc/nameof";
 import type { IRequestContext } from "@gtsc/services";
 import type { IVaultProvider } from "@gtsc/vault-provider-models";
 import type { IFaucetProvider, IWalletProvider } from "@gtsc/wallet-provider-models";
-import { Client, Utils, type IRent } from "@iota/sdk-wasm/node/lib/index.js";
-import type { IIotaWalletProviderConfig } from "./models/IIotaWalletProviderConfig";
+import type { IMemoryWalletProviderConfig } from "./models/IMemoryWalletProviderConfig";
 
 /**
- * Class for performing wallet operations on IOTA.
+ * Class for performing wallet operations using in-memory storage.
  */
-export class IotaWalletProvider implements IWalletProvider {
+export class MemoryWalletProvider implements IWalletProvider {
 	/**
 	 * The namespace supported by the wallet provider.
 	 */
-	public static NAMESPACE: string = "iota";
+	public static NAMESPACE: string = "mem";
 
 	/**
 	 * Runtime name for the class.
 	 * @internal
 	 */
-	private static readonly _CLASS_NAME: string = nameof<IotaWalletProvider>();
-
-	/**
-	 * The configuration to use for tangle operations.
-	 * @internal
-	 */
-	private readonly _config: IIotaWalletProviderConfig;
-
-	/**
-	 * The IOTA Wallet client.
-	 * @internal
-	 */
-	private _client?: Client;
+	private static readonly _CLASS_NAME: string = nameof<MemoryWalletProvider>();
 
 	/**
 	 * The vault for the mnemonic.
@@ -42,19 +30,29 @@ export class IotaWalletProvider implements IWalletProvider {
 	private readonly _vaultProvider: IVaultProvider;
 
 	/**
-	 * The IOTA faucet.
+	 * The faucet.
 	 * @internal
 	 */
 	private readonly _faucetProvider?: IFaucetProvider;
 
 	/**
-	 * Information about the rent structure.
+	 * The configuration to use for provider.
 	 * @internal
 	 */
-	private _rentInfo?: IRent;
+	private readonly _config: IMemoryWalletProviderConfig;
 
 	/**
-	 * Create a new instance of IotaWalletProvider.
+	 * The balance in the wallet.
+	 */
+	private _balance: bigint;
+
+	/**
+	 * The address for the wallet.
+	 */
+	private _addressBech32?: string;
+
+	/**
+	 * Create a new instance of MemoryWalletProvider.
 	 * @param dependencies The dependencies for the wallet provider.
 	 * @param dependencies.vaultProvider Vault provider to use for wallet secrets.
 	 * @param dependencies.faucetProvider Optional faucet for requesting funds.
@@ -65,38 +63,59 @@ export class IotaWalletProvider implements IWalletProvider {
 			vaultProvider: IVaultProvider;
 			faucetProvider?: IFaucetProvider;
 		},
-		config: IIotaWalletProviderConfig
+		config: IMemoryWalletProviderConfig
 	) {
-		Guards.object<IIotaWalletProviderConfig>(
-			IotaWalletProvider._CLASS_NAME,
+		Guards.object<IMemoryWalletProviderConfig>(
+			MemoryWalletProvider._CLASS_NAME,
 			nameof(dependencies),
 			dependencies
 		);
-		Guards.object<IIotaWalletProviderConfig>(
-			IotaWalletProvider._CLASS_NAME,
+		Guards.object<IMemoryWalletProviderConfig>(
+			MemoryWalletProvider._CLASS_NAME,
 			nameof(dependencies.vaultProvider),
 			dependencies.vaultProvider
 		);
-
-		Guards.object<IIotaWalletProviderConfig>(
-			IotaWalletProvider._CLASS_NAME,
+		Guards.object<IMemoryWalletProviderConfig>(
+			MemoryWalletProvider._CLASS_NAME,
 			nameof(config),
 			config
 		);
-		Guards.object<IIotaWalletProviderConfig>(
-			IotaWalletProvider._CLASS_NAME,
-			nameof(config.clientOptions),
-			config.clientOptions
-		);
+		Guards.number(MemoryWalletProvider._CLASS_NAME, nameof(config.coinType), config.coinType);
+		Guards.string(MemoryWalletProvider._CLASS_NAME, nameof(config.bech32Hrp), config.bech32Hrp);
 		Guards.string(
-			IotaWalletProvider._CLASS_NAME,
+			MemoryWalletProvider._CLASS_NAME,
 			nameof(config.walletMnemonicId),
 			config.walletMnemonicId
 		);
 
-		this._config = config;
 		this._vaultProvider = dependencies.vaultProvider;
 		this._faucetProvider = dependencies.faucetProvider;
+		this._config = config;
+		this._balance = !Is.empty(config?.balance) ? BigInt(config.balance) : 0n;
+	}
+
+	/**
+	 * Bootstrap the service by creating and initializing any resources it needs.
+	 * @param requestContext The request context for bootstrapping.
+	 * @returns Nothing.
+	 */
+	public async bootstrap(requestContext: IRequestContext): Promise<void> {
+		const mnemonic = await this._vaultProvider.get<string>(
+			requestContext,
+			this._config.walletMnemonicId
+		);
+
+		const seed = Bip39.mnemonicToSeed(mnemonic);
+		const addressKeyPair = Bip44.addressBech32(
+			seed,
+			KeyType.Ed25519,
+			this._config.bech32Hrp,
+			this._config.coinType,
+			0,
+			false,
+			0
+		);
+		this._addressBech32 = addressKeyPair.address;
 	}
 
 	/**
@@ -106,23 +125,7 @@ export class IotaWalletProvider implements IWalletProvider {
 	 * @returns The balance of the wallet address.
 	 */
 	public async getBalance(requestContext: IRequestContext, address: string): Promise<bigint> {
-		const client = await this.createClient();
-
-		const outputIds = await client.basicOutputIds([
-			{ address },
-			{ hasExpiration: false },
-			{ hasTimelock: false },
-			{ hasStorageDepositReturn: false }
-		]);
-
-		const outputs = await client.getOutputs(outputIds.items);
-
-		let totalAmount = BigInt(0);
-		for (const output of outputs) {
-			totalAmount += output.output.getAmount();
-		}
-
-		return totalAmount;
+		return address === this._addressBech32 ? this._balance : 0n;
 	}
 
 	/**
@@ -132,26 +135,6 @@ export class IotaWalletProvider implements IWalletProvider {
 	 * @returns The storage costs for the address.
 	 */
 	public async getStorageCosts(requestContext: IRequestContext, address: string): Promise<bigint> {
-		const client = await this.createClient();
-
-		if (this._rentInfo) {
-			const outputIds = await client.basicOutputIds([
-				{ address },
-				{ hasExpiration: false },
-				{ hasTimelock: false },
-				{ hasStorageDepositReturn: false }
-			]);
-
-			const outputs = await client.getOutputs(outputIds.items);
-
-			let totalStorageCosts = BigInt(0);
-			for (const output of outputs) {
-				totalStorageCosts += Utils.computeStorageDeposit(output.output, this._rentInfo);
-			}
-
-			return totalStorageCosts;
-		}
-
 		return 0n;
 	}
 
@@ -169,7 +152,7 @@ export class IotaWalletProvider implements IWalletProvider {
 		ensureBalance: bigint,
 		timeoutInSeconds?: number
 	): Promise<boolean> {
-		if (this._faucetProvider) {
+		if (this._faucetProvider && address === this._addressBech32) {
 			let retryCount = 10;
 			let currentBalance = await this.getBalance(requestContext, address);
 
@@ -183,10 +166,11 @@ export class IotaWalletProvider implements IWalletProvider {
 					// The balance has not increased, so return.
 					return false;
 				}
+				this._balance += addedBalance;
 				currentBalance += addedBalance;
 				if (currentBalance < ensureBalance) {
-					// The balance has increased but is still not enough, wait a second and try again.
-					await new Promise(resolve => setTimeout(resolve, 1000));
+					// The balance has increased but is still not enough, wait and try again.
+					await new Promise(resolve => setTimeout(resolve, 100));
 					retryCount--;
 				}
 			}
@@ -208,41 +192,10 @@ export class IotaWalletProvider implements IWalletProvider {
 		address: string,
 		amount: bigint
 	): Promise<string> {
-		try {
-			const client = await this.createClient();
-
-			const mnemonic = await this._vaultProvider.get<string>(
-				requestContext,
-				this._config.walletMnemonicId
-			);
-
-			const blockIdAndBlock = await client.buildAndPostBlock(
-				{ mnemonic },
-				{
-					output: {
-						address,
-						amount
-					}
-				}
-			);
-
-			return blockIdAndBlock[0];
-		} catch (error) {
-			throw new GeneralError(IotaWalletProvider._CLASS_NAME, "transferFailed", undefined, error);
+		if (address !== this._addressBech32) {
+			this._balance -= amount;
 		}
-	}
 
-	/**
-	 * Create a client for the IOTA network.
-	 * @returns The client.
-	 * @internal
-	 */
-	private async createClient(): Promise<Client> {
-		if (!this._client) {
-			this._client = new Client(this._config.clientOptions);
-			const info = await this._client.getInfo();
-			this._rentInfo = info.nodeInfo.protocol.rentStructure;
-		}
-		return this._client;
+		return Converter.bytesToHex(RandomHelper.generate(32));
 	}
 }

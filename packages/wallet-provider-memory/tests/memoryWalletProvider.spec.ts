@@ -1,23 +1,18 @@
 // Copyright 2024 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
-import { Bip44, KeyType } from "@gtsc/crypto";
 import type { IVaultProvider } from "@gtsc/vault-provider-models";
 import {
 	TEST_ADDRESS_BECH32,
-	TEST_CLIENT_OPTIONS,
-	TEST_COIN_TYPE,
 	TEST_CONTEXT,
-	TEST_HRP,
 	TEST_MNEMONIC_ID,
-	TEST_SEED,
 	TEST_VAULT,
 	initTestWallet
 } from "./testWallet";
-import { IotaFaucetProvider } from "../src/iotaFaucetProvider";
-import { IotaWalletProvider } from "../src/iotaWalletProvider";
-import type { IIotaWalletProviderConfig } from "../src/models/IIotaWalletProviderConfig";
+import { MemoryFaucetProvider } from "../src/memoryFaucetProvider";
+import { MemoryWalletProvider } from "../src/memoryWalletProvider";
+import type { IMemoryWalletProviderConfig } from "../src/models/IMemoryWalletProviderConfig";
 
-describe("IotaWalletProvider", () => {
+describe("MemoryWalletProvider", () => {
 	beforeAll(async () => {
 		await initTestWallet();
 	});
@@ -25,9 +20,9 @@ describe("IotaWalletProvider", () => {
 	test("can fail to construct a wallet with no dependencies", () => {
 		expect(
 			() =>
-				new IotaWalletProvider(
+				new MemoryWalletProvider(
 					undefined as unknown as { vaultProvider: IVaultProvider },
-					undefined as unknown as IIotaWalletProviderConfig
+					undefined as unknown as IMemoryWalletProviderConfig
 				)
 		).toThrow(
 			expect.objectContaining({
@@ -44,9 +39,9 @@ describe("IotaWalletProvider", () => {
 	test("can fail to construct a wallet with no vault", () => {
 		expect(
 			() =>
-				new IotaWalletProvider(
+				new MemoryWalletProvider(
 					{ vaultProvider: undefined as unknown as IVaultProvider },
-					undefined as unknown as IIotaWalletProviderConfig
+					undefined as unknown as IMemoryWalletProviderConfig
 				)
 		).toThrow(
 			expect.objectContaining({
@@ -63,9 +58,9 @@ describe("IotaWalletProvider", () => {
 	test("can fail to construct a wallet with no config", () => {
 		expect(
 			() =>
-				new IotaWalletProvider(
+				new MemoryWalletProvider(
 					{ vaultProvider: {} as unknown as IVaultProvider },
-					undefined as unknown as IIotaWalletProviderConfig
+					undefined as unknown as IMemoryWalletProviderConfig
 				)
 		).toThrow(
 			expect.objectContaining({
@@ -79,19 +74,37 @@ describe("IotaWalletProvider", () => {
 		);
 	});
 
-	test("can fail to construct a wallet with no config client options", () => {
+	test("can fail to construct a wallet with no coin type", () => {
 		expect(
 			() =>
-				new IotaWalletProvider(
+				new MemoryWalletProvider(
 					{ vaultProvider: {} as unknown as IVaultProvider },
-					{} as unknown as IIotaWalletProviderConfig
+					{} as unknown as IMemoryWalletProviderConfig
 				)
 		).toThrow(
 			expect.objectContaining({
 				name: "GuardError",
-				message: "guard.objectUndefined",
+				message: "guard.number",
 				properties: {
-					property: "config.clientOptions",
+					property: "config.coinType",
+					value: "undefined"
+				}
+			})
+		);
+	});
+
+	test("can fail to construct a wallet with no bech32 hrp", () => {
+		expect(
+			() =>
+				new MemoryWalletProvider({ vaultProvider: {} as unknown as IVaultProvider }, {
+					coinType: 999999
+				} as unknown as IMemoryWalletProviderConfig)
+		).toThrow(
+			expect.objectContaining({
+				name: "GuardError",
+				message: "guard.string",
+				properties: {
+					property: "config.bech32Hrp",
 					value: "undefined"
 				}
 			})
@@ -101,9 +114,10 @@ describe("IotaWalletProvider", () => {
 	test("can fail to construct a wallet with no wallet mnemonic id", () => {
 		expect(
 			() =>
-				new IotaWalletProvider({ vaultProvider: {} as unknown as IVaultProvider }, {
-					clientOptions: {}
-				} as unknown as IIotaWalletProviderConfig)
+				new MemoryWalletProvider({ vaultProvider: {} as unknown as IVaultProvider }, {
+					coinType: 999999,
+					bech32Hrp: "mem"
+				} as unknown as IMemoryWalletProviderConfig)
 		).toThrow(
 			expect.objectContaining({
 				name: "GuardError",
@@ -117,12 +131,13 @@ describe("IotaWalletProvider", () => {
 	});
 
 	test("can construct a wallet with details", () => {
-		const faucet = new IotaWalletProvider(
+		const faucet = new MemoryWalletProvider(
 			{
 				vaultProvider: TEST_VAULT
 			},
 			{
-				clientOptions: TEST_CLIENT_OPTIONS,
+				coinType: 999999,
+				bech32Hrp: "mem",
 				walletMnemonicId: TEST_MNEMONIC_ID
 			}
 		);
@@ -130,12 +145,13 @@ describe("IotaWalletProvider", () => {
 	});
 
 	test("can fail to ensure a balance on an address with no faucet available", async () => {
-		const wallet = new IotaWalletProvider(
+		const wallet = new MemoryWalletProvider(
 			{
 				vaultProvider: TEST_VAULT
 			},
 			{
-				clientOptions: TEST_CLIENT_OPTIONS,
+				coinType: 999999,
+				bech32Hrp: "mem",
 				walletMnemonicId: TEST_MNEMONIC_ID
 			}
 		);
@@ -145,65 +161,58 @@ describe("IotaWalletProvider", () => {
 	});
 
 	test("can ensure a balance on an address", async () => {
-		// Use a random address which has not yet been used
-		const addressKeyPair = Bip44.addressBech32(
-			TEST_SEED,
-			KeyType.Ed25519,
-			TEST_HRP,
-			TEST_COIN_TYPE,
-			0,
-			false,
-			Math.floor(Math.random() * 100000000) + 1000
-		);
-
-		const wallet = new IotaWalletProvider(
+		const wallet = new MemoryWalletProvider(
 			{
 				vaultProvider: TEST_VAULT,
-				faucetProvider: new IotaFaucetProvider({
-					clientOptions: TEST_CLIENT_OPTIONS,
-					endpoint: process.env.TEST_FAUCET_ENDPOINT ?? ""
-				})
+				faucetProvider: new MemoryFaucetProvider()
 			},
 			{
-				clientOptions: TEST_CLIENT_OPTIONS,
+				coinType: 999999,
+				bech32Hrp: "mem",
 				walletMnemonicId: TEST_MNEMONIC_ID
 			}
 		);
 
-		const ensured = await wallet.ensureBalance(TEST_CONTEXT, addressKeyPair.address, 1000000000n);
+		await wallet.bootstrap(TEST_CONTEXT);
+
+		const ensured = await wallet.ensureBalance(TEST_CONTEXT, TEST_ADDRESS_BECH32, 1000000000n);
 
 		expect(ensured).toBeTruthy();
 	});
 
 	test("can get a balance for an address", async () => {
-		const wallet = new IotaWalletProvider(
+		const wallet = new MemoryWalletProvider(
 			{
 				vaultProvider: TEST_VAULT
 			},
 			{
-				clientOptions: TEST_CLIENT_OPTIONS,
-				walletMnemonicId: TEST_MNEMONIC_ID
+				coinType: 999999,
+				bech32Hrp: "mem",
+				walletMnemonicId: TEST_MNEMONIC_ID,
+				balance: "1000000000"
 			}
 		);
+		await wallet.bootstrap(TEST_CONTEXT);
 
 		const balance = await wallet.getBalance(TEST_CONTEXT, TEST_ADDRESS_BECH32);
 
-		expect(balance).toBeGreaterThan(0n);
+		expect(balance).toEqual(1000000000n);
 	});
 
 	test("can get storage costs for an address", async () => {
-		const wallet = new IotaWalletProvider(
+		const wallet = new MemoryWalletProvider(
 			{
 				vaultProvider: TEST_VAULT
 			},
 			{
-				clientOptions: TEST_CLIENT_OPTIONS,
+				coinType: 999999,
+				bech32Hrp: "mem",
 				walletMnemonicId: TEST_MNEMONIC_ID
 			}
 		);
 
 		const storageCosts = await wallet.getStorageCosts(TEST_CONTEXT, TEST_ADDRESS_BECH32);
 
-		expect(storageCosts).toBeGreaterThan(0);
+		expect(storageCosts).toEqual(0n);
 	});
 });
