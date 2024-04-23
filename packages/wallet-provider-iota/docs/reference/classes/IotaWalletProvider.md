@@ -39,7 +39,7 @@ The namespace supported by the wallet provider.
 
 ### ensureBalance
 
-▸ **ensureBalance**(`requestContext`, `address`, `balance`, `timeoutInSeconds?`): `Promise`\<`boolean`\>
+▸ **ensureBalance**(`requestContext`, `address`, `ensureBalance`, `timeoutInSeconds?`): `Promise`\<`boolean`\>
 
 Ensure the balance for an address in a wallet.
 
@@ -49,7 +49,7 @@ Ensure the balance for an address in a wallet.
 | :------ | :------ | :------ |
 | `requestContext` | `IRequestContext` | The context for the request. |
 | `address` | `string` | The bech32 encoded address. |
-| `balance` | `bigint` | The balance to ensure on the address. |
+| `ensureBalance` | `bigint` | The balance to ensure on the address. |
 | `timeoutInSeconds?` | `number` | The timeout in seconds to wait for the funding to complete. |
 
 #### Returns

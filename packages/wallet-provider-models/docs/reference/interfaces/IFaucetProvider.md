@@ -52,7 +52,7 @@ Fund the wallet from the faucet.
 
 `Promise`\<`bigint`\>
 
-The amount available on the wallet address.
+The amount added to the address by the faucet.
 
 ___
 

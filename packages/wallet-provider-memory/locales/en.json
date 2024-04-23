@@ -1,0 +1,7 @@
+{
+	"error": {
+		"iotaWalletProvider": {
+			"transferFailed": "The wallet transfer failed."
+		}
+	}
+}

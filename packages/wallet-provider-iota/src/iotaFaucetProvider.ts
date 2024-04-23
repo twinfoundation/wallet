@@ -59,7 +59,7 @@ export class IotaFaucetProvider implements IFaucetProvider {
 	 * @param requestContext The context for the request.
 	 * @param address The bech32 encoded address of the address to fund.
 	 * @param timeoutInSeconds The timeout in seconds to wait for the funding to complete.
-	 * @returns The amount available on the wallet address.
+	 * @returns The amount added to the address by the faucet.
 	 */
 	public async fundAddress(
 		requestContext: IRequestContext,
@@ -75,14 +75,14 @@ export class IotaFaucetProvider implements IFaucetProvider {
 			const newBalance = await this.getBalance(address);
 			if (newBalance > oldBalance) {
 				// The balance increased so re can return the new balance
-				return newBalance;
+				return newBalance - oldBalance;
 			}
 
 			// Still waiting for the balance to update so wait and try again
 			await new Promise(resolve => setTimeout(resolve, 1000));
 		}
 
-		return oldBalance;
+		return 0n;
 	}
 
 	/**

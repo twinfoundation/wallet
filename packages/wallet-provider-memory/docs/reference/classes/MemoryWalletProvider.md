@@ -1,12 +1,55 @@
-# Interface: IWalletProvider
+# Class: MemoryWalletProvider
 
-Interface describing a wallet provider.
+Class for performing wallet operations using in-memory storage.
 
-## Hierarchy
+## Implements
 
-- `IService`
+- `IWalletProvider`
 
-  ↳ **`IWalletProvider`**
+## Constructors
+
+### constructor
+
+• **new MemoryWalletProvider**(`dependencies`, `config`): [`MemoryWalletProvider`](MemoryWalletProvider.md)
+
+Create a new instance of MemoryWalletProvider.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `dependencies` | `Object` | The dependencies for the wallet provider. |
+| `dependencies.faucetProvider?` | `IFaucetProvider` | Optional faucet for requesting funds. |
+| `dependencies.vaultProvider` | `IVaultProvider` | Vault provider to use for wallet secrets. |
+| `config` | [`IMemoryWalletProviderConfig`](../interfaces/IMemoryWalletProviderConfig.md) | The configuration to use. |
+
+#### Returns
+
+[`MemoryWalletProvider`](MemoryWalletProvider.md)
+
+## Properties
+
+### \_addressBech32
+
+• `Private` `Optional` **\_addressBech32**: `string`
+
+The address for the wallet.
+
+___
+
+### \_balance
+
+• `Private` **\_balance**: `bigint`
+
+The balance in the wallet.
+
+___
+
+### NAMESPACE
+
+▪ `Static` **NAMESPACE**: `string` = `"mem"`
+
+The namespace supported by the wallet provider.
 
 ## Methods
 
@@ -28,9 +71,9 @@ Bootstrap the service by creating and initializing any resources it needs.
 
 Nothing.
 
-#### Inherited from
+#### Implementation of
 
-IService.bootstrap
+IWalletProvider.bootstrap
 
 ___
 
@@ -55,6 +98,10 @@ Ensure the balance for an address in a wallet.
 
 True if the balance has been ensured.
 
+#### Implementation of
+
+IWalletProvider.ensureBalance
+
 ___
 
 ### getBalance
@@ -75,6 +122,10 @@ Get the balance for an address in a wallet.
 `Promise`\<`bigint`\>
 
 The balance of the wallet address.
+
+#### Implementation of
+
+IWalletProvider.getBalance
 
 ___
 
@@ -97,41 +148,9 @@ Get the storage costs for an address in a wallet.
 
 The storage costs for the address.
 
-___
+#### Implementation of
 
-### start
-
-▸ **start**(): `Promise`\<`void`\>
-
-The service needs to be started when the application is initialized.
-
-#### Returns
-
-`Promise`\<`void`\>
-
-Nothing.
-
-#### Inherited from
-
-IService.start
-
-___
-
-### stop
-
-▸ **stop**(): `Promise`\<`void`\>
-
-The service needs to be stopped when the application is closed.
-
-#### Returns
-
-`Promise`\<`void`\>
-
-Nothing.
-
-#### Inherited from
-
-IService.stop
+IWalletProvider.getStorageCosts
 
 ___
 
@@ -154,3 +173,7 @@ Transfer funds to an address.
 `Promise`\<`string`\>
 
 The block created.
+
+#### Implementation of
+
+IWalletProvider.transfer

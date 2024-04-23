@@ -26,14 +26,14 @@ export interface IWalletProvider extends IService {
 	 * Ensure the balance for an address in a wallet.
 	 * @param requestContext The context for the request.
 	 * @param address The bech32 encoded address.
-	 * @param balance The balance to ensure on the address.
+	 * @param ensureBalance The balance to ensure on the address.
 	 * @param timeoutInSeconds The timeout in seconds to wait for the funding to complete.
 	 * @returns True if the balance has been ensured.
 	 */
 	ensureBalance(
 		requestContext: IRequestContext,
 		address: string,
-		balance: bigint,
+		ensureBalance: bigint,
 		timeoutInSeconds?: number
 	): Promise<boolean>;
 

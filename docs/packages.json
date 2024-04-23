@@ -7,6 +7,10 @@
 			"description": "Models which define the structure of the provider implementations."
 		},
 		{
+			"name": "wallet-provider-memory",
+			"description": "Wallet provider implementation using in-memory storage."
+		},
+		{
 			"name": "wallet-provider-iota",
 			"description": "Wallet provider implementation using IOTA."
 		}

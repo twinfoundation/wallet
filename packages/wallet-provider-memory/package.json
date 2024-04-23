@@ -1,11 +1,11 @@
 {
-	"name": "@gtsc/wallet-provider-models",
+	"name": "@gtsc/wallet-provider-memory",
 	"version": "0.0.3-next.8",
-	"description": "Models which define the structure of the provider implementations.",
+	"description": "Wallet provider implementation using in-memory storage.",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/gtscio/wallet.git",
-		"directory": "packages/wallet-provider-models"
+		"directory": "packages/wallet-provider-memory"
 	},
 	"author": "martyn.janes@iota.org",
 	"license": "Apache-2.0",
@@ -29,15 +29,20 @@
 	},
 	"dependencies": {
 		"@gtsc/core": "next",
+		"@gtsc/crypto": "next",
 		"@gtsc/nameof": "^0.0.4",
-		"@gtsc/services": "next"
+		"@gtsc/vault-provider-models": "next",
+		"@gtsc/vault-provider-memory": "next",
+		"@gtsc/wallet-provider-models": "0.0.3-next.8"
 	},
 	"devDependencies": {
 		"@gtsc/nameof-transformer": "^0.0.4",
 		"@vitest/coverage-v8": "^1.5.0",
 		"copyfiles": "^2.4.1",
+		"dotenv": "^16.4.5",
 		"rimraf": "^5.0.5",
 		"rollup": "^4.16.3",
+		"rollup-plugin-copy": "^3.5.0",
 		"rollup-plugin-typescript2": "^0.36.0",
 		"ts-patch": "^3.1.2",
 		"typedoc": "^0.25.13",

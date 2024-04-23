@@ -11,7 +11,7 @@ export interface IFaucetProvider extends IService {
 	 * @param requestContext The context for the request.
 	 * @param address The bech32 encoded address of the address to fund.
 	 * @param timeoutInSeconds The timeout in seconds to wait for the funding to complete.
-	 * @returns The amount available on the wallet address.
+	 * @returns The amount added to the address by the faucet.
 	 */
 	fundAddress(
 		requestContext: IRequestContext,
