@@ -1,6 +1,6 @@
 {
 	"error": {
-		"iotaWalletProvider": {
+		"iotaWalletConnector": {
 			"transferFailed": "The wallet transfer failed."
 		}
 	}
