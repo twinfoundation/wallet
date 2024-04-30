@@ -1,0 +1,7 @@
+{
+	"error": {
+		"entityStorageWalletConnector": {
+			"insufficientFunds": "There are insufficient funds in the wallet."
+		}
+	}
+}

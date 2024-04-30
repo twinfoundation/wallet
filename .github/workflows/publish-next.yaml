@@ -8,9 +8,9 @@ on:
         required: true
         type: choice
         options:
-          - wallet-provider-models
-          - wallet-provider-memory
-          - wallet-provider-iota
+          - wallet-models
+          - wallet-connector-entity-storage
+          - wallet-connector-iota
 
 jobs:
   publish:

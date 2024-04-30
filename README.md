@@ -4,9 +4,9 @@ This mono-repository contains the packages to use with Wallets in GTSC applicati
 
 ## Packages
 
-- [wallet-provider-models](packages/wallet-provider-models/README.md) - Models which define the structure of the provider implementations.
-- [wallet-provider-memory](packages/wallet-provider-memory/README.md) - Wallet provider implementation using in-memory storage.
-- [wallet-provider-iota](packages/wallet-provider-iota/README.md) - Wallet provider implementation using IOTA.
+- [wallet-models](packages/wallet-models/README.md) - Models which define the structure of the wallet contracts and connectors.
+- [wallet-connector-entity-storage](packages/wallet-connector-entity-storage/README.md) - Wallet connector implementation using entity storage.
+- [wallet-connector-iota](packages/wallet-connector-iota/README.md) - Wallet connector implementation using IOTA.
 
 ## Contributing
 
