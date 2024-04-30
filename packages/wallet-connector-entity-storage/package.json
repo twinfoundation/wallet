@@ -1,6 +1,6 @@
 {
 	"name": "@gtsc/wallet-connector-entity-storage",
-	"version": "0.0.3-next.10",
+	"version": "0.0.3-next.11",
 	"description": "Wallet connector implementation using entity storage.",
 	"repository": {
 		"type": "git",
@@ -34,8 +34,7 @@
 		"@gtsc/entity-storage-models": "next",
 		"@gtsc/nameof": "^0.0.4",
 		"@gtsc/vault-models": "next",
-		"@gtsc/vault-connector-entity-storage": "next",
-		"@gtsc/wallet-models": "0.0.3-next.10"
+		"@gtsc/wallet-models": "0.0.3-next.11"
 	},
 	"devDependencies": {
 		"@gtsc/nameof-transformer": "^0.0.4",

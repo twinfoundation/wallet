@@ -1,6 +1,6 @@
 {
 	"name": "@gtsc/wallet-connector-iota",
-	"version": "0.0.3-next.10",
+	"version": "0.0.3-next.11",
 	"description": "Wallet connector implementation using IOTA.",
 	"repository": {
 		"type": "git",
@@ -32,11 +32,13 @@
 		"@gtsc/crypto": "next",
 		"@gtsc/nameof": "^0.0.4",
 		"@gtsc/vault-models": "next",
-		"@gtsc/wallet-models": "0.0.3-next.10",
+		"@gtsc/wallet-models": "0.0.3-next.11",
 		"@iota/sdk-wasm": "^1.1.3"
 	},
 	"devDependencies": {
 		"@gtsc/nameof-transformer": "^0.0.4",
+		"@gtsc/entity-storage-connector-memory": "next",
+		"@gtsc/vault-connector-entity-storage": "next",
 		"@vitest/coverage-v8": "^1.5.0",
 		"copyfiles": "^2.4.1",
 		"dotenv": "^16.4.5",
