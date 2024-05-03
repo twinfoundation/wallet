@@ -71,12 +71,12 @@ export class EntityStorageWalletConnector implements IWalletConnector {
 			nameof(requestContext),
 			requestContext
 		);
-		Guards.string(
+		Guards.stringValue(
 			EntityStorageWalletConnector._CLASS_NAME,
 			nameof(requestContext.tenantId),
 			requestContext.tenantId
 		);
-		Guards.string(
+		Guards.stringValue(
 			EntityStorageWalletConnector._CLASS_NAME,
 			nameof(requestContext.identity),
 			requestContext.identity
@@ -95,12 +95,12 @@ export class EntityStorageWalletConnector implements IWalletConnector {
 			nameof(requestContext),
 			requestContext
 		);
-		Guards.string(
+		Guards.stringValue(
 			EntityStorageWalletConnector._CLASS_NAME,
 			nameof(requestContext.tenantId),
 			requestContext.tenantId
 		);
-		Guards.string(
+		Guards.stringValue(
 			EntityStorageWalletConnector._CLASS_NAME,
 			nameof(requestContext.identity),
 			requestContext.identity
@@ -140,12 +140,12 @@ export class EntityStorageWalletConnector implements IWalletConnector {
 			nameof(requestContext),
 			requestContext
 		);
-		Guards.string(
+		Guards.stringValue(
 			EntityStorageWalletConnector._CLASS_NAME,
 			nameof(requestContext.tenantId),
 			requestContext.tenantId
 		);
-		Guards.string(
+		Guards.stringValue(
 			EntityStorageWalletConnector._CLASS_NAME,
 			nameof(requestContext.identity),
 			requestContext.identity
@@ -195,12 +195,12 @@ export class EntityStorageWalletConnector implements IWalletConnector {
 			nameof(requestContext),
 			requestContext
 		);
-		Guards.string(
+		Guards.stringValue(
 			EntityStorageWalletConnector._CLASS_NAME,
 			nameof(requestContext.tenantId),
 			requestContext.tenantId
 		);
-		Guards.string(
+		Guards.stringValue(
 			EntityStorageWalletConnector._CLASS_NAME,
 			nameof(requestContext.identity),
 			requestContext.identity

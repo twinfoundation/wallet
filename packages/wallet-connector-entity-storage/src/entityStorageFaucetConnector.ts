@@ -67,12 +67,12 @@ export class EntityStorageFaucetConnector implements IFaucetConnector {
 			nameof(requestContext),
 			requestContext
 		);
-		Guards.string(
+		Guards.stringValue(
 			EntityStorageFaucetConnector._CLASS_NAME,
 			nameof(requestContext.tenantId),
 			requestContext.tenantId
 		);
-		Guards.string(
+		Guards.stringValue(
 			EntityStorageFaucetConnector._CLASS_NAME,
 			nameof(requestContext.identity),
 			requestContext.identity
