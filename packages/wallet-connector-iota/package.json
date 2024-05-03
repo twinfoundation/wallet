@@ -1,7 +1,7 @@
 {
 	"name": "@gtsc/wallet-connector-iota",
 	"version": "0.0.3-next.12",
-	"description": "Wallet connector implementation using IOTA.",
+	"description": "Wallet connector implementation using IOTA",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/gtscio/wallet.git",
