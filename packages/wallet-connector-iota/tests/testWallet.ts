@@ -2,16 +2,15 @@
 // SPDX-License-Identifier: Apache-2.0.
 
 import path from "node:path";
-import { Converter } from "@gtsc/core";
 import { Bip39, Bip44, KeyType } from "@gtsc/crypto";
 import { MemoryEntityStorageConnector } from "@gtsc/entity-storage-connector-memory";
 import type { IRequestContext } from "@gtsc/services";
 import {
 	EntityStorageVaultConnector,
-	type IVaultKey,
-	type IVaultSecret,
 	VaultKeyDescriptor,
-	VaultSecretDescriptor
+	VaultSecretDescriptor,
+	type IVaultKey,
+	type IVaultSecret
 } from "@gtsc/vault-connector-entity-storage";
 import type { IVaultConnector } from "@gtsc/vault-models";
 import { CoinType, type IClientOptions } from "@iota/sdk-wasm/node/lib/index.js";
@@ -36,17 +35,7 @@ export const TEST_MNEMONIC_NAME = "test-mnemonic";
 export const TEST_VAULT: IVaultConnector = new EntityStorageVaultConnector({
 	vaultKeyEntityStorageConnector: new MemoryEntityStorageConnector<IVaultKey>(VaultKeyDescriptor),
 	vaultSecretEntityStorageConnector: new MemoryEntityStorageConnector<IVaultSecret>(
-		VaultSecretDescriptor,
-		{
-			initialValues: {
-				[TEST_TENANT_ID]: [
-					{
-						id: `${TEST_IDENTITY_ID}/${TEST_MNEMONIC_NAME}`,
-						data: Converter.bytesToBase64(Converter.utf8ToBytes(process.env.TEST_MNEMONIC))
-					}
-				]
-			}
-		}
+		VaultSecretDescriptor
 	)
 });
 

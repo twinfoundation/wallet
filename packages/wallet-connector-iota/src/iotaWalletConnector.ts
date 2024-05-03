@@ -111,12 +111,12 @@ export class IotaWalletConnector implements IWalletConnector {
 			nameof(requestContext),
 			requestContext
 		);
-		Guards.string(
+		Guards.stringValue(
 			IotaWalletConnector._CLASS_NAME,
 			nameof(requestContext.tenantId),
 			requestContext.tenantId
 		);
-		Guards.string(
+		Guards.stringValue(
 			IotaWalletConnector._CLASS_NAME,
 			nameof(requestContext.identity),
 			requestContext.identity
@@ -142,17 +142,17 @@ export class IotaWalletConnector implements IWalletConnector {
 			nameof(requestContext),
 			requestContext
 		);
-		Guards.string(
+		Guards.stringValue(
 			IotaWalletConnector._CLASS_NAME,
 			nameof(requestContext.tenantId),
 			requestContext.tenantId
 		);
-		Guards.string(
+		Guards.stringValue(
 			IotaWalletConnector._CLASS_NAME,
 			nameof(requestContext.identity),
 			requestContext.identity
 		);
-		Guards.string(IotaWalletConnector._CLASS_NAME, nameof(address), address);
+		Guards.stringValue(IotaWalletConnector._CLASS_NAME, nameof(address), address);
 
 		const client = await this.createClient();
 
@@ -185,17 +185,17 @@ export class IotaWalletConnector implements IWalletConnector {
 			nameof(requestContext),
 			requestContext
 		);
-		Guards.string(
+		Guards.stringValue(
 			IotaWalletConnector._CLASS_NAME,
 			nameof(requestContext.tenantId),
 			requestContext.tenantId
 		);
-		Guards.string(
+		Guards.stringValue(
 			IotaWalletConnector._CLASS_NAME,
 			nameof(requestContext.identity),
 			requestContext.identity
 		);
-		Guards.string(IotaWalletConnector._CLASS_NAME, nameof(address), address);
+		Guards.stringValue(IotaWalletConnector._CLASS_NAME, nameof(address), address);
 
 		const client = await this.createClient();
 
@@ -239,17 +239,17 @@ export class IotaWalletConnector implements IWalletConnector {
 			nameof(requestContext),
 			requestContext
 		);
-		Guards.string(
+		Guards.stringValue(
 			IotaWalletConnector._CLASS_NAME,
 			nameof(requestContext.tenantId),
 			requestContext.tenantId
 		);
-		Guards.string(
+		Guards.stringValue(
 			IotaWalletConnector._CLASS_NAME,
 			nameof(requestContext.identity),
 			requestContext.identity
 		);
-		Guards.string(IotaWalletConnector._CLASS_NAME, nameof(address), address);
+		Guards.stringValue(IotaWalletConnector._CLASS_NAME, nameof(address), address);
 		Guards.bigint(IotaWalletConnector._CLASS_NAME, nameof(ensureBalance), ensureBalance);
 
 		if (this._faucetConnector) {
@@ -296,17 +296,17 @@ export class IotaWalletConnector implements IWalletConnector {
 			nameof(requestContext),
 			requestContext
 		);
-		Guards.string(
+		Guards.stringValue(
 			IotaWalletConnector._CLASS_NAME,
 			nameof(requestContext.tenantId),
 			requestContext.tenantId
 		);
-		Guards.string(
+		Guards.stringValue(
 			IotaWalletConnector._CLASS_NAME,
 			nameof(requestContext.identity),
 			requestContext.identity
 		);
-		Guards.string(IotaWalletConnector._CLASS_NAME, nameof(address), address);
+		Guards.stringValue(IotaWalletConnector._CLASS_NAME, nameof(address), address);
 		Guards.bigint(IotaWalletConnector._CLASS_NAME, nameof(amount), amount);
 
 		try {
