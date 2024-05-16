@@ -5,7 +5,7 @@ import type { IEntityStorageConnector } from "@gtsc/entity-storage-models";
 import { nameof } from "@gtsc/nameof";
 import type { IRequestContext } from "@gtsc/services";
 import type { IFaucetConnector } from "@gtsc/wallet-models";
-import type { IWalletAddress } from "./models/IWalletAddress";
+import type { WalletAddress } from "./entities/walletAddress";
 
 /**
  * Class for performing faucet operations using entity storage.
@@ -26,7 +26,7 @@ export class EntityStorageFaucetConnector implements IFaucetConnector {
 	 * The entity storage for wallets.
 	 * @internal
 	 */
-	private readonly _walletAddressEntityStorage: IEntityStorageConnector<IWalletAddress>;
+	private readonly _walletAddressEntityStorage: IEntityStorageConnector<WalletAddress>;
 
 	/**
 	 * Create a new instance of MemoryFaucetConnector.
@@ -34,7 +34,7 @@ export class EntityStorageFaucetConnector implements IFaucetConnector {
 	 * @param dependencies.walletAddressEntityStorage The entity storage for wallet addresses.
 	 */
 	constructor(dependencies: {
-		walletAddressEntityStorage: IEntityStorageConnector<IWalletAddress>;
+		walletAddressEntityStorage: IEntityStorageConnector<WalletAddress>;
 	}) {
 		Guards.object<EntityStorageFaucetConnector>(
 			EntityStorageFaucetConnector._CLASS_NAME,
