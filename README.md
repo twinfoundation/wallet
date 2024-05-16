@@ -1,4 +1,4 @@
-# GTSC / Wallet
+# GTSC Wallet
 
 This mono-repository contains the packages to use with Wallets in GTSC applications.
 

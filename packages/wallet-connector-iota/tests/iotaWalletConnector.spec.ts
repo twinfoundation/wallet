@@ -1,13 +1,12 @@
 // Copyright 2024 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
 import { Bip44, KeyType } from "@gtsc/crypto";
+import { EntitySchemaHelper } from "@gtsc/entity";
 import { MemoryEntityStorageConnector } from "@gtsc/entity-storage-connector-memory";
 import {
 	EntityStorageVaultConnector,
-	type IVaultKey,
-	type IVaultSecret,
-	VaultKeyDescriptor,
-	VaultSecretDescriptor
+	VaultKey,
+	VaultSecret
 } from "@gtsc/vault-connector-entity-storage";
 import type { IVaultConnector } from "@gtsc/vault-models";
 import {
@@ -122,15 +121,15 @@ describe("IotaWalletConnector", () => {
 	});
 
 	test("can create a new wallet", async () => {
-		const vaultSecretEntityStorageConnector = new MemoryEntityStorageConnector<IVaultSecret>(
-			VaultSecretDescriptor
+		const vaultSecretEntityStorageConnector = new MemoryEntityStorageConnector<VaultSecret>(
+			EntitySchemaHelper.getSchema(VaultSecret)
 		);
 
 		const wallet = new IotaWalletConnector(
 			{
 				vaultConnector: new EntityStorageVaultConnector({
-					vaultKeyEntityStorageConnector: new MemoryEntityStorageConnector<IVaultKey>(
-						VaultKeyDescriptor
+					vaultKeyEntityStorageConnector: new MemoryEntityStorageConnector<VaultKey>(
+						EntitySchemaHelper.getSchema(VaultKey)
 					),
 					vaultSecretEntityStorageConnector
 				})

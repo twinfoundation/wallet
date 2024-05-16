@@ -1,23 +1,25 @@
 // Copyright 2024 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
+import { EntitySchemaHelper } from "@gtsc/entity";
 import { MemoryEntityStorageConnector } from "@gtsc/entity-storage-connector-memory";
 import type { IEntityStorageConnector } from "@gtsc/entity-storage-models";
 import type { IFaucetConnector } from "@gtsc/wallet-models";
+import { WalletAddress } from "../src/entities/walletAddress";
 import { EntityStorageFaucetConnector } from "../src/entityStorageFaucetConnector";
 import { EntityStorageWalletConnector } from "../src/entityStorageWalletConnector";
-import type { IWalletAddress } from "../src/models/IWalletAddress";
-import { WalletAddressDescriptor } from "../src/models/walletAddressDescriptor";
 
 const TEST_TENANT_ID = "test-tenant";
 const TEST_IDENTITY_ID = "test-identity";
 
-let walletAddressEntityStorage: MemoryEntityStorageConnector<IWalletAddress>;
+let walletAddressEntityStorage: MemoryEntityStorageConnector<WalletAddress>;
 let faucetConnector: EntityStorageFaucetConnector;
+
+const walletAddressSchema = EntitySchemaHelper.getSchema(WalletAddress);
 
 describe("EntityStorageWalletConnector", () => {
 	beforeEach(() => {
-		walletAddressEntityStorage = new MemoryEntityStorageConnector<IWalletAddress>(
-			WalletAddressDescriptor
+		walletAddressEntityStorage = new MemoryEntityStorageConnector<WalletAddress>(
+			walletAddressSchema
 		);
 		faucetConnector = new EntityStorageFaucetConnector({ walletAddressEntityStorage });
 	});
@@ -28,7 +30,7 @@ describe("EntityStorageWalletConnector", () => {
 				new EntityStorageWalletConnector(
 					undefined as unknown as {
 						faucetConnector?: IFaucetConnector;
-						walletAddressEntityStorage: IEntityStorageConnector<IWalletAddress>;
+						walletAddressEntityStorage: IEntityStorageConnector<WalletAddress>;
 					}
 				)
 		).toThrow(
@@ -111,8 +113,8 @@ describe("EntityStorageWalletConnector", () => {
 	});
 
 	test("can get a balance for an address", async () => {
-		walletAddressEntityStorage = new MemoryEntityStorageConnector<IWalletAddress>(
-			WalletAddressDescriptor,
+		walletAddressEntityStorage = new MemoryEntityStorageConnector<WalletAddress>(
+			walletAddressSchema,
 			{
 				initialValues: {
 					[TEST_TENANT_ID]: [
@@ -168,8 +170,8 @@ describe("EntityStorageWalletConnector", () => {
 	});
 
 	test("can transfer to another address that does not exist", async () => {
-		walletAddressEntityStorage = new MemoryEntityStorageConnector<IWalletAddress>(
-			WalletAddressDescriptor,
+		walletAddressEntityStorage = new MemoryEntityStorageConnector<WalletAddress>(
+			walletAddressSchema,
 			{
 				initialValues: {
 					[TEST_TENANT_ID]: [
@@ -211,8 +213,8 @@ describe("EntityStorageWalletConnector", () => {
 	});
 
 	test("can transfer to another address that exists", async () => {
-		walletAddressEntityStorage = new MemoryEntityStorageConnector<IWalletAddress>(
-			WalletAddressDescriptor,
+		walletAddressEntityStorage = new MemoryEntityStorageConnector<WalletAddress>(
+			walletAddressSchema,
 			{
 				initialValues: {
 					[TEST_TENANT_ID]: [

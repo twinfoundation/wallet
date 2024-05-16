@@ -6,7 +6,7 @@ import type { IEntityStorageConnector } from "@gtsc/entity-storage-models";
 import { nameof } from "@gtsc/nameof";
 import type { IRequestContext } from "@gtsc/services";
 import type { IFaucetConnector, IWalletConnector } from "@gtsc/wallet-models";
-import type { IWalletAddress } from "./models/IWalletAddress";
+import type { WalletAddress } from "./entities/walletAddress";
 
 /**
  * Class for performing wallet operations using in-memory storage.
@@ -33,7 +33,7 @@ export class EntityStorageWalletConnector implements IWalletConnector {
 	 * The entity storage for wallets.
 	 * @internal
 	 */
-	private readonly _walletAddressEntityStorage: IEntityStorageConnector<IWalletAddress>;
+	private readonly _walletAddressEntityStorage: IEntityStorageConnector<WalletAddress>;
 
 	/**
 	 * Create a new instance of EntityStorageWalletConnector.
@@ -43,7 +43,7 @@ export class EntityStorageWalletConnector implements IWalletConnector {
 	 */
 	constructor(dependencies: {
 		faucetConnector?: IFaucetConnector;
-		walletAddressEntityStorage: IEntityStorageConnector<IWalletAddress>;
+		walletAddressEntityStorage: IEntityStorageConnector<WalletAddress>;
 	}) {
 		Guards.object<EntityStorageWalletConnector>(
 			EntityStorageWalletConnector._CLASS_NAME,
@@ -218,7 +218,7 @@ export class EntityStorageWalletConnector implements IWalletConnector {
 		});
 
 		let amountRequired = amount;
-		const updates: Partial<IWalletAddress>[] = [];
+		const updates: Partial<WalletAddress>[] = [];
 		for (const walletAddress of walletAddresses.entities) {
 			if (Is.stringValue(walletAddress.balance)) {
 				let balance = BigInt(walletAddress.balance);
@@ -240,7 +240,7 @@ export class EntityStorageWalletConnector implements IWalletConnector {
 		}
 
 		for (const update of updates) {
-			await this._walletAddressEntityStorage.set(requestContext, update as IWalletAddress);
+			await this._walletAddressEntityStorage.set(requestContext, update as WalletAddress);
 		}
 
 		let destWalletAddress = await this._walletAddressEntityStorage.get(requestContext, address);

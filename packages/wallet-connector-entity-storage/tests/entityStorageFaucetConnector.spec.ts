@@ -1,19 +1,20 @@
 // Copyright 2024 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
+import { EntitySchemaHelper } from "@gtsc/entity";
 import { MemoryEntityStorageConnector } from "@gtsc/entity-storage-connector-memory";
+import { WalletAddress } from "../src/entities/walletAddress";
 import { EntityStorageFaucetConnector } from "../src/entityStorageFaucetConnector";
-import type { IWalletAddress } from "../src/models/IWalletAddress";
-import { WalletAddressDescriptor } from "../src/models/walletAddressDescriptor";
 
 const TEST_TENANT_ID = "test-tenant";
 const TEST_IDENTITY_ID = "test-identity";
 
-let walletAddressEntityStorage: MemoryEntityStorageConnector<IWalletAddress>;
+let walletAddressEntityStorage: MemoryEntityStorageConnector<WalletAddress>;
+const walletAddressSchema = EntitySchemaHelper.getSchema(WalletAddress);
 
 describe("EntityStorageFaucetConnector", () => {
 	beforeEach(() => {
-		walletAddressEntityStorage = new MemoryEntityStorageConnector<IWalletAddress>(
-			WalletAddressDescriptor
+		walletAddressEntityStorage = new MemoryEntityStorageConnector<WalletAddress>(
+			walletAddressSchema
 		);
 	});
 
@@ -42,8 +43,8 @@ describe("EntityStorageFaucetConnector", () => {
 	});
 
 	test("can fund an existing address from the faucet", async () => {
-		walletAddressEntityStorage = new MemoryEntityStorageConnector<IWalletAddress>(
-			WalletAddressDescriptor,
+		walletAddressEntityStorage = new MemoryEntityStorageConnector<WalletAddress>(
+			walletAddressSchema,
 			{
 				initialValues: {
 					[TEST_TENANT_ID]: [
