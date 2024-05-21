@@ -61,7 +61,7 @@ export const TEST_WALLET_CONNECTOR = new IotaWalletConnector(
 export const TEST_SEED = Bip39.mnemonicToSeed(process.env.TEST_MNEMONIC ?? "");
 export const TEST_COIN_TYPE = process.env.TEST_COIN_TYPE
 	? Number.parseInt(process.env.TEST_COIN_TYPE, 10)
-	: CoinType.Shimmer;
+	: CoinType.IOTA;
 export const TEST_HRP = process.env.TEST_BECH32_HRP ?? "";
 const addressKeyPair = Bip44.addressBech32(
 	TEST_SEED,
