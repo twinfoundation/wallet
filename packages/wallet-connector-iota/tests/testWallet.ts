@@ -72,7 +72,6 @@ const addressKeyPair = Bip44.addressBech32(
 	false,
 	0
 );
-export const TEST_WALLET_KEY_PAIR = addressKeyPair.keyPair;
 export const TEST_ADDRESS_BECH32 = addressKeyPair.address;
 export const TEST_CONTEXT: IRequestContext = {
 	tenantId: TEST_TENANT_ID,
