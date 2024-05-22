@@ -5,16 +5,16 @@ import {
 	TEST_CLIENT_OPTIONS,
 	TEST_COIN_TYPE,
 	TEST_CONTEXT,
-	TEST_HRP,
+	TEST_BECH32_HRP,
 	TEST_SEED,
-	initTestWallet
-} from "./testWallet";
+	setupTestEnv
+} from "./setupTestEnv";
 import { IotaFaucetConnector } from "../src/iotaFaucetConnector";
 import type { IIotaFaucetConnectorConfig } from "../src/models/IIotaFaucetConnectorConfig";
 
 describe("IotaFaucetConnector", () => {
 	beforeAll(async () => {
-		await initTestWallet();
+		await setupTestEnv();
 	});
 
 	test("can fail to construct a faucet with no config", () => {
@@ -73,7 +73,7 @@ describe("IotaFaucetConnector", () => {
 		const addressKeyPair = Bip44.addressBech32(
 			TEST_SEED,
 			KeyType.Ed25519,
-			TEST_HRP,
+			TEST_BECH32_HRP,
 			TEST_COIN_TYPE,
 			0,
 			false,

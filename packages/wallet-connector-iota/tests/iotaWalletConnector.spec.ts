@@ -14,21 +14,21 @@ import {
 	TEST_CLIENT_OPTIONS,
 	TEST_COIN_TYPE,
 	TEST_CONTEXT,
-	TEST_HRP,
+	TEST_BECH32_HRP,
 	TEST_IDENTITY_ID,
 	TEST_MNEMONIC_NAME,
 	TEST_SEED,
 	TEST_TENANT_ID,
 	TEST_VAULT,
-	initTestWallet
-} from "./testWallet";
+	setupTestEnv
+} from "./setupTestEnv";
 import { IotaFaucetConnector } from "../src/iotaFaucetConnector";
 import { IotaWalletConnector } from "../src/iotaWalletConnector";
 import type { IIotaWalletConnectorConfig } from "../src/models/IIotaWalletConnectorConfig";
 
 describe("IotaWalletConnector", () => {
 	beforeAll(async () => {
-		await initTestWallet();
+		await setupTestEnv();
 	});
 
 	test("can fail to construct a wallet with no dependencies", () => {
@@ -167,7 +167,7 @@ describe("IotaWalletConnector", () => {
 		const addressKeyPair = Bip44.addressBech32(
 			TEST_SEED,
 			KeyType.Ed25519,
-			TEST_HRP,
+			TEST_BECH32_HRP,
 			TEST_COIN_TYPE,
 			0,
 			false,
