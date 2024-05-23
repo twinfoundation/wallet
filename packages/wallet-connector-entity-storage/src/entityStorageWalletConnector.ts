@@ -1,12 +1,15 @@
 // Copyright 2024 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
 import { Coerce, GeneralError, Guards, Is } from "@gtsc/core";
+import { Bip39, Bip44, KeyType } from "@gtsc/crypto";
 import { ComparisonOperator, LogicalOperator } from "@gtsc/entity";
 import type { IEntityStorageConnector } from "@gtsc/entity-storage-models";
 import { nameof } from "@gtsc/nameof";
 import type { IRequestContext } from "@gtsc/services";
+import type { IVaultConnector } from "@gtsc/vault-models";
 import type { IFaucetConnector, IWalletConnector } from "@gtsc/wallet-models";
 import type { WalletAddress } from "./entities/walletAddress";
+import type { IEntityStorageWalletConnectorConfig } from "./models/IEntityStorageWalletConnectorConfig";
 
 /**
  * Class for performing wallet operations using in-memory storage.
@@ -18,10 +21,33 @@ export class EntityStorageWalletConnector implements IWalletConnector {
 	public static NAMESPACE: string = "entity-storage";
 
 	/**
+	 * Default name for the mnemonic secret.
+	 */
+	public static MNEMONIC_SECRET_NAME: string = "wallet-mnemonic";
+
+	/**
+	 * Default coin type.
+	 * @internal
+	 */
+	private static readonly _COIN_TYPE: number = 9999;
+
+	/**
+	 * Default bech32 hrp.
+	 * @internal
+	 */
+	private static readonly _BECH32_HRP: string = "ent";
+
+	/**
 	 * Runtime name for the class.
 	 * @internal
 	 */
 	private static readonly _CLASS_NAME: string = nameof<EntityStorageWalletConnector>();
+
+	/**
+	 * The vault for the mnemonic.
+	 * @internal
+	 */
+	private readonly _vaultConnector: IVaultConnector;
 
 	/**
 	 * The faucet.
@@ -36,19 +62,36 @@ export class EntityStorageWalletConnector implements IWalletConnector {
 	private readonly _walletAddressEntityStorage: IEntityStorageConnector<WalletAddress>;
 
 	/**
+	 * The configuration to use for tangle operations.
+	 * @internal
+	 */
+	private readonly _config: IEntityStorageWalletConnectorConfig;
+
+	/**
 	 * Create a new instance of EntityStorageWalletConnector.
 	 * @param dependencies The dependencies for the wallet connector.
+	 * @param dependencies.vaultConnector Vault connector to use for wallet secrets.
 	 * @param dependencies.faucetConnector Optional faucet for requesting funds.
 	 * @param dependencies.walletAddressEntityStorage The entity storage for wallets.
+	 * @param config The configuration to use.
 	 */
-	constructor(dependencies: {
-		faucetConnector?: IFaucetConnector;
-		walletAddressEntityStorage: IEntityStorageConnector<WalletAddress>;
-	}) {
+	constructor(
+		dependencies: {
+			vaultConnector: IVaultConnector;
+			faucetConnector?: IFaucetConnector;
+			walletAddressEntityStorage: IEntityStorageConnector<WalletAddress>;
+		},
+		config?: IEntityStorageWalletConnectorConfig
+	) {
 		Guards.object<EntityStorageWalletConnector>(
 			EntityStorageWalletConnector._CLASS_NAME,
 			nameof(dependencies),
 			dependencies
+		);
+		Guards.object<IVaultConnector>(
+			EntityStorageWalletConnector._CLASS_NAME,
+			nameof(dependencies.vaultConnector),
+			dependencies.vaultConnector
 		);
 		Guards.object<EntityStorageWalletConnector>(
 			EntityStorageWalletConnector._CLASS_NAME,
@@ -57,7 +100,11 @@ export class EntityStorageWalletConnector implements IWalletConnector {
 		);
 
 		this._walletAddressEntityStorage = dependencies.walletAddressEntityStorage;
+		this._vaultConnector = dependencies.vaultConnector;
 		this._faucetConnector = dependencies.faucetConnector;
+		this._config = config ?? {};
+		this._config.coinType ??= EntityStorageWalletConnector._COIN_TYPE;
+		this._config.bech32Hrp ??= EntityStorageWalletConnector._BECH32_HRP;
 	}
 
 	/**
@@ -81,6 +128,67 @@ export class EntityStorageWalletConnector implements IWalletConnector {
 			nameof(requestContext.identity),
 			requestContext.identity
 		);
+
+		const mnemonic = Bip39.randomMnemonic();
+		await this._vaultConnector.setSecret<string>(
+			requestContext,
+			this._config.walletMnemonicId ?? EntityStorageWalletConnector.MNEMONIC_SECRET_NAME,
+			mnemonic
+		);
+	}
+
+	/**
+	 * Get the addresses for the requested range.
+	 * @param requestContext The context for the request.
+	 * @param startIndex The start index for the addresses.
+	 * @param endIndex The end index for the addresses.
+	 * @returns The list of addresses.
+	 */
+	public async getAddresses(
+		requestContext: IRequestContext,
+		startIndex: number,
+		endIndex: number
+	): Promise<string[]> {
+		Guards.object<IRequestContext>(
+			EntityStorageWalletConnector._CLASS_NAME,
+			nameof(requestContext),
+			requestContext
+		);
+		Guards.stringValue(
+			EntityStorageWalletConnector._CLASS_NAME,
+			nameof(requestContext.tenantId),
+			requestContext.tenantId
+		);
+		Guards.stringValue(
+			EntityStorageWalletConnector._CLASS_NAME,
+			nameof(requestContext.identity),
+			requestContext.identity
+		);
+
+		const mnemonic = await this._vaultConnector.getSecret<string>(
+			requestContext,
+			this._config.walletMnemonicId ?? EntityStorageWalletConnector.MNEMONIC_SECRET_NAME
+		);
+
+		const seed = Bip39.mnemonicToSeed(mnemonic);
+
+		const keyPairs: string[] = [];
+
+		for (let i = startIndex; i < endIndex; i++) {
+			const addressKeyPair = Bip44.addressBech32(
+				seed,
+				KeyType.Ed25519,
+				this._config.bech32Hrp ?? EntityStorageWalletConnector._BECH32_HRP,
+				this._config.coinType ?? EntityStorageWalletConnector._COIN_TYPE,
+				0,
+				false,
+				i
+			);
+
+			keyPairs.push(addressKeyPair.address);
+		}
+
+		return keyPairs;
 	}
 
 	/**

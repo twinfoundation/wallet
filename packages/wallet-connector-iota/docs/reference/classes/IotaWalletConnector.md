@@ -78,6 +78,38 @@ Nothing.
 
 ***
 
+### getAddresses()
+
+> **getAddresses**(`requestContext`, `startIndex`, `endIndex`): `Promise`\<`string`[]\>
+
+Get the addresses for the requested range.
+
+#### Parameters
+
+• **requestContext**: `IRequestContext`
+
+The context for the request.
+
+• **startIndex**: `number`
+
+The start index for the addresses.
+
+• **endIndex**: `number`
+
+The end index for the addresses.
+
+#### Returns
+
+`Promise`\<`string`[]\>
+
+The list of addresses.
+
+#### Implementation of
+
+`IWalletConnector.getAddresses`
+
+***
+
 ### getBalance()
 
 > **getBalance**(`requestContext`, `address`): `Promise`\<`bigint`\>

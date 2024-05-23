@@ -17,3 +17,19 @@ The configuration for the client.
 > `optional` **walletMnemonicId**: `string`
 
 The id of the entry in the vault containing the wallet mnemonic.
+
+***
+
+### coinType?
+
+> `optional` **coinType**: `number`
+
+The coin type, defaults to IOTA.
+
+***
+
+### bech32Hrp?
+
+> `optional` **bech32Hrp**: `string`
+
+The bech32 human readable part for the addresses, defaults to iota.
