@@ -44,7 +44,7 @@ export class IotaFaucetConnector implements IFaucetConnector {
 			nameof(config),
 			config
 		);
-		Guards.object<IIotaFaucetConnectorConfig>(
+		Guards.object<IIotaFaucetConnectorConfig["clientOptions"]>(
 			IotaFaucetConnector._CLASS_NAME,
 			nameof(config.clientOptions),
 			config.clientOptions

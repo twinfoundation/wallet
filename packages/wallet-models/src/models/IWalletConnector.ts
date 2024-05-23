@@ -14,6 +14,19 @@ export interface IWalletConnector extends IService {
 	create(requestContext: IRequestContext): Promise<void>;
 
 	/**
+	 * Get the addresses for the requested range.
+	 * @param requestContext The context for the request.
+	 * @param startIndex The start index for the addresses.
+	 * @param endIndex The end index for the addresses.
+	 * @returns The list of addresses.
+	 */
+	getAddresses(
+		requestContext: IRequestContext,
+		startIndex: number,
+		endIndex: number
+	): Promise<string[]>;
+
+	/**
 	 * Get the balance for an address in a wallet.
 	 * @param requestContext The context for the request.
 	 * @param address The bech32 encoded address.

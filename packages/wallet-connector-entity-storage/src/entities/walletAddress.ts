@@ -9,7 +9,7 @@ import { entity, property } from "@gtsc/entity";
 @entity()
 export class WalletAddress {
 	/**
-	 * The address of the wallet.
+	 * The address in the wallet.
 	 */
 	@property({ type: "string", isPrimary: true })
 	public address!: string;

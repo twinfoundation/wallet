@@ -108,7 +108,7 @@ describe("IotaWalletConnector", () => {
 	});
 
 	test("can construct a wallet with details", () => {
-		const faucet = new IotaWalletConnector(
+		const wallet = new IotaWalletConnector(
 			{
 				vaultConnector: TEST_VAULT
 			},
@@ -117,7 +117,7 @@ describe("IotaWalletConnector", () => {
 				walletMnemonicId: TEST_MNEMONIC_NAME
 			}
 		);
-		expect(faucet).toBeDefined();
+		expect(wallet).toBeDefined();
 	});
 
 	test("can create a new wallet", async () => {
@@ -145,6 +145,23 @@ describe("IotaWalletConnector", () => {
 		const store = vaultSecretEntityStorageConnector.getStore(TEST_TENANT_ID);
 		expect(store?.[0].id).toEqual(`${TEST_IDENTITY_ID}/${TEST_MNEMONIC_NAME}`);
 		expect(JSON.parse(store?.[0].data ?? "").split(" ").length).toEqual(24);
+	});
+
+	test("can generate addresses for the wallet", async () => {
+		const wallet = new IotaWalletConnector(
+			{
+				vaultConnector: TEST_VAULT
+			},
+			{
+				clientOptions: TEST_CLIENT_OPTIONS,
+				walletMnemonicId: TEST_MNEMONIC_NAME
+			}
+		);
+
+		await wallet.create(TEST_CONTEXT);
+
+		const testAddresses = await wallet.getAddresses(TEST_CONTEXT, 0, 10);
+		expect(testAddresses.length).toEqual(10);
 	});
 
 	test("can fail to ensure a balance on an address with no faucet available", async () => {

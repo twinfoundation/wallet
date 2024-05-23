@@ -10,7 +10,7 @@ Class for performing wallet operations using in-memory storage.
 
 ### new EntityStorageWalletConnector()
 
-> **new EntityStorageWalletConnector**(`dependencies`): [`EntityStorageWalletConnector`](EntityStorageWalletConnector.md)
+> **new EntityStorageWalletConnector**(`dependencies`, `config`?): [`EntityStorageWalletConnector`](EntityStorageWalletConnector.md)
 
 Create a new instance of EntityStorageWalletConnector.
 
@@ -20,13 +20,21 @@ Create a new instance of EntityStorageWalletConnector.
 
 The dependencies for the wallet connector.
 
+• **dependencies.vaultConnector**: `IVaultConnector`
+
+Vault connector to use for wallet secrets.
+
 • **dependencies.faucetConnector?**: `IFaucetConnector`
 
 Optional faucet for requesting funds.
 
-• **dependencies.walletAddressEntityStorage**: `IEntityStorageConnector`\<[`WalletAddress`](WalletAddress.md)\>
+• **dependencies.walletAddressEntityStorage?**: `IEntityStorageConnector`\<[`WalletAddress`](WalletAddress.md)\>
 
 The entity storage for wallets.
+
+• **config?**: [`IEntityStorageWalletConnectorConfig`](../interfaces/IEntityStorageWalletConnectorConfig.md)
+
+The configuration to use.
 
 #### Returns
 
@@ -39,6 +47,14 @@ The entity storage for wallets.
 > `static` **NAMESPACE**: `string` = `"entity-storage"`
 
 The namespace supported by the wallet connector.
+
+***
+
+### MNEMONIC\_SECRET\_NAME
+
+> `static` **MNEMONIC\_SECRET\_NAME**: `string` = `"wallet-mnemonic"`
+
+Default name for the mnemonic secret.
 
 ## Methods
 
@@ -63,6 +79,38 @@ Nothing.
 #### Implementation of
 
 `IWalletConnector.create`
+
+***
+
+### getAddresses()
+
+> **getAddresses**(`requestContext`, `startIndex`, `endIndex`): `Promise`\<`string`[]\>
+
+Get the addresses for the requested range.
+
+#### Parameters
+
+• **requestContext**: `IRequestContext`
+
+The context for the request.
+
+• **startIndex**: `number`
+
+The start index for the addresses.
+
+• **endIndex**: `number`
+
+The end index for the addresses.
+
+#### Returns
+
+`Promise`\<`string`[]\>
+
+The list of addresses.
+
+#### Implementation of
+
+`IWalletConnector.getAddresses`
 
 ***
 
