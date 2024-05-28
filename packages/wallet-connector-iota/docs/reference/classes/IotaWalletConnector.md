@@ -46,9 +46,9 @@ The namespace supported by the wallet connector.
 
 ***
 
-### MNEMONIC\_SECRET\_NAME
+### \_DEFAULT\_MNEMONIC\_SECRET\_NAME
 
-> `static` **MNEMONIC\_SECRET\_NAME**: `string` = `"wallet-mnemonic"`
+> `static` `private` `readonly` **\_DEFAULT\_MNEMONIC\_SECRET\_NAME**: `string` = `"wallet-mnemonic"`
 
 Default name for the mnemonic secret.
 
@@ -80,7 +80,7 @@ Nothing.
 
 ### getAddresses()
 
-> **getAddresses**(`requestContext`, `startIndex`, `endIndex`): `Promise`\<`string`[]\>
+> **getAddresses**(`requestContext`, `accountIndex`, `startIndex`, `endIndex`): `Promise`\<`string`[]\>
 
 Get the addresses for the requested range.
 
@@ -89,6 +89,10 @@ Get the addresses for the requested range.
 • **requestContext**: `IRequestContext`
 
 The context for the request.
+
+• **accountIndex**: `number`
+
+The account index for the addresses.
 
 • **startIndex**: `number`
 
@@ -231,3 +235,51 @@ Nothing.
 #### Implementation of
 
 `IWalletConnector.transfer`
+
+***
+
+### sign()
+
+> **sign**(`requestContext`, `signatureType`, `accountIndex`, `addressIndex`, `data`): `Promise`\<`object`\>
+
+Sign data using a wallet based key.
+
+#### Parameters
+
+• **requestContext**: `IRequestContext`
+
+The context for the request.
+
+• **signatureType**: `KeyType`
+
+The type of signature to create.
+
+• **accountIndex**: `number`
+
+The account index for the address.
+
+• **addressIndex**: `number`
+
+The index for the address.
+
+• **data**: `string`
+
+The data as a base64 encoded string.
+
+#### Returns
+
+`Promise`\<`object`\>
+
+The signature and public key base64 encoded.
+
+##### publicKey
+
+> **publicKey**: `string`
+
+##### signature
+
+> **signature**: `string`
+
+#### Implementation of
+
+`IWalletConnector.sign`

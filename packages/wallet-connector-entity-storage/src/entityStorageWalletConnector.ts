@@ -1,7 +1,7 @@
 // Copyright 2024 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
-import { Coerce, GeneralError, Guards, Is } from "@gtsc/core";
-import { Bip39, Bip44, KeyType } from "@gtsc/crypto";
+import { Coerce, Converter, GeneralError, Guards, Is } from "@gtsc/core";
+import { Bip39, Bip44, Ed25519, KeyType, Secp256k1 } from "@gtsc/crypto";
 import { ComparisonOperator, LogicalOperator } from "@gtsc/entity";
 import type { IEntityStorageConnector } from "@gtsc/entity-storage-models";
 import { nameof } from "@gtsc/nameof";
@@ -23,19 +23,19 @@ export class EntityStorageWalletConnector implements IWalletConnector {
 	/**
 	 * Default name for the mnemonic secret.
 	 */
-	public static MNEMONIC_SECRET_NAME: string = "wallet-mnemonic";
+	private static readonly _DEFAULT_MNEMONIC_SECRET_NAME: string = "wallet-mnemonic";
 
 	/**
 	 * Default coin type.
 	 * @internal
 	 */
-	private static readonly _COIN_TYPE: number = 9999;
+	private static readonly _DEFAULT_COIN_TYPE: number = 9999;
 
 	/**
 	 * Default bech32 hrp.
 	 * @internal
 	 */
-	private static readonly _BECH32_HRP: string = "ent";
+	private static readonly _DEFAULT_BECH32_HRP: string = "ent";
 
 	/**
 	 * Runtime name for the class.
@@ -103,8 +103,8 @@ export class EntityStorageWalletConnector implements IWalletConnector {
 		this._vaultConnector = dependencies.vaultConnector;
 		this._faucetConnector = dependencies.faucetConnector;
 		this._config = config ?? {};
-		this._config.coinType ??= EntityStorageWalletConnector._COIN_TYPE;
-		this._config.bech32Hrp ??= EntityStorageWalletConnector._BECH32_HRP;
+		this._config.coinType ??= EntityStorageWalletConnector._DEFAULT_COIN_TYPE;
+		this._config.bech32Hrp ??= EntityStorageWalletConnector._DEFAULT_BECH32_HRP;
 	}
 
 	/**
@@ -132,7 +132,7 @@ export class EntityStorageWalletConnector implements IWalletConnector {
 		const mnemonic = Bip39.randomMnemonic();
 		await this._vaultConnector.setSecret<string>(
 			requestContext,
-			this._config.walletMnemonicId ?? EntityStorageWalletConnector.MNEMONIC_SECRET_NAME,
+			this._config.walletMnemonicId ?? EntityStorageWalletConnector._DEFAULT_MNEMONIC_SECRET_NAME,
 			mnemonic
 		);
 	}
@@ -140,12 +140,14 @@ export class EntityStorageWalletConnector implements IWalletConnector {
 	/**
 	 * Get the addresses for the requested range.
 	 * @param requestContext The context for the request.
+	 * @param accountIndex The account index for the addresses.
 	 * @param startIndex The start index for the addresses.
 	 * @param endIndex The end index for the addresses.
 	 * @returns The list of addresses.
 	 */
 	public async getAddresses(
 		requestContext: IRequestContext,
+		accountIndex: number,
 		startIndex: number,
 		endIndex: number
 	): Promise<string[]> {
@@ -164,10 +166,13 @@ export class EntityStorageWalletConnector implements IWalletConnector {
 			nameof(requestContext.identity),
 			requestContext.identity
 		);
+		Guards.integer(EntityStorageWalletConnector._CLASS_NAME, nameof(accountIndex), accountIndex);
+		Guards.integer(EntityStorageWalletConnector._CLASS_NAME, nameof(startIndex), startIndex);
+		Guards.integer(EntityStorageWalletConnector._CLASS_NAME, nameof(endIndex), endIndex);
 
 		const mnemonic = await this._vaultConnector.getSecret<string>(
 			requestContext,
-			this._config.walletMnemonicId ?? EntityStorageWalletConnector.MNEMONIC_SECRET_NAME
+			this._config.walletMnemonicId ?? EntityStorageWalletConnector._DEFAULT_MNEMONIC_SECRET_NAME
 		);
 
 		const seed = Bip39.mnemonicToSeed(mnemonic);
@@ -178,9 +183,9 @@ export class EntityStorageWalletConnector implements IWalletConnector {
 			const addressKeyPair = Bip44.addressBech32(
 				seed,
 				KeyType.Ed25519,
-				this._config.bech32Hrp ?? EntityStorageWalletConnector._BECH32_HRP,
-				this._config.coinType ?? EntityStorageWalletConnector._COIN_TYPE,
-				0,
+				this._config.bech32Hrp ?? EntityStorageWalletConnector._DEFAULT_BECH32_HRP,
+				this._config.coinType ?? EntityStorageWalletConnector._DEFAULT_COIN_TYPE,
+				accountIndex,
 				false,
 				i
 			);
@@ -364,5 +369,77 @@ export class EntityStorageWalletConnector implements IWalletConnector {
 		destWalletAddress.balance = (BigInt(destWalletAddress.balance) + amount).toString();
 
 		await this._walletAddressEntityStorage.set(requestContext, destWalletAddress);
+	}
+
+	/**
+	 * Sign data using a wallet based key.
+	 * @param requestContext The context for the request.
+	 * @param signatureType The type of signature to create.
+	 * @param accountIndex The account index for the address.
+	 * @param addressIndex The index for the address.
+	 * @param data The data as a base64 encoded string.
+	 * @returns The signature and public key base64 encoded.
+	 */
+	public async sign(
+		requestContext: IRequestContext,
+		signatureType: KeyType,
+		accountIndex: number,
+		addressIndex: number,
+		data: string
+	): Promise<{
+		publicKey: string;
+		signature: string;
+	}> {
+		Guards.object<IRequestContext>(
+			EntityStorageWalletConnector._CLASS_NAME,
+			nameof(requestContext),
+			requestContext
+		);
+		Guards.stringValue(
+			EntityStorageWalletConnector._CLASS_NAME,
+			nameof(requestContext.tenantId),
+			requestContext.tenantId
+		);
+		Guards.stringValue(
+			EntityStorageWalletConnector._CLASS_NAME,
+			nameof(requestContext.identity),
+			requestContext.identity
+		);
+		Guards.arrayOneOf(
+			EntityStorageWalletConnector._CLASS_NAME,
+			nameof(signatureType),
+			signatureType,
+			Object.values(KeyType)
+		);
+		Guards.integer(EntityStorageWalletConnector._CLASS_NAME, nameof(accountIndex), accountIndex);
+		Guards.integer(EntityStorageWalletConnector._CLASS_NAME, nameof(addressIndex), addressIndex);
+		Guards.stringBase64(EntityStorageWalletConnector._CLASS_NAME, nameof(data), data);
+
+		const mnemonic = await this._vaultConnector.getSecret<string>(
+			requestContext,
+			this._config.walletMnemonicId ?? EntityStorageWalletConnector._DEFAULT_MNEMONIC_SECRET_NAME
+		);
+
+		const seed = Bip39.mnemonicToSeed(mnemonic);
+
+		const addressKeyPair = Bip44.addressBech32(
+			seed,
+			KeyType.Ed25519,
+			this._config.bech32Hrp ?? EntityStorageWalletConnector._DEFAULT_BECH32_HRP,
+			this._config.coinType ?? EntityStorageWalletConnector._DEFAULT_COIN_TYPE,
+			accountIndex,
+			false,
+			addressIndex
+		);
+
+		const signature =
+			signatureType === KeyType.Ed25519
+				? Ed25519.sign(Converter.base64ToBytes(data), addressKeyPair.privateKey)
+				: Secp256k1.sign(Converter.base64ToBytes(data), addressKeyPair.privateKey);
+
+		return {
+			publicKey: Converter.bytesToBase64(addressKeyPair.publicKey),
+			signature: Converter.bytesToBase64(signature)
+		};
 	}
 }

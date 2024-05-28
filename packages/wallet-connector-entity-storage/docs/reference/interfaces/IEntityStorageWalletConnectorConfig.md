@@ -16,7 +16,13 @@ The id of the entry in the vault containing the wallet mnemonic.
 
 > `optional` **coinType**: `number`
 
-The coin type, defaults to 9999.
+The coin type.
+
+#### Default
+
+```ts
+9999
+```
 
 ***
 
@@ -24,4 +30,10 @@ The coin type, defaults to 9999.
 
 > `optional` **bech32Hrp**: `string`
 
-The bech32 human readable part for the addresses, defaults to ent.
+The bech32 human readable part for the addresses.
+
+#### Default
+
+```ts
+ent
+```

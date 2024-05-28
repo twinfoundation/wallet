@@ -1,5 +1,6 @@
 // Copyright 2024 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
+import type { KeyType } from "@gtsc/crypto";
 import type { IRequestContext, IService } from "@gtsc/services";
 
 /**
@@ -16,12 +17,14 @@ export interface IWalletConnector extends IService {
 	/**
 	 * Get the addresses for the requested range.
 	 * @param requestContext The context for the request.
+	 * @param accountIndex The account index for the addresses.
 	 * @param startIndex The start index for the addresses.
 	 * @param endIndex The end index for the addresses.
 	 * @returns The list of addresses.
 	 */
 	getAddresses(
 		requestContext: IRequestContext,
+		accountIndex: number,
 		startIndex: number,
 		endIndex: number
 	): Promise<string[]>;
@@ -65,4 +68,24 @@ export interface IWalletConnector extends IService {
 	 * @returns Nothing.
 	 */
 	transfer(requestContext: IRequestContext, address: string, amount: bigint): Promise<void>;
+
+	/**
+	 * Sign data using a wallet based key.
+	 * @param requestContext The context for the request.
+	 * @param signatureType The type of signature to create.
+	 * @param accountIndex The account index for the address.
+	 * @param addressIndex The index for the address.
+	 * @param data The data as a base64 encoded string.
+	 * @returns The signature and public key base64 encoded.
+	 */
+	sign(
+		requestContext: IRequestContext,
+		signatureType: KeyType,
+		accountIndex: number,
+		addressIndex: number,
+		data: string
+	): Promise<{
+		publicKey: string;
+		signature: string;
+	}>;
 }

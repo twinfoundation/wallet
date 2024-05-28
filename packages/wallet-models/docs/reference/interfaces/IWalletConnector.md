@@ -90,7 +90,7 @@ Nothing.
 
 ### getAddresses()
 
-> **getAddresses**(`requestContext`, `startIndex`, `endIndex`): `Promise`\<`string`[]\>
+> **getAddresses**(`requestContext`, `accountIndex`, `startIndex`, `endIndex`): `Promise`\<`string`[]\>
 
 Get the addresses for the requested range.
 
@@ -99,6 +99,10 @@ Get the addresses for the requested range.
 • **requestContext**: `IRequestContext`
 
 The context for the request.
+
+• **accountIndex**: `number`
+
+The account index for the addresses.
 
 • **startIndex**: `number`
 
@@ -221,3 +225,47 @@ The amount to transfer.
 `Promise`\<`void`\>
 
 Nothing.
+
+***
+
+### sign()
+
+> **sign**(`requestContext`, `signatureType`, `accountIndex`, `addressIndex`, `data`): `Promise`\<`object`\>
+
+Sign data using a wallet based key.
+
+#### Parameters
+
+• **requestContext**: `IRequestContext`
+
+The context for the request.
+
+• **signatureType**: `KeyType`
+
+The type of signature to create.
+
+• **accountIndex**: `number`
+
+The account index for the address.
+
+• **addressIndex**: `number`
+
+The index for the address.
+
+• **data**: `string`
+
+The data as a base64 encoded string.
+
+#### Returns
+
+`Promise`\<`object`\>
+
+The signature and public key base64 encoded.
+
+##### publicKey
+
+> **publicKey**: `string`
+
+##### signature
+
+> **signature**: `string`

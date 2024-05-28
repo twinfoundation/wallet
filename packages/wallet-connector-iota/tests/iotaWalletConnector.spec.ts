@@ -160,7 +160,7 @@ describe("IotaWalletConnector", () => {
 
 		await wallet.create(TEST_CONTEXT);
 
-		const testAddresses = await wallet.getAddresses(TEST_CONTEXT, 0, 10);
+		const testAddresses = await wallet.getAddresses(TEST_CONTEXT, 0, 0, 10);
 		expect(testAddresses.length).toEqual(10);
 	});
 

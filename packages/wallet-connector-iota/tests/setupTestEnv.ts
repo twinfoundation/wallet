@@ -26,8 +26,7 @@ Guards.stringValue("TestEnv", "TEST_NODE_ENDPOINT", process.env.TEST_NODE_ENDPOI
 Guards.stringValue("TestEnv", "TEST_FAUCET_ENDPOINT", process.env.TEST_FAUCET_ENDPOINT);
 Guards.stringValue("TestEnv", "TEST_BECH32_HRP", process.env.TEST_BECH32_HRP);
 Guards.stringValue("TestEnv", "TEST_COIN_TYPE", process.env.TEST_COIN_TYPE);
-Guards.stringValue("TestEnv", "TEST_EXPLORER_ADDRESS", process.env.TEST_EXPLORER_ADDRESS);
-Guards.stringValue("TestEnv", "TEST_EXPLORER_SEARCH", process.env.TEST_EXPLORER_SEARCH);
+Guards.stringValue("TestEnv", "TEST_EXPLORER_URL", process.env.TEST_EXPLORER_URL);
 if (!Is.stringValue(process.env.TEST_MNEMONIC)) {
 	// eslint-disable-next-line no-restricted-syntax
 	throw new Error(
@@ -91,6 +90,6 @@ export const TEST_CONTEXT: IRequestContext = {
  * Setup the test environment.
  */
 export async function setupTestEnv(): Promise<void> {
-	console.log("Wallet Address", `${process.env.TEST_EXPLORER_ADDRESS}${TEST_ADDRESS_BECH32}`);
+	console.log("Wallet Address", `${process.env.TEST_EXPLORER_URL}addr/${TEST_ADDRESS_BECH32}`);
 	await TEST_WALLET_CONNECTOR.ensureBalance(TEST_CONTEXT, TEST_ADDRESS_BECH32, 1000000000n);
 }

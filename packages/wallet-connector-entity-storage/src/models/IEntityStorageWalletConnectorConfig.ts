@@ -11,12 +11,14 @@ export interface IEntityStorageWalletConnectorConfig {
 	walletMnemonicId?: string;
 
 	/**
-	 * The coin type, defaults to 9999.
+	 * The coin type.
+	 * @default 9999
 	 */
 	coinType?: number;
 
 	/**
-	 * The bech32 human readable part for the addresses, defaults to ent.
+	 * The bech32 human readable part for the addresses.
+	 * @default ent
 	 */
 	bech32Hrp?: string;
 }
