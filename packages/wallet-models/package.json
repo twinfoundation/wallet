@@ -29,6 +29,7 @@
 	},
 	"dependencies": {
 		"@gtsc/core": "next",
+		"@gtsc/crypto": "next",
 		"@gtsc/nameof": "^0.0.4",
 		"@gtsc/services": "next"
 	},
