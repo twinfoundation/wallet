@@ -17,12 +17,14 @@ export interface IIotaWalletConnectorConfig {
 	walletMnemonicId?: string;
 
 	/**
-	 * The coin type, defaults to IOTA.
+	 * The coin type.
+	 * @default IOTA 4218
 	 */
 	coinType?: number;
 
 	/**
-	 * The bech32 human readable part for the addresses, defaults to iota.
+	 * The bech32 human readable part for the addresses.
+	 * @default iota
 	 */
 	bech32Hrp?: string;
 }

@@ -82,7 +82,7 @@ describe("EntityStorageWalletConnector", () => {
 			vaultConnector: TEST_VAULT
 		});
 
-		testAddresses = await wallet.getAddresses(TEST_CONTEXT, 0, 10);
+		testAddresses = await wallet.getAddresses(TEST_CONTEXT, 0, 0, 10);
 		expect(testAddresses.length).toEqual(10);
 	});
 

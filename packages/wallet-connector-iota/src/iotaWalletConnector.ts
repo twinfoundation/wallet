@@ -1,7 +1,7 @@
 // Copyright 2024 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
-import { GeneralError, Guards } from "@gtsc/core";
-import { Bip39, Bip44, KeyType } from "@gtsc/crypto";
+import { Converter, GeneralError, Guards } from "@gtsc/core";
+import { Bip39, Bip44, Ed25519, KeyType, Secp256k1 } from "@gtsc/crypto";
 import { nameof } from "@gtsc/nameof";
 import type { IRequestContext } from "@gtsc/services";
 import type { IVaultConnector } from "@gtsc/vault-models";
@@ -21,19 +21,19 @@ export class IotaWalletConnector implements IWalletConnector {
 	/**
 	 * Default name for the mnemonic secret.
 	 */
-	public static MNEMONIC_SECRET_NAME: string = "wallet-mnemonic";
+	private static readonly _DEFAULT_MNEMONIC_SECRET_NAME: string = "wallet-mnemonic";
 
 	/**
 	 * Default coin type.
 	 * @internal
 	 */
-	private static readonly _COIN_TYPE: number = CoinType.IOTA;
+	private static readonly _DEFAULT_COIN_TYPE: number = CoinType.IOTA;
 
 	/**
 	 * Default bech32 hrp.
 	 * @internal
 	 */
-	private static readonly _BECH32_HRP: string = "iota";
+	private static readonly _DEFAULT_BECH32_HRP: string = "iota";
 
 	/**
 	 * Runtime name for the class.
@@ -109,8 +109,8 @@ export class IotaWalletConnector implements IWalletConnector {
 		this._vaultConnector = dependencies.vaultConnector;
 		this._faucetConnector = dependencies.faucetConnector;
 		this._config = config;
-		this._config.coinType ??= IotaWalletConnector._COIN_TYPE;
-		this._config.bech32Hrp ??= IotaWalletConnector._BECH32_HRP;
+		this._config.coinType ??= IotaWalletConnector._DEFAULT_COIN_TYPE;
+		this._config.bech32Hrp ??= IotaWalletConnector._DEFAULT_BECH32_HRP;
 	}
 
 	/**
@@ -138,7 +138,7 @@ export class IotaWalletConnector implements IWalletConnector {
 		const mnemonic = Bip39.randomMnemonic();
 		await this._vaultConnector.setSecret<string>(
 			requestContext,
-			this._config.walletMnemonicId ?? IotaWalletConnector.MNEMONIC_SECRET_NAME,
+			this._config.walletMnemonicId ?? IotaWalletConnector._DEFAULT_MNEMONIC_SECRET_NAME,
 			mnemonic
 		);
 	}
@@ -146,12 +146,14 @@ export class IotaWalletConnector implements IWalletConnector {
 	/**
 	 * Get the addresses for the requested range.
 	 * @param requestContext The context for the request.
+	 * @param accountIndex The account index for the addresses.
 	 * @param startIndex The start index for the addresses.
 	 * @param endIndex The end index for the addresses.
 	 * @returns The list of addresses.
 	 */
 	public async getAddresses(
 		requestContext: IRequestContext,
+		accountIndex: number,
 		startIndex: number,
 		endIndex: number
 	): Promise<string[]> {
@@ -170,10 +172,13 @@ export class IotaWalletConnector implements IWalletConnector {
 			nameof(requestContext.identity),
 			requestContext.identity
 		);
+		Guards.integer(IotaWalletConnector._CLASS_NAME, nameof(accountIndex), accountIndex);
+		Guards.integer(IotaWalletConnector._CLASS_NAME, nameof(startIndex), startIndex);
+		Guards.integer(IotaWalletConnector._CLASS_NAME, nameof(endIndex), endIndex);
 
 		const mnemonic = await this._vaultConnector.getSecret<string>(
 			requestContext,
-			this._config.walletMnemonicId ?? IotaWalletConnector.MNEMONIC_SECRET_NAME
+			this._config.walletMnemonicId ?? IotaWalletConnector._DEFAULT_MNEMONIC_SECRET_NAME
 		);
 
 		const seed = Bip39.mnemonicToSeed(mnemonic);
@@ -184,9 +189,9 @@ export class IotaWalletConnector implements IWalletConnector {
 			const addressKeyPair = Bip44.addressBech32(
 				seed,
 				KeyType.Ed25519,
-				this._config.bech32Hrp ?? IotaWalletConnector._BECH32_HRP,
-				this._config.coinType ?? IotaWalletConnector._COIN_TYPE,
-				0,
+				this._config.bech32Hrp ?? IotaWalletConnector._DEFAULT_BECH32_HRP,
+				this._config.coinType ?? IotaWalletConnector._DEFAULT_COIN_TYPE,
+				accountIndex,
 				false,
 				i
 			);
@@ -381,7 +386,7 @@ export class IotaWalletConnector implements IWalletConnector {
 
 			const mnemonic = await this._vaultConnector.getSecret<string>(
 				requestContext,
-				this._config.walletMnemonicId ?? IotaWalletConnector.MNEMONIC_SECRET_NAME
+				this._config.walletMnemonicId ?? IotaWalletConnector._DEFAULT_MNEMONIC_SECRET_NAME
 			);
 
 			await client.buildAndPostBlock(
@@ -396,6 +401,78 @@ export class IotaWalletConnector implements IWalletConnector {
 		} catch (error) {
 			throw new GeneralError(IotaWalletConnector._CLASS_NAME, "transferFailed", undefined, error);
 		}
+	}
+
+	/**
+	 * Sign data using a wallet based key.
+	 * @param requestContext The context for the request.
+	 * @param signatureType The type of signature to create.
+	 * @param accountIndex The account index for the address.
+	 * @param addressIndex The index for the address.
+	 * @param data The data as a base64 encoded string.
+	 * @returns The signature and public key base64 encoded.
+	 */
+	public async sign(
+		requestContext: IRequestContext,
+		signatureType: KeyType,
+		accountIndex: number,
+		addressIndex: number,
+		data: string
+	): Promise<{
+		publicKey: string;
+		signature: string;
+	}> {
+		Guards.object<IRequestContext>(
+			IotaWalletConnector._CLASS_NAME,
+			nameof(requestContext),
+			requestContext
+		);
+		Guards.stringValue(
+			IotaWalletConnector._CLASS_NAME,
+			nameof(requestContext.tenantId),
+			requestContext.tenantId
+		);
+		Guards.stringValue(
+			IotaWalletConnector._CLASS_NAME,
+			nameof(requestContext.identity),
+			requestContext.identity
+		);
+		Guards.arrayOneOf(
+			IotaWalletConnector._CLASS_NAME,
+			nameof(signatureType),
+			signatureType,
+			Object.values(KeyType)
+		);
+		Guards.integer(IotaWalletConnector._CLASS_NAME, nameof(accountIndex), accountIndex);
+		Guards.integer(IotaWalletConnector._CLASS_NAME, nameof(addressIndex), addressIndex);
+		Guards.stringBase64(IotaWalletConnector._CLASS_NAME, nameof(data), data);
+
+		const mnemonic = await this._vaultConnector.getSecret<string>(
+			requestContext,
+			this._config.walletMnemonicId ?? IotaWalletConnector._DEFAULT_MNEMONIC_SECRET_NAME
+		);
+
+		const seed = Bip39.mnemonicToSeed(mnemonic);
+
+		const addressKeyPair = Bip44.addressBech32(
+			seed,
+			KeyType.Ed25519,
+			this._config.bech32Hrp ?? IotaWalletConnector._DEFAULT_BECH32_HRP,
+			this._config.coinType ?? IotaWalletConnector._DEFAULT_COIN_TYPE,
+			accountIndex,
+			false,
+			addressIndex
+		);
+
+		const signature =
+			signatureType === KeyType.Ed25519
+				? Ed25519.sign(Converter.base64ToBytes(data), addressKeyPair.privateKey)
+				: Secp256k1.sign(Converter.base64ToBytes(data), addressKeyPair.privateKey);
+
+		return {
+			publicKey: Converter.bytesToBase64(addressKeyPair.publicKey),
+			signature: Converter.bytesToBase64(signature)
+		};
 	}
 
 	/**

@@ -24,7 +24,13 @@ The id of the entry in the vault containing the wallet mnemonic.
 
 > `optional` **coinType**: `number`
 
-The coin type, defaults to IOTA.
+The coin type.
+
+#### Default
+
+```ts
+IOTA 4218
+```
 
 ***
 
@@ -32,4 +38,10 @@ The coin type, defaults to IOTA.
 
 > `optional` **bech32Hrp**: `string`
 
-The bech32 human readable part for the addresses, defaults to iota.
+The bech32 human readable part for the addresses.
+
+#### Default
+
+```ts
+iota
+```
