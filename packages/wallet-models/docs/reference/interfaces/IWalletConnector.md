@@ -90,7 +90,7 @@ Nothing.
 
 ### getAddresses()
 
-> **getAddresses**(`requestContext`, `accountIndex`, `startIndex`, `endIndex`): `Promise`\<`string`[]\>
+> **getAddresses**(`requestContext`, `accountIndex`, `startAddressIndex`, `count`): `Promise`\<`string`[]\>
 
 Get the addresses for the requested range.
 
@@ -104,11 +104,11 @@ The context for the request.
 
 The account index for the addresses.
 
-• **startIndex**: `number`
+• **startAddressIndex**: `number`
 
 The start index for the addresses.
 
-• **endIndex**: `number`
+• **count**: `number`
 
 The end index for the addresses.
 
@@ -252,20 +252,20 @@ The account index for the address.
 
 The index for the address.
 
-• **data**: `string`
+• **data**: `Uint8Array`
 
-The data as a base64 encoded string.
+The data bytes.
 
 #### Returns
 
 `Promise`\<`object`\>
 
-The signature and public key base64 encoded.
+The signature and public key bytes.
 
 ##### publicKey
 
-> **publicKey**: `string`
+> **publicKey**: `Uint8Array`
 
 ##### signature
 
-> **signature**: `string`
+> **signature**: `Uint8Array`

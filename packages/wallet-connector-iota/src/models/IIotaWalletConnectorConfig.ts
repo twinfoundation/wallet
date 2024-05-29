@@ -13,6 +13,7 @@ export interface IIotaWalletConnectorConfig {
 
 	/**
 	 * The id of the entry in the vault containing the wallet mnemonic.
+	 * @default wallet-mnemonic
 	 */
 	walletMnemonicId?: string;
 

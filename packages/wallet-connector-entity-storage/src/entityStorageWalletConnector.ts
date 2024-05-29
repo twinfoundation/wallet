@@ -1,6 +1,6 @@
 // Copyright 2024 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
-import { Coerce, Converter, GeneralError, Guards, Is } from "@gtsc/core";
+import { Coerce, GeneralError, Guards, Is } from "@gtsc/core";
 import { Bip39, Bip44, Ed25519, KeyType, Secp256k1 } from "@gtsc/crypto";
 import { ComparisonOperator, LogicalOperator } from "@gtsc/entity";
 import type { IEntityStorageConnector } from "@gtsc/entity-storage-models";
@@ -141,15 +141,15 @@ export class EntityStorageWalletConnector implements IWalletConnector {
 	 * Get the addresses for the requested range.
 	 * @param requestContext The context for the request.
 	 * @param accountIndex The account index for the addresses.
-	 * @param startIndex The start index for the addresses.
-	 * @param endIndex The end index for the addresses.
+	 * @param startAddressIndex The start index for the addresses.
+	 * @param count The number of addresses to generate.
 	 * @returns The list of addresses.
 	 */
 	public async getAddresses(
 		requestContext: IRequestContext,
 		accountIndex: number,
-		startIndex: number,
-		endIndex: number
+		startAddressIndex: number,
+		count: number
 	): Promise<string[]> {
 		Guards.object<IRequestContext>(
 			EntityStorageWalletConnector._CLASS_NAME,
@@ -167,8 +167,12 @@ export class EntityStorageWalletConnector implements IWalletConnector {
 			requestContext.identity
 		);
 		Guards.integer(EntityStorageWalletConnector._CLASS_NAME, nameof(accountIndex), accountIndex);
-		Guards.integer(EntityStorageWalletConnector._CLASS_NAME, nameof(startIndex), startIndex);
-		Guards.integer(EntityStorageWalletConnector._CLASS_NAME, nameof(endIndex), endIndex);
+		Guards.integer(
+			EntityStorageWalletConnector._CLASS_NAME,
+			nameof(startAddressIndex),
+			startAddressIndex
+		);
+		Guards.integer(EntityStorageWalletConnector._CLASS_NAME, nameof(count), count);
 
 		const mnemonic = await this._vaultConnector.getSecret<string>(
 			requestContext,
@@ -179,7 +183,7 @@ export class EntityStorageWalletConnector implements IWalletConnector {
 
 		const keyPairs: string[] = [];
 
-		for (let i = startIndex; i < endIndex; i++) {
+		for (let i = startAddressIndex; i < startAddressIndex + count; i++) {
 			const addressKeyPair = Bip44.addressBech32(
 				seed,
 				KeyType.Ed25519,
@@ -377,18 +381,18 @@ export class EntityStorageWalletConnector implements IWalletConnector {
 	 * @param signatureType The type of signature to create.
 	 * @param accountIndex The account index for the address.
 	 * @param addressIndex The index for the address.
-	 * @param data The data as a base64 encoded string.
-	 * @returns The signature and public key base64 encoded.
+	 * @param data The data bytes.
+	 * @returns The signature and public key bytes.
 	 */
 	public async sign(
 		requestContext: IRequestContext,
 		signatureType: KeyType,
 		accountIndex: number,
 		addressIndex: number,
-		data: string
+		data: Uint8Array
 	): Promise<{
-		publicKey: string;
-		signature: string;
+		publicKey: Uint8Array;
+		signature: Uint8Array;
 	}> {
 		Guards.object<IRequestContext>(
 			EntityStorageWalletConnector._CLASS_NAME,
@@ -413,7 +417,7 @@ export class EntityStorageWalletConnector implements IWalletConnector {
 		);
 		Guards.integer(EntityStorageWalletConnector._CLASS_NAME, nameof(accountIndex), accountIndex);
 		Guards.integer(EntityStorageWalletConnector._CLASS_NAME, nameof(addressIndex), addressIndex);
-		Guards.stringBase64(EntityStorageWalletConnector._CLASS_NAME, nameof(data), data);
+		Guards.uint8Array(EntityStorageWalletConnector._CLASS_NAME, nameof(data), data);
 
 		const mnemonic = await this._vaultConnector.getSecret<string>(
 			requestContext,
@@ -424,7 +428,7 @@ export class EntityStorageWalletConnector implements IWalletConnector {
 
 		const addressKeyPair = Bip44.addressBech32(
 			seed,
-			KeyType.Ed25519,
+			signatureType,
 			this._config.bech32Hrp ?? EntityStorageWalletConnector._DEFAULT_BECH32_HRP,
 			this._config.coinType ?? EntityStorageWalletConnector._DEFAULT_COIN_TYPE,
 			accountIndex,
@@ -434,12 +438,12 @@ export class EntityStorageWalletConnector implements IWalletConnector {
 
 		const signature =
 			signatureType === KeyType.Ed25519
-				? Ed25519.sign(Converter.base64ToBytes(data), addressKeyPair.privateKey)
-				: Secp256k1.sign(Converter.base64ToBytes(data), addressKeyPair.privateKey);
+				? Ed25519.sign(data, addressKeyPair.privateKey)
+				: Secp256k1.sign(data, addressKeyPair.privateKey);
 
 		return {
-			publicKey: Converter.bytesToBase64(addressKeyPair.publicKey),
-			signature: Converter.bytesToBase64(signature)
+			publicKey: addressKeyPair.publicKey,
+			signature
 		};
 	}
 }

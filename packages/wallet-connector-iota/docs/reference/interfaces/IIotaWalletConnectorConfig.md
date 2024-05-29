@@ -18,6 +18,12 @@ The configuration for the client.
 
 The id of the entry in the vault containing the wallet mnemonic.
 
+#### Default
+
+```ts
+wallet-mnemonic
+```
+
 ***
 
 ### coinType?
