@@ -1,7 +1,8 @@
 {
 	"error": {
 		"iotaWalletConnector": {
-			"transferFailed": "The wallet transfer failed."
+			"transferFailed": "The wallet transfer failed.",
+			"inclusionFailed": "The transaction generated was not included in a reasonable amount of time"
 		}
 	}
 }

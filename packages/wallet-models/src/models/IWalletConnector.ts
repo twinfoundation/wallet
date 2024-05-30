@@ -17,14 +17,12 @@ export interface IWalletConnector extends IService {
 	/**
 	 * Get the addresses for the requested range.
 	 * @param requestContext The context for the request.
-	 * @param accountIndex The account index for the addresses.
 	 * @param startAddressIndex The start index for the addresses.
 	 * @param count The end index for the addresses.
 	 * @returns The list of addresses.
 	 */
 	getAddresses(
 		requestContext: IRequestContext,
-		accountIndex: number,
 		startAddressIndex: number,
 		count: number
 	): Promise<string[]>;
@@ -73,7 +71,6 @@ export interface IWalletConnector extends IService {
 	 * Sign data using a wallet based key.
 	 * @param requestContext The context for the request.
 	 * @param signatureType The type of signature to create.
-	 * @param accountIndex The account index for the address.
 	 * @param addressIndex The index for the address.
 	 * @param data The data bytes.
 	 * @returns The signature and public key bytes.
@@ -81,7 +78,6 @@ export interface IWalletConnector extends IService {
 	sign(
 		requestContext: IRequestContext,
 		signatureType: KeyType,
-		accountIndex: number,
 		addressIndex: number,
 		data: Uint8Array
 	): Promise<{
