@@ -80,7 +80,7 @@ Nothing.
 
 ### getAddresses()
 
-> **getAddresses**(`requestContext`, `accountIndex`, `startAddressIndex`, `count`): `Promise`\<`string`[]\>
+> **getAddresses**(`requestContext`, `startAddressIndex`, `count`): `Promise`\<`string`[]\>
 
 Get the addresses for the requested range.
 
@@ -89,10 +89,6 @@ Get the addresses for the requested range.
 • **requestContext**: `IRequestContext`
 
 The context for the request.
-
-• **accountIndex**: `number`
-
-The account index for the addresses.
 
 • **startAddressIndex**: `number`
 
@@ -240,7 +236,7 @@ Nothing.
 
 ### sign()
 
-> **sign**(`requestContext`, `signatureType`, `accountIndex`, `addressIndex`, `data`): `Promise`\<`object`\>
+> **sign**(`requestContext`, `signatureType`, `addressIndex`, `data`): `Promise`\<`object`\>
 
 Sign data using a wallet based key.
 
@@ -253,10 +249,6 @@ The context for the request.
 • **signatureType**: `KeyType`
 
 The type of signature to create.
-
-• **accountIndex**: `number`
-
-The account index for the address.
 
 • **addressIndex**: `number`
 

@@ -51,3 +51,17 @@ The bech32 human readable part for the addresses.
 ```ts
 iota
 ```
+
+***
+
+### inclusionTimeoutSeconds?
+
+> `optional` **inclusionTimeoutSeconds**: `number`
+
+The length of time to wait for the inclusion of a transaction in seconds.
+
+#### Default
+
+```ts
+60
+```

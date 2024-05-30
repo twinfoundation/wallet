@@ -140,14 +140,12 @@ export class EntityStorageWalletConnector implements IWalletConnector {
 	/**
 	 * Get the addresses for the requested range.
 	 * @param requestContext The context for the request.
-	 * @param accountIndex The account index for the addresses.
 	 * @param startAddressIndex The start index for the addresses.
 	 * @param count The number of addresses to generate.
 	 * @returns The list of addresses.
 	 */
 	public async getAddresses(
 		requestContext: IRequestContext,
-		accountIndex: number,
 		startAddressIndex: number,
 		count: number
 	): Promise<string[]> {
@@ -166,7 +164,6 @@ export class EntityStorageWalletConnector implements IWalletConnector {
 			nameof(requestContext.identity),
 			requestContext.identity
 		);
-		Guards.integer(EntityStorageWalletConnector._CLASS_NAME, nameof(accountIndex), accountIndex);
 		Guards.integer(
 			EntityStorageWalletConnector._CLASS_NAME,
 			nameof(startAddressIndex),
@@ -189,7 +186,7 @@ export class EntityStorageWalletConnector implements IWalletConnector {
 				KeyType.Ed25519,
 				this._config.bech32Hrp ?? EntityStorageWalletConnector._DEFAULT_BECH32_HRP,
 				this._config.coinType ?? EntityStorageWalletConnector._DEFAULT_COIN_TYPE,
-				accountIndex,
+				0,
 				false,
 				i
 			);
@@ -379,7 +376,6 @@ export class EntityStorageWalletConnector implements IWalletConnector {
 	 * Sign data using a wallet based key.
 	 * @param requestContext The context for the request.
 	 * @param signatureType The type of signature to create.
-	 * @param accountIndex The account index for the address.
 	 * @param addressIndex The index for the address.
 	 * @param data The data bytes.
 	 * @returns The signature and public key bytes.
@@ -387,7 +383,6 @@ export class EntityStorageWalletConnector implements IWalletConnector {
 	public async sign(
 		requestContext: IRequestContext,
 		signatureType: KeyType,
-		accountIndex: number,
 		addressIndex: number,
 		data: Uint8Array
 	): Promise<{
@@ -415,7 +410,6 @@ export class EntityStorageWalletConnector implements IWalletConnector {
 			signatureType,
 			Object.values(KeyType)
 		);
-		Guards.integer(EntityStorageWalletConnector._CLASS_NAME, nameof(accountIndex), accountIndex);
 		Guards.integer(EntityStorageWalletConnector._CLASS_NAME, nameof(addressIndex), addressIndex);
 		Guards.uint8Array(EntityStorageWalletConnector._CLASS_NAME, nameof(data), data);
 
@@ -431,7 +425,7 @@ export class EntityStorageWalletConnector implements IWalletConnector {
 			signatureType,
 			this._config.bech32Hrp ?? EntityStorageWalletConnector._DEFAULT_BECH32_HRP,
 			this._config.coinType ?? EntityStorageWalletConnector._DEFAULT_COIN_TYPE,
-			accountIndex,
+			0,
 			false,
 			addressIndex
 		);

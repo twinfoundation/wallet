@@ -28,11 +28,11 @@ export const TEST_CONTEXT: IRequestContext = {
 export const TEST_VAULT_KEY_STORAGE = new MemoryEntityStorageConnector<VaultKey>(
 	EntitySchemaHelper.getSchema(VaultKey)
 );
-export const TEST_VAULT_ENTITY_STORAGE = new MemoryEntityStorageConnector<VaultSecret>(
+export const TEST_VAULT_SECRET_STORAGE = new MemoryEntityStorageConnector<VaultSecret>(
 	EntitySchemaHelper.getSchema(VaultSecret)
 );
 
-export const TEST_VAULT: IVaultConnector = new EntityStorageVaultConnector({
+export const TEST_VAULT_CONNECTOR: IVaultConnector = new EntityStorageVaultConnector({
 	vaultKeyEntityStorageConnector: TEST_VAULT_KEY_STORAGE,
-	vaultSecretEntityStorageConnector: TEST_VAULT_ENTITY_STORAGE
+	vaultSecretEntityStorageConnector: TEST_VAULT_SECRET_STORAGE
 });

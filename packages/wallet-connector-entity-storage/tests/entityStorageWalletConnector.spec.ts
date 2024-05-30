@@ -9,8 +9,8 @@ import {
 	TEST_CONTEXT,
 	TEST_IDENTITY_ID,
 	TEST_TENANT_ID,
-	TEST_VAULT,
-	TEST_VAULT_ENTITY_STORAGE
+	TEST_VAULT_CONNECTOR,
+	TEST_VAULT_SECRET_STORAGE
 } from "./setupTestEnv";
 import { WalletAddress } from "../src/entities/walletAddress";
 import { EntityStorageFaucetConnector } from "../src/entityStorageFaucetConnector";
@@ -57,7 +57,7 @@ describe("EntityStorageWalletConnector", () => {
 	test("can construct a wallet with details", () => {
 		const faucet = new EntityStorageWalletConnector({
 			walletAddressEntityStorage,
-			vaultConnector: TEST_VAULT,
+			vaultConnector: TEST_VAULT_CONNECTOR,
 			faucetConnector
 		});
 		expect(faucet).toBeDefined();
@@ -66,12 +66,12 @@ describe("EntityStorageWalletConnector", () => {
 	test("can create a new wallet", async () => {
 		const wallet = new EntityStorageWalletConnector({
 			walletAddressEntityStorage,
-			vaultConnector: TEST_VAULT
+			vaultConnector: TEST_VAULT_CONNECTOR
 		});
 
 		await wallet.create(TEST_CONTEXT);
 
-		const store = TEST_VAULT_ENTITY_STORAGE.getStore(TEST_TENANT_ID);
+		const store = TEST_VAULT_SECRET_STORAGE.getStore(TEST_TENANT_ID);
 		expect(store?.[0].id).toEqual(`${TEST_IDENTITY_ID}/wallet-mnemonic`);
 		expect(JSON.parse(store?.[0].data ?? "").split(" ").length).toEqual(24);
 	});
@@ -79,17 +79,17 @@ describe("EntityStorageWalletConnector", () => {
 	test("can generate addresses for the wallet", async () => {
 		const wallet = new EntityStorageWalletConnector({
 			walletAddressEntityStorage,
-			vaultConnector: TEST_VAULT
+			vaultConnector: TEST_VAULT_CONNECTOR
 		});
 
-		testAddresses = await wallet.getAddresses(TEST_CONTEXT, 0, 0, 10);
+		testAddresses = await wallet.getAddresses(TEST_CONTEXT, 0, 10);
 		expect(testAddresses.length).toEqual(10);
 	});
 
 	test("can fail to ensure a balance on an address with no faucet available", async () => {
 		const wallet = new EntityStorageWalletConnector({
 			walletAddressEntityStorage,
-			vaultConnector: TEST_VAULT
+			vaultConnector: TEST_VAULT_CONNECTOR
 		});
 
 		const ensured = await wallet.ensureBalance(TEST_CONTEXT, testAddresses[0], 1000000000n);
@@ -99,7 +99,7 @@ describe("EntityStorageWalletConnector", () => {
 	test("can fail to ensure a balance with faucet depleted", async () => {
 		const wallet = new EntityStorageWalletConnector({
 			walletAddressEntityStorage,
-			vaultConnector: TEST_VAULT,
+			vaultConnector: TEST_VAULT_CONNECTOR,
 			faucetConnector: {
 				fundAddress: async (): Promise<bigint> => 0n
 			}
@@ -112,7 +112,7 @@ describe("EntityStorageWalletConnector", () => {
 	test("can ensure a balance on an address with retries", async () => {
 		const wallet = new EntityStorageWalletConnector({
 			walletAddressEntityStorage,
-			vaultConnector: TEST_VAULT,
+			vaultConnector: TEST_VAULT_CONNECTOR,
 			faucetConnector
 		});
 
@@ -129,7 +129,7 @@ describe("EntityStorageWalletConnector", () => {
 	test("can ensure a balance on an address", async () => {
 		const wallet = new EntityStorageWalletConnector({
 			walletAddressEntityStorage,
-			vaultConnector: TEST_VAULT,
+			vaultConnector: TEST_VAULT_CONNECTOR,
 			faucetConnector
 		});
 
@@ -161,7 +161,7 @@ describe("EntityStorageWalletConnector", () => {
 
 		const wallet = new EntityStorageWalletConnector({
 			walletAddressEntityStorage,
-			vaultConnector: TEST_VAULT,
+			vaultConnector: TEST_VAULT_CONNECTOR,
 			faucetConnector
 		});
 
@@ -173,7 +173,7 @@ describe("EntityStorageWalletConnector", () => {
 	test("can get storage costs for an address", async () => {
 		const wallet = new EntityStorageWalletConnector({
 			walletAddressEntityStorage,
-			vaultConnector: TEST_VAULT,
+			vaultConnector: TEST_VAULT_CONNECTOR,
 			faucetConnector
 		});
 
@@ -185,7 +185,7 @@ describe("EntityStorageWalletConnector", () => {
 	test("can fail to transfer with insufficient funds", async () => {
 		const wallet = new EntityStorageWalletConnector({
 			walletAddressEntityStorage,
-			vaultConnector: TEST_VAULT,
+			vaultConnector: TEST_VAULT_CONNECTOR,
 			faucetConnector
 		});
 
@@ -218,7 +218,7 @@ describe("EntityStorageWalletConnector", () => {
 
 		const wallet = new EntityStorageWalletConnector({
 			walletAddressEntityStorage,
-			vaultConnector: TEST_VAULT,
+			vaultConnector: TEST_VAULT_CONNECTOR,
 			faucetConnector
 		});
 
@@ -267,7 +267,7 @@ describe("EntityStorageWalletConnector", () => {
 
 		const wallet = new EntityStorageWalletConnector({
 			walletAddressEntityStorage,
-			vaultConnector: TEST_VAULT,
+			vaultConnector: TEST_VAULT_CONNECTOR,
 			faucetConnector
 		});
 

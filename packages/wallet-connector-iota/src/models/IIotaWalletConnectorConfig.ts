@@ -28,4 +28,10 @@ export interface IIotaWalletConnectorConfig {
 	 * @default iota
 	 */
 	bech32Hrp?: string;
+
+	/**
+	 * The length of time to wait for the inclusion of a transaction in seconds.
+	 * @default 60
+	 */
+	inclusionTimeoutSeconds?: number;
 }

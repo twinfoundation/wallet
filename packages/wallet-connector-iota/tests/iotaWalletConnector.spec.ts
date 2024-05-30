@@ -1,25 +1,19 @@
 // Copyright 2024 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
 import { Bip44, KeyType } from "@gtsc/crypto";
-import { EntitySchemaHelper } from "@gtsc/entity";
-import { MemoryEntityStorageConnector } from "@gtsc/entity-storage-connector-memory";
-import {
-	EntityStorageVaultConnector,
-	VaultKey,
-	VaultSecret
-} from "@gtsc/vault-connector-entity-storage";
 import type { IVaultConnector } from "@gtsc/vault-models";
 import {
 	TEST_ADDRESS_BECH32,
+	TEST_BECH32_HRP,
 	TEST_CLIENT_OPTIONS,
 	TEST_COIN_TYPE,
 	TEST_CONTEXT,
-	TEST_BECH32_HRP,
 	TEST_IDENTITY_ID,
 	TEST_MNEMONIC_NAME,
 	TEST_SEED,
 	TEST_TENANT_ID,
-	TEST_VAULT,
+	TEST_VAULT_CONNECTOR,
+	TEST_VAULT_SECRET_STORAGE,
 	setupTestEnv
 } from "./setupTestEnv";
 import { IotaFaucetConnector } from "../src/iotaFaucetConnector";
@@ -110,39 +104,34 @@ describe("IotaWalletConnector", () => {
 	test("can construct a wallet with details", () => {
 		const wallet = new IotaWalletConnector(
 			{
-				vaultConnector: TEST_VAULT
+				vaultConnector: TEST_VAULT_CONNECTOR
 			},
 			{
 				clientOptions: TEST_CLIENT_OPTIONS,
-				walletMnemonicId: TEST_MNEMONIC_NAME
+				walletMnemonicId: TEST_MNEMONIC_NAME,
+				coinType: TEST_COIN_TYPE,
+				bech32Hrp: TEST_BECH32_HRP
 			}
 		);
 		expect(wallet).toBeDefined();
 	});
 
 	test("can create a new wallet", async () => {
-		const vaultSecretEntityStorageConnector = new MemoryEntityStorageConnector<VaultSecret>(
-			EntitySchemaHelper.getSchema(VaultSecret)
-		);
-
 		const wallet = new IotaWalletConnector(
 			{
-				vaultConnector: new EntityStorageVaultConnector({
-					vaultKeyEntityStorageConnector: new MemoryEntityStorageConnector<VaultKey>(
-						EntitySchemaHelper.getSchema(VaultKey)
-					),
-					vaultSecretEntityStorageConnector
-				})
+				vaultConnector: TEST_VAULT_CONNECTOR
 			},
 			{
 				clientOptions: TEST_CLIENT_OPTIONS,
-				walletMnemonicId: TEST_MNEMONIC_NAME
+				walletMnemonicId: TEST_MNEMONIC_NAME,
+				coinType: TEST_COIN_TYPE,
+				bech32Hrp: TEST_BECH32_HRP
 			}
 		);
 
 		await wallet.create(TEST_CONTEXT);
 
-		const store = vaultSecretEntityStorageConnector.getStore(TEST_TENANT_ID);
+		const store = TEST_VAULT_SECRET_STORAGE.getStore(TEST_TENANT_ID);
 		expect(store?.[0].id).toEqual(`${TEST_IDENTITY_ID}/${TEST_MNEMONIC_NAME}`);
 		expect(JSON.parse(store?.[0].data ?? "").split(" ").length).toEqual(24);
 	});
@@ -150,28 +139,32 @@ describe("IotaWalletConnector", () => {
 	test("can generate addresses for the wallet", async () => {
 		const wallet = new IotaWalletConnector(
 			{
-				vaultConnector: TEST_VAULT
+				vaultConnector: TEST_VAULT_CONNECTOR
 			},
 			{
 				clientOptions: TEST_CLIENT_OPTIONS,
-				walletMnemonicId: TEST_MNEMONIC_NAME
+				walletMnemonicId: TEST_MNEMONIC_NAME,
+				coinType: TEST_COIN_TYPE,
+				bech32Hrp: TEST_BECH32_HRP
 			}
 		);
 
 		await wallet.create(TEST_CONTEXT);
 
-		const testAddresses = await wallet.getAddresses(TEST_CONTEXT, 0, 0, 10);
+		const testAddresses = await wallet.getAddresses(TEST_CONTEXT, 0, 10);
 		expect(testAddresses.length).toEqual(10);
 	});
 
 	test("can fail to ensure a balance on an address with no faucet available", async () => {
 		const wallet = new IotaWalletConnector(
 			{
-				vaultConnector: TEST_VAULT
+				vaultConnector: TEST_VAULT_CONNECTOR
 			},
 			{
 				clientOptions: TEST_CLIENT_OPTIONS,
-				walletMnemonicId: TEST_MNEMONIC_NAME
+				walletMnemonicId: TEST_MNEMONIC_NAME,
+				coinType: TEST_COIN_TYPE,
+				bech32Hrp: TEST_BECH32_HRP
 			}
 		);
 
@@ -193,7 +186,7 @@ describe("IotaWalletConnector", () => {
 
 		const wallet = new IotaWalletConnector(
 			{
-				vaultConnector: TEST_VAULT,
+				vaultConnector: TEST_VAULT_CONNECTOR,
 				faucetConnector: new IotaFaucetConnector({
 					clientOptions: TEST_CLIENT_OPTIONS,
 					endpoint: process.env.TEST_FAUCET_ENDPOINT ?? ""
@@ -201,7 +194,9 @@ describe("IotaWalletConnector", () => {
 			},
 			{
 				clientOptions: TEST_CLIENT_OPTIONS,
-				walletMnemonicId: TEST_MNEMONIC_NAME
+				walletMnemonicId: TEST_MNEMONIC_NAME,
+				coinType: TEST_COIN_TYPE,
+				bech32Hrp: TEST_BECH32_HRP
 			}
 		);
 
@@ -213,11 +208,13 @@ describe("IotaWalletConnector", () => {
 	test("can get a balance for an address", async () => {
 		const wallet = new IotaWalletConnector(
 			{
-				vaultConnector: TEST_VAULT
+				vaultConnector: TEST_VAULT_CONNECTOR
 			},
 			{
 				clientOptions: TEST_CLIENT_OPTIONS,
-				walletMnemonicId: TEST_MNEMONIC_NAME
+				walletMnemonicId: TEST_MNEMONIC_NAME,
+				coinType: TEST_COIN_TYPE,
+				bech32Hrp: TEST_BECH32_HRP
 			}
 		);
 
@@ -229,11 +226,13 @@ describe("IotaWalletConnector", () => {
 	test("can get storage costs for an address", async () => {
 		const wallet = new IotaWalletConnector(
 			{
-				vaultConnector: TEST_VAULT
+				vaultConnector: TEST_VAULT_CONNECTOR
 			},
 			{
 				clientOptions: TEST_CLIENT_OPTIONS,
-				walletMnemonicId: TEST_MNEMONIC_NAME
+				walletMnemonicId: TEST_MNEMONIC_NAME,
+				coinType: TEST_COIN_TYPE,
+				bech32Hrp: TEST_BECH32_HRP
 			}
 		);
 
