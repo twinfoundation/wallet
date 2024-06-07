@@ -14,7 +14,7 @@ jobs:
     strategy:
       max-parallel: 1
       matrix:
-        package: [wallet-models, wallet-connector-entity-storage, wallet-connector-iota]
+        package: [wallet-models, wallet-connector-entity-storage, wallet-connector-iota, wallet-cli]
 
     steps:
       - name: Checkout

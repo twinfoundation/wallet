@@ -26,6 +26,20 @@ wallet-mnemonic
 
 ***
 
+### walletSeedId?
+
+> `optional` **walletSeedId**: `string`
+
+The id of the entry in the vault containing the wallet seed.
+
+#### Default
+
+```ts
+wallet-seed
+```
+
+***
+
 ### coinType?
 
 > `optional` **coinType**: `number`

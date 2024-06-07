@@ -61,11 +61,17 @@ export interface IWalletConnector extends IService {
 	/**
 	 * Transfer funds to an address.
 	 * @param requestContext The context for the request.
-	 * @param address The bech32 encoded address to send the funds to.
+	 * @param addressSource The bech32 encoded address to send the funds from.
+	 * @param addressDest The bech32 encoded address to send the funds to.
 	 * @param amount The amount to transfer.
-	 * @returns Nothing.
+	 * @returns An identifier for the transfer if there was one.
 	 */
-	transfer(requestContext: IRequestContext, address: string, amount: bigint): Promise<void>;
+	transfer(
+		requestContext: IRequestContext,
+		addressSource: string,
+		addressDest: string,
+		amount: bigint
+	): Promise<string | undefined>;
 
 	/**
 	 * Sign data using a wallet based key.

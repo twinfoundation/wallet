@@ -189,7 +189,7 @@ describe("EntityStorageWalletConnector", () => {
 			faucetConnector
 		});
 
-		await expect(wallet.transfer(TEST_CONTEXT, "addr2", 100n)).rejects.toMatchObject({
+		await expect(wallet.transfer(TEST_CONTEXT, "addr1", "addr2", 100n)).rejects.toMatchObject({
 			name: "GeneralError",
 			message: "entityStorageWalletConnector.insufficientFunds"
 		});
@@ -222,16 +222,16 @@ describe("EntityStorageWalletConnector", () => {
 			faucetConnector
 		});
 
-		await wallet.transfer(TEST_CONTEXT, testAddresses[2], 100n);
+		await wallet.transfer(TEST_CONTEXT, testAddresses[1], testAddresses[2], 100n);
 
 		const store = walletAddressEntityStorage.getStore(TEST_TENANT_ID);
 
 		expect(store?.[0].address).toEqual(testAddresses[0]);
-		expect(store?.[0].balance).toEqual("0");
+		expect(store?.[0].balance).toEqual("1");
 		expect(store?.[0].identity).toEqual(TEST_IDENTITY_ID);
 
 		expect(store?.[1].address).toEqual(testAddresses[1]);
-		expect(store?.[1].balance).toEqual("999999901");
+		expect(store?.[1].balance).toEqual("999999900");
 		expect(store?.[1].identity).toEqual(TEST_IDENTITY_ID);
 
 		expect(store?.[2].address).toEqual(testAddresses[2]);
@@ -258,7 +258,7 @@ describe("EntityStorageWalletConnector", () => {
 						{
 							address: testAddresses[2],
 							identity: "test-identity-2",
-							balance: "0"
+							balance: "500"
 						}
 					]
 				}
@@ -271,20 +271,20 @@ describe("EntityStorageWalletConnector", () => {
 			faucetConnector
 		});
 
-		await wallet.transfer(TEST_CONTEXT, testAddresses[2], 100n);
+		await wallet.transfer(TEST_CONTEXT, testAddresses[1], testAddresses[2], 100n);
 
 		const store = walletAddressEntityStorage.getStore(TEST_TENANT_ID);
 
 		expect(store?.[0].address).toEqual(testAddresses[0]);
-		expect(store?.[0].balance).toEqual("0");
+		expect(store?.[0].balance).toEqual("1");
 		expect(store?.[0].identity).toEqual(TEST_IDENTITY_ID);
 
 		expect(store?.[1].address).toEqual(testAddresses[1]);
-		expect(store?.[1].balance).toEqual("999999901");
+		expect(store?.[1].balance).toEqual("999999900");
 		expect(store?.[1].identity).toEqual(TEST_IDENTITY_ID);
 
 		expect(store?.[2].address).toEqual(testAddresses[2]);
-		expect(store?.[2].balance).toEqual("100");
+		expect(store?.[2].balance).toEqual("600");
 		expect(store?.[2].identity).toEqual("test-identity-2");
 	});
 });

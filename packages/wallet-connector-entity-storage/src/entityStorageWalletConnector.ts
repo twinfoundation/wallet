@@ -295,15 +295,17 @@ export class EntityStorageWalletConnector implements IWalletConnector {
 	/**
 	 * Transfer funds to an address.
 	 * @param requestContext The context for the request.
-	 * @param address The bech32 encoded address to send the funds to.
+	 * @param addressSource The bech32 encoded address to send the funds from.
+	 * @param addressDest The bech32 encoded address to send the funds to.
 	 * @param amount The amount to transfer.
-	 * @returns Nothing.
+	 * @returns An identifier for the transfer if there was one.
 	 */
 	public async transfer(
 		requestContext: IRequestContext,
-		address: string,
+		addressSource: string,
+		addressDest: string,
 		amount: bigint
-	): Promise<void> {
+	): Promise<string | undefined> {
 		Guards.object<IRequestContext>(
 			EntityStorageWalletConnector._CLASS_NAME,
 			nameof(requestContext),
@@ -319,6 +321,13 @@ export class EntityStorageWalletConnector implements IWalletConnector {
 			nameof(requestContext.identity),
 			requestContext.identity
 		);
+		Guards.stringValue(
+			EntityStorageWalletConnector._CLASS_NAME,
+			nameof(addressSource),
+			addressSource
+		);
+		Guards.stringValue(EntityStorageWalletConnector._CLASS_NAME, nameof(addressDest), addressDest);
+		Guards.bigint(EntityStorageWalletConnector._CLASS_NAME, nameof(amount), amount);
 
 		const walletAddresses = await this._walletAddressEntityStorage.query(requestContext, {
 			logicalOperator: LogicalOperator.And,
@@ -327,49 +336,49 @@ export class EntityStorageWalletConnector implements IWalletConnector {
 					property: "identity",
 					operator: ComparisonOperator.Equals,
 					value: requestContext.identity
+				},
+				{
+					property: "address",
+					operator: ComparisonOperator.Equals,
+					value: addressSource
 				}
 			]
 		});
 
-		let amountRequired = amount;
-		const updates: Partial<WalletAddress>[] = [];
-		for (const walletAddress of walletAddresses.entities) {
-			if (Is.stringValue(walletAddress.balance)) {
-				let balance = BigInt(walletAddress.balance);
-				if (balance > 0) {
-					const transferAmount = amountRequired < balance ? amountRequired : balance;
-					balance -= transferAmount;
-					amountRequired -= transferAmount;
-					walletAddress.balance = balance.toString();
-					updates.push(walletAddress);
-				}
-				if (amountRequired === 0n) {
-					break;
-				}
-			}
+		let walletAddress: WalletAddress | undefined;
+		let balance = 0n;
+		if (walletAddresses.entities.length > 0) {
+			walletAddress = walletAddresses.entities[0] as WalletAddress;
+			balance = BigInt(walletAddress.balance);
+			walletAddress.balance = (BigInt(walletAddress.balance) - amount).toString();
 		}
 
-		if (amountRequired > 0n) {
+		if (balance < amount) {
 			throw new GeneralError(EntityStorageWalletConnector._CLASS_NAME, "insufficientFunds");
 		}
 
-		for (const update of updates) {
-			await this._walletAddressEntityStorage.set(requestContext, update as WalletAddress);
+		if (!Is.empty(walletAddress)) {
+			await this._walletAddressEntityStorage.set(requestContext, walletAddress);
+
+			let destWalletAddress = await this._walletAddressEntityStorage.get(
+				requestContext,
+				addressDest
+			);
+
+			if (Is.empty(destWalletAddress)) {
+				destWalletAddress = {
+					identity: "",
+					balance: "0",
+					address: addressDest
+				};
+			}
+
+			destWalletAddress.balance = (BigInt(destWalletAddress.balance) + amount).toString();
+
+			await this._walletAddressEntityStorage.set(requestContext, destWalletAddress);
 		}
 
-		let destWalletAddress = await this._walletAddressEntityStorage.get(requestContext, address);
-
-		if (Is.empty(destWalletAddress)) {
-			destWalletAddress = {
-				identity: "",
-				balance: "0",
-				address
-			};
-		}
-
-		destWalletAddress.balance = (BigInt(destWalletAddress.balance) + amount).toString();
-
-		await this._walletAddressEntityStorage.set(requestContext, destWalletAddress);
+		return undefined;
 	}
 
 	/**

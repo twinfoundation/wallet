@@ -1,6 +1,6 @@
 {
 	"name": "@gtsc/wallet",
-	"version": "0.0.3-next.18",
+	"version": "0.0.3-next.19",
 	"description": "Wallet",
 	"repository": {
 		"type": "git",
@@ -41,7 +41,8 @@
 	"workspaces": [
 		"packages/wallet-models",
 		"packages/wallet-connector-entity-storage",
-		"packages/wallet-connector-iota"
+		"packages/wallet-connector-iota",
+		"packages/wallet-cli"
 	],
 	"type": "module"
 }
