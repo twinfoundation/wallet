@@ -11,6 +11,7 @@ on:
           - wallet-models
           - wallet-connector-entity-storage
           - wallet-connector-iota
+          - wallet-cli
 
 jobs:
   publish:

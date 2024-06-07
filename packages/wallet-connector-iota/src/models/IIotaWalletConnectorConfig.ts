@@ -18,6 +18,12 @@ export interface IIotaWalletConnectorConfig {
 	walletMnemonicId?: string;
 
 	/**
+	 * The id of the entry in the vault containing the wallet seed.
+	 * @default wallet-seed
+	 */
+	walletSeedId?: string;
+
+	/**
 	 * The coin type.
 	 * @default IOTA 4218
 	 */

@@ -37,7 +37,7 @@ export default {
 		globals: globs,
 		exports: 'named'
 	},
-	external: [/^node:.*/].concat(Object.keys(globs)),
+	external: [/^node:.*/].concat(Object.keys(globs).map(g => new RegExp(`^${g}`))),
 	onwarn: message => {
 		if (!['EMPTY_BUNDLE', 'CIRCULAR_DEPENDENCY'].includes(message.code)) {
 			process.stderr.write(`${err}\n`);

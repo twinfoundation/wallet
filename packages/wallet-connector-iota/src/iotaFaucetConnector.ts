@@ -71,15 +71,17 @@ export class IotaFaucetConnector implements IFaucetConnector {
 		const oldBalance = await this.getBalance(address);
 		await client.requestFundsFromFaucet(this._config.endpoint, address);
 
-		for (let i = 0; i < timeoutInSeconds; i++) {
+		const numTries = Math.ceil(timeoutInSeconds / 5);
+
+		for (let i = 0; i < numTries; i++) {
 			const newBalance = await this.getBalance(address);
 			if (newBalance > oldBalance) {
-				// The balance increased so re can return the new balance
+				// The balance increased so we can return the new balance
 				return newBalance - oldBalance;
 			}
 
 			// Still waiting for the balance to update so wait and try again
-			await new Promise(resolve => setTimeout(resolve, 1000));
+			await new Promise(resolve => setTimeout(resolve, 5000));
 		}
 
 		return 0n;
