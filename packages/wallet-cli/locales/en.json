@@ -1,14 +1,4 @@
 {
-	"error": {
-		"commands": {
-			"common": {
-				"missingEnv": "The \"{option}\" option is configured as an environment variable, but there is no environment variable with the name \"{env}\" set.",
-				"missingEnvUrl": "The \"{option}\" option does not appear to be a url, assuming it is an environment variable, but there is no environment variable with the name \"{env}\" set.",
-				"missingEnvNumber": "The \"{option}\" option does not appear to be a number, assuming it is an environment variable, but there is no environment variable with the name \"{env}\" set.",
-				"missingEnvBigInt": "The \"{option}\" option does not appear to be a bigint, assuming it is an environment variable, but there is no environment variable with the name \"{env}\" set."
-			}
-		}
-	},
 	"commands": {
 		"faucet": {
 			"summary": "Request funds from the faucet.",
