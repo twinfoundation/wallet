@@ -2,7 +2,7 @@
 
 > **actionCommandFaucet**(`opts`): `Promise`\<`void`\>
 
-Action the mnemonic command.
+Action the faucet command.
 
 ## Parameters
 
