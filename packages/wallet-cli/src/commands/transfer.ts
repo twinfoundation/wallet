@@ -55,7 +55,7 @@ export function buildCommandTransfer(): Command {
 }
 
 /**
- * Action the mnemonic command.
+ * Action the transfer command.
  * @param opts The options for the command.
  * @param opts.seed The seed to use for the wallet.
  * @param opts.address The address to source the funds from.
@@ -72,62 +72,57 @@ export async function actionCommandTransfer(opts: {
 	node: string;
 	explorer: string;
 }): Promise<void> {
-	try {
-		const seed: Uint8Array = CLIParam.hexBase64("seed", opts.seed);
-		const address: string = CLIParam.bech32("address", opts.address);
-		const destAddress: string = CLIParam.bech32("destAddress", opts.destAddress);
-		const amount: bigint = CLIParam.bigint("amount", opts.amount, false, 0n);
-		const nodeEndpoint: string = CLIParam.url("node", opts.node);
-		const explorerEndpoint: string = CLIParam.url("explorer", opts.explorer);
+	const seed: Uint8Array = CLIParam.hexBase64("seed", opts.seed);
+	const address: string = CLIParam.bech32("address", opts.address);
+	const destAddress: string = CLIParam.bech32("destAddress", opts.destAddress);
+	const amount: bigint = CLIParam.bigint("amount", opts.amount, false, 0n);
+	const nodeEndpoint: string = CLIParam.url("node", opts.node);
+	const explorerEndpoint: string = CLIParam.url("explorer", opts.explorer);
 
-		CLIDisplay.value(I18n.formatMessage("commands.common.labels.node"), nodeEndpoint);
-		CLIDisplay.value(I18n.formatMessage("commands.common.labels.address"), address);
-		CLIDisplay.value(I18n.formatMessage("commands.transfer.labels.dest-address"), destAddress);
-		CLIDisplay.break();
+	CLIDisplay.value(I18n.formatMessage("commands.common.labels.node"), nodeEndpoint);
+	CLIDisplay.value(I18n.formatMessage("commands.common.labels.address"), address);
+	CLIDisplay.value(I18n.formatMessage("commands.transfer.labels.dest-address"), destAddress);
+	CLIDisplay.break();
 
-		CLIDisplay.task(I18n.formatMessage("commands.transfer.progress.transferringFunds"));
-		CLIDisplay.break();
+	CLIDisplay.task(I18n.formatMessage("commands.transfer.progress.transferringFunds"));
+	CLIDisplay.break();
 
-		CLIDisplay.spinnerStart();
+	CLIDisplay.spinnerStart();
 
-		const requestContext = { identity: "dummy", tenantId: "dummy" };
+	const requestContext = { identity: "dummy", tenantId: "dummy" };
 
-		const vault = new EntityStorageVaultConnector({
-			vaultKeyEntityStorageConnector: new MemoryEntityStorageConnector<VaultKey>(
-				EntitySchemaHelper.getSchema(VaultKey)
-			),
-			vaultSecretEntityStorageConnector: new MemoryEntityStorageConnector<VaultSecret>(
-				EntitySchemaHelper.getSchema(VaultSecret)
-			)
-		});
+	const vault = new EntityStorageVaultConnector({
+		vaultKeyEntityStorageConnector: new MemoryEntityStorageConnector<VaultKey>(
+			EntitySchemaHelper.getSchema(VaultKey)
+		),
+		vaultSecretEntityStorageConnector: new MemoryEntityStorageConnector<VaultSecret>(
+			EntitySchemaHelper.getSchema(VaultSecret)
+		)
+	});
 
-		await vault.setSecret(requestContext, "wallet-seed", Converter.bytesToBase64(seed));
+	await vault.setSecret(requestContext, "wallet-seed", Converter.bytesToBase64(seed));
 
-		const iotaWallet = new IotaWalletConnector(
-			{
-				vaultConnector: vault
-			},
-			{
-				clientOptions: {
-					nodes: [nodeEndpoint],
-					localPow: true
-				}
+	const iotaWallet = new IotaWalletConnector(
+		{
+			vaultConnector: vault
+		},
+		{
+			clientOptions: {
+				nodes: [nodeEndpoint],
+				localPow: true
 			}
-		);
+		}
+	);
 
-		const blockId = await iotaWallet.transfer(requestContext, address, destAddress, amount);
+	const blockId = await iotaWallet.transfer(requestContext, address, destAddress, amount);
 
-		CLIDisplay.spinnerStop();
+	CLIDisplay.spinnerStop();
 
-		CLIDisplay.value(
-			I18n.formatMessage("commands.common.labels.explorer"),
-			`${StringHelper.trimTrailingSlashes(explorerEndpoint)}/block/${blockId}`
-		);
-		CLIDisplay.break();
+	CLIDisplay.value(
+		I18n.formatMessage("commands.common.labels.explorer"),
+		`${StringHelper.trimTrailingSlashes(explorerEndpoint)}/block/${blockId}`
+	);
+	CLIDisplay.break();
 
-		CLIDisplay.done();
-	} catch (error) {
-		CLIDisplay.spinnerStop();
-		CLIDisplay.error(error);
-	}
+	CLIDisplay.done();
 }

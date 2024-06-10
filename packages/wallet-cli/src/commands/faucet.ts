@@ -47,7 +47,7 @@ export function buildCommandFaucet(): Command {
 }
 
 /**
- * Action the mnemonic command.
+ * Action the faucet command.
  * @param opts The options for the command.
  * @param opts.address The address to fill from the faucet.
  * @param opts.faucet The faucet URL.
@@ -60,82 +60,77 @@ export async function actionCommandFaucet(opts: {
 	node: string;
 	explorer: string;
 }): Promise<void> {
-	try {
-		const address: string = CLIParam.bech32("address", opts.address);
-		const faucetEndpoint: string = CLIParam.url("faucet", opts.faucet);
-		const nodeEndpoint: string = CLIParam.url("node", opts.node);
-		const explorerEndpoint: string = CLIParam.url("explorer", opts.explorer);
+	const address: string = CLIParam.bech32("address", opts.address);
+	const faucetEndpoint: string = CLIParam.url("faucet", opts.faucet);
+	const nodeEndpoint: string = CLIParam.url("node", opts.node);
+	const explorerEndpoint: string = CLIParam.url("explorer", opts.explorer);
 
-		CLIDisplay.value(I18n.formatMessage("commands.common.labels.node"), nodeEndpoint);
-		CLIDisplay.value(I18n.formatMessage("commands.faucet.labels.faucet"), faucetEndpoint);
-		CLIDisplay.value(I18n.formatMessage("commands.common.labels.address"), address);
-		CLIDisplay.break();
+	CLIDisplay.value(I18n.formatMessage("commands.common.labels.node"), nodeEndpoint);
+	CLIDisplay.value(I18n.formatMessage("commands.faucet.labels.faucet"), faucetEndpoint);
+	CLIDisplay.value(I18n.formatMessage("commands.common.labels.address"), address);
+	CLIDisplay.break();
 
-		CLIDisplay.task(I18n.formatMessage("commands.faucet.progress.requestingFunds"));
-		CLIDisplay.break();
+	CLIDisplay.task(I18n.formatMessage("commands.faucet.progress.requestingFunds"));
+	CLIDisplay.break();
 
-		CLIDisplay.spinnerStart();
+	CLIDisplay.spinnerStart();
 
-		const iotaFaucet = new IotaFaucetConnector({
+	const iotaFaucet = new IotaFaucetConnector({
+		clientOptions: {
+			primaryNode: nodeEndpoint
+		},
+		endpoint: faucetEndpoint
+	});
+
+	const fundsAdded = await iotaFaucet.fundAddress(
+		{ identity: "dummy", tenantId: "dummy" },
+		address
+	);
+
+	CLIDisplay.spinnerStop();
+
+	CLIDisplay.value(
+		I18n.formatMessage("commands.faucet.labels.fundsAdded"),
+		fundsAdded === 0n
+			? I18n.formatMessage("commands.faucet.messages.noFundsAdded")
+			: fundsAdded.toString()
+	);
+	CLIDisplay.break();
+
+	CLIDisplay.task(I18n.formatMessage("commands.faucet.progress.requestingBalance"));
+	CLIDisplay.break();
+
+	const vault = new EntityStorageVaultConnector({
+		vaultKeyEntityStorageConnector: new MemoryEntityStorageConnector<VaultKey>(
+			EntitySchemaHelper.getSchema(VaultKey)
+		),
+		vaultSecretEntityStorageConnector: new MemoryEntityStorageConnector<VaultSecret>(
+			EntitySchemaHelper.getSchema(VaultSecret)
+		)
+	});
+
+	const iotaWallet = new IotaWalletConnector(
+		{
+			vaultConnector: vault,
+			faucetConnector: iotaFaucet
+		},
+		{
 			clientOptions: {
 				primaryNode: nodeEndpoint
-			},
-			endpoint: faucetEndpoint
-		});
-
-		const fundsAdded = await iotaFaucet.fundAddress(
-			{ identity: "dummy", tenantId: "dummy" },
-			address
-		);
-
-		CLIDisplay.spinnerStop();
-
-		CLIDisplay.value(
-			I18n.formatMessage("commands.faucet.labels.fundsAdded"),
-			fundsAdded === 0n
-				? I18n.formatMessage("commands.faucet.messages.noFundsAdded")
-				: fundsAdded.toString()
-		);
-		CLIDisplay.break();
-
-		CLIDisplay.task(I18n.formatMessage("commands.faucet.progress.requestingBalance"));
-		CLIDisplay.break();
-
-		const vault = new EntityStorageVaultConnector({
-			vaultKeyEntityStorageConnector: new MemoryEntityStorageConnector<VaultKey>(
-				EntitySchemaHelper.getSchema(VaultKey)
-			),
-			vaultSecretEntityStorageConnector: new MemoryEntityStorageConnector<VaultSecret>(
-				EntitySchemaHelper.getSchema(VaultSecret)
-			)
-		});
-
-		const iotaWallet = new IotaWalletConnector(
-			{
-				vaultConnector: vault,
-				faucetConnector: iotaFaucet
-			},
-			{
-				clientOptions: {
-					primaryNode: nodeEndpoint
-				}
 			}
-		);
+		}
+	);
 
-		const balance = await iotaWallet.getBalance({ identity: "dummy", tenantId: "dummy" }, address);
+	const balance = await iotaWallet.getBalance({ identity: "dummy", tenantId: "dummy" }, address);
 
-		CLIDisplay.value(I18n.formatMessage("commands.common.labels.balance"), balance.toString());
-		CLIDisplay.break();
+	CLIDisplay.value(I18n.formatMessage("commands.common.labels.balance"), balance.toString());
+	CLIDisplay.break();
 
-		CLIDisplay.value(
-			I18n.formatMessage("commands.common.labels.explorer"),
-			`${StringHelper.trimTrailingSlashes(explorerEndpoint)}/addr/${address}`
-		);
-		CLIDisplay.break();
+	CLIDisplay.value(
+		I18n.formatMessage("commands.common.labels.explorer"),
+		`${StringHelper.trimTrailingSlashes(explorerEndpoint)}/addr/${address}`
+	);
+	CLIDisplay.break();
 
-		CLIDisplay.done();
-	} catch (error) {
-		CLIDisplay.spinnerStop();
-		CLIDisplay.error(error);
-	}
+	CLIDisplay.done();
 }
