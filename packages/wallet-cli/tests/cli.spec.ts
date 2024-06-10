@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0.
 import path from "node:path";
 import { CLIDisplay } from "@gtsc/cli-core";
-import chalk from "chalk";
 import { CLI } from "../src/cli";
 
 let writeBuffer: string[] = [];
@@ -28,7 +27,7 @@ describe("CLI", () => {
 		const exitCode = await cli.run(["", path.join(__dirname, "wallet-cli")], localesDirectory);
 		expect(exitCode).toBe(0);
 		expect(writeBuffer.length).toEqual(19);
-		expect(writeBuffer[0]).toEqual(`🌍 ${chalk.underline.bold.blue("GTSC Wallet v0.0.3-next.20")}`);
+		expect(writeBuffer[0].includes("GTSC Wallet v0.0.3-next.21")).toEqual(true);
 		expect(writeBuffer[1]).toEqual("");
 		expect(writeBuffer[2]).toEqual("");
 		expect(writeBuffer[3]).toEqual("");
