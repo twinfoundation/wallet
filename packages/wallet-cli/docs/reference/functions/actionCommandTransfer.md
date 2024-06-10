@@ -2,7 +2,7 @@
 
 > **actionCommandTransfer**(`opts`): `Promise`\<`void`\>
 
-Action the mnemonic command.
+Action the transfer command.
 
 ## Parameters
 

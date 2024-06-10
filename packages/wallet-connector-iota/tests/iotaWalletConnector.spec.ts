@@ -108,7 +108,7 @@ describe("IotaWalletConnector", () => {
 			},
 			{
 				clientOptions: TEST_CLIENT_OPTIONS,
-				walletMnemonicId: TEST_MNEMONIC_NAME,
+				vaultMnemonicId: TEST_MNEMONIC_NAME,
 				coinType: TEST_COIN_TYPE,
 				bech32Hrp: TEST_BECH32_HRP
 			}
@@ -123,7 +123,7 @@ describe("IotaWalletConnector", () => {
 			},
 			{
 				clientOptions: TEST_CLIENT_OPTIONS,
-				walletMnemonicId: TEST_MNEMONIC_NAME,
+				vaultMnemonicId: TEST_MNEMONIC_NAME,
 				coinType: TEST_COIN_TYPE,
 				bech32Hrp: TEST_BECH32_HRP
 			}
@@ -143,7 +143,7 @@ describe("IotaWalletConnector", () => {
 			},
 			{
 				clientOptions: TEST_CLIENT_OPTIONS,
-				walletMnemonicId: TEST_MNEMONIC_NAME,
+				vaultMnemonicId: TEST_MNEMONIC_NAME,
 				coinType: TEST_COIN_TYPE,
 				bech32Hrp: TEST_BECH32_HRP
 			}
@@ -162,7 +162,7 @@ describe("IotaWalletConnector", () => {
 			},
 			{
 				clientOptions: TEST_CLIENT_OPTIONS,
-				walletMnemonicId: TEST_MNEMONIC_NAME,
+				vaultMnemonicId: TEST_MNEMONIC_NAME,
 				coinType: TEST_COIN_TYPE,
 				bech32Hrp: TEST_BECH32_HRP
 			}
@@ -194,7 +194,7 @@ describe("IotaWalletConnector", () => {
 			},
 			{
 				clientOptions: TEST_CLIENT_OPTIONS,
-				walletMnemonicId: TEST_MNEMONIC_NAME,
+				vaultMnemonicId: TEST_MNEMONIC_NAME,
 				coinType: TEST_COIN_TYPE,
 				bech32Hrp: TEST_BECH32_HRP
 			}
@@ -212,7 +212,7 @@ describe("IotaWalletConnector", () => {
 			},
 			{
 				clientOptions: TEST_CLIENT_OPTIONS,
-				walletMnemonicId: TEST_MNEMONIC_NAME,
+				vaultMnemonicId: TEST_MNEMONIC_NAME,
 				coinType: TEST_COIN_TYPE,
 				bech32Hrp: TEST_BECH32_HRP
 			}
@@ -230,7 +230,7 @@ describe("IotaWalletConnector", () => {
 			},
 			{
 				clientOptions: TEST_CLIENT_OPTIONS,
-				walletMnemonicId: TEST_MNEMONIC_NAME,
+				vaultMnemonicId: TEST_MNEMONIC_NAME,
 				coinType: TEST_COIN_TYPE,
 				bech32Hrp: TEST_BECH32_HRP
 			}

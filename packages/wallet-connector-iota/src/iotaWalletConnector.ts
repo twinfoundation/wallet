@@ -34,12 +34,12 @@ export class IotaWalletConnector implements IWalletConnector {
 	/**
 	 * Default name for the mnemonic secret.
 	 */
-	private static readonly _DEFAULT_MNEMONIC_SECRET_NAME: string = "wallet-mnemonic";
+	private static readonly _DEFAULT_MNEMONIC_SECRET_NAME: string = "mnemonic";
 
 	/**
 	 * Default name for the seed secret.
 	 */
-	private static readonly _DEFAULT_SEED_SECRET_NAME: string = "wallet-seed";
+	private static readonly _DEFAULT_SEED_SECRET_NAME: string = "seed";
 
 	/**
 	 * Default coin type.
@@ -127,8 +127,8 @@ export class IotaWalletConnector implements IWalletConnector {
 		this._vaultConnector = dependencies.vaultConnector;
 		this._faucetConnector = dependencies.faucetConnector;
 		this._config = config;
-		this._config.walletMnemonicId ??= IotaWalletConnector._DEFAULT_MNEMONIC_SECRET_NAME;
-		this._config.walletSeedId ??= IotaWalletConnector._DEFAULT_SEED_SECRET_NAME;
+		this._config.vaultMnemonicId ??= IotaWalletConnector._DEFAULT_MNEMONIC_SECRET_NAME;
+		this._config.vaultSeedId ??= IotaWalletConnector._DEFAULT_SEED_SECRET_NAME;
 		this._config.coinType ??= IotaWalletConnector._DEFAULT_COIN_TYPE;
 		this._config.bech32Hrp ??= IotaWalletConnector._DEFAULT_BECH32_HRP;
 		this._config.inclusionTimeoutSeconds ??= IotaWalletConnector._DEFAULT_INCLUSION_TIMEOUT;
@@ -159,13 +159,13 @@ export class IotaWalletConnector implements IWalletConnector {
 		const mnemonic = Bip39.randomMnemonic();
 		await this._vaultConnector.setSecret<string>(
 			requestContext,
-			this._config.walletMnemonicId ?? IotaWalletConnector._DEFAULT_MNEMONIC_SECRET_NAME,
+			this._config.vaultMnemonicId ?? IotaWalletConnector._DEFAULT_MNEMONIC_SECRET_NAME,
 			mnemonic
 		);
 		const seed = Bip39.mnemonicToSeed(mnemonic);
 		await this._vaultConnector.setSecret<string>(
 			requestContext,
-			this._config.walletSeedId ?? IotaWalletConnector._DEFAULT_SEED_SECRET_NAME,
+			this._config.vaultSeedId ?? IotaWalletConnector._DEFAULT_SEED_SECRET_NAME,
 			Converter.bytesToBase64(seed)
 		);
 	}
@@ -470,7 +470,7 @@ export class IotaWalletConnector implements IWalletConnector {
 
 		const mnemonic = await this._vaultConnector.getSecret<string>(
 			requestContext,
-			this._config.walletMnemonicId ?? IotaWalletConnector._DEFAULT_MNEMONIC_SECRET_NAME
+			this._config.vaultMnemonicId ?? IotaWalletConnector._DEFAULT_MNEMONIC_SECRET_NAME
 		);
 
 		const seed = Bip39.mnemonicToSeed(mnemonic);
@@ -564,14 +564,14 @@ export class IotaWalletConnector implements IWalletConnector {
 		try {
 			const seedBase64 = await this._vaultConnector.getSecret<string>(
 				requestContext,
-				this._config.walletSeedId ?? IotaWalletConnector._DEFAULT_SEED_SECRET_NAME
+				this._config.vaultSeedId ?? IotaWalletConnector._DEFAULT_SEED_SECRET_NAME
 			);
 			return Converter.base64ToBytes(seedBase64);
 		} catch {}
 
 		const mnemonic = await this._vaultConnector.getSecret<string>(
 			requestContext,
-			this._config.walletMnemonicId ?? IotaWalletConnector._DEFAULT_MNEMONIC_SECRET_NAME
+			this._config.vaultMnemonicId ?? IotaWalletConnector._DEFAULT_MNEMONIC_SECRET_NAME
 		);
 
 		return Bip39.mnemonicToSeed(mnemonic);

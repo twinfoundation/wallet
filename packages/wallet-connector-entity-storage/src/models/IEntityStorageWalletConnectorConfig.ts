@@ -6,9 +6,9 @@
  */
 export interface IEntityStorageWalletConnectorConfig {
 	/**
-	 * The id of the entry in the vault containing the wallet mnemonic.
+	 * The id of the entry in the vault containing the mnemonic.
 	 */
-	walletMnemonicId?: string;
+	vaultMnemonicId?: string;
 
 	/**
 	 * The coin type.

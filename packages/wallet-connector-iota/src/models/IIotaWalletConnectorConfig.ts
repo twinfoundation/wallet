@@ -12,16 +12,16 @@ export interface IIotaWalletConnectorConfig {
 	clientOptions: IClientOptions;
 
 	/**
-	 * The id of the entry in the vault containing the wallet mnemonic.
-	 * @default wallet-mnemonic
+	 * The id of the entry in the vault containing the mnemonic.
+	 * @default mnemonic
 	 */
-	walletMnemonicId?: string;
+	vaultMnemonicId?: string;
 
 	/**
-	 * The id of the entry in the vault containing the wallet seed.
-	 * @default wallet-seed
+	 * The id of the entry in the vault containing the seed.
+	 * @default seed
 	 */
-	walletSeedId?: string;
+	vaultSeedId?: string;
 
 	/**
 	 * The coin type.

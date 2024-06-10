@@ -89,9 +89,9 @@ export async function actionCommandTransfer(opts: {
 
 	CLIDisplay.spinnerStart();
 
-	const requestContext = { identity: "dummy", tenantId: "dummy" };
+	const requestContext = { identity: "local", tenantId: "local" };
 
-	const vault = new EntityStorageVaultConnector({
+	const vaultConnector = new EntityStorageVaultConnector({
 		vaultKeyEntityStorageConnector: new MemoryEntityStorageConnector<VaultKey>(
 			EntitySchemaHelper.getSchema(VaultKey)
 		),
@@ -100,19 +100,22 @@ export async function actionCommandTransfer(opts: {
 		)
 	});
 
-	await vault.setSecret(requestContext, "wallet-seed", Converter.bytesToBase64(seed));
+	const seedName = "local-seed";
 
 	const iotaWallet = new IotaWalletConnector(
 		{
-			vaultConnector: vault
+			vaultConnector
 		},
 		{
 			clientOptions: {
 				nodes: [nodeEndpoint],
 				localPow: true
-			}
+			},
+			vaultSeedId: seedName
 		}
 	);
+
+	await vaultConnector.setSecret(requestContext, seedName, Converter.bytesToBase64(seed));
 
 	const blockId = await iotaWallet.transfer(requestContext, address, destAddress, amount);
 

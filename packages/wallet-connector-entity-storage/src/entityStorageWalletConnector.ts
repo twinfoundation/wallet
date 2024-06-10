@@ -132,7 +132,7 @@ export class EntityStorageWalletConnector implements IWalletConnector {
 		const mnemonic = Bip39.randomMnemonic();
 		await this._vaultConnector.setSecret<string>(
 			requestContext,
-			this._config.walletMnemonicId ?? EntityStorageWalletConnector._DEFAULT_MNEMONIC_SECRET_NAME,
+			this._config.vaultMnemonicId ?? EntityStorageWalletConnector._DEFAULT_MNEMONIC_SECRET_NAME,
 			mnemonic
 		);
 	}
@@ -173,7 +173,7 @@ export class EntityStorageWalletConnector implements IWalletConnector {
 
 		const mnemonic = await this._vaultConnector.getSecret<string>(
 			requestContext,
-			this._config.walletMnemonicId ?? EntityStorageWalletConnector._DEFAULT_MNEMONIC_SECRET_NAME
+			this._config.vaultMnemonicId ?? EntityStorageWalletConnector._DEFAULT_MNEMONIC_SECRET_NAME
 		);
 
 		const seed = Bip39.mnemonicToSeed(mnemonic);
@@ -424,7 +424,7 @@ export class EntityStorageWalletConnector implements IWalletConnector {
 
 		const mnemonic = await this._vaultConnector.getSecret<string>(
 			requestContext,
-			this._config.walletMnemonicId ?? EntityStorageWalletConnector._DEFAULT_MNEMONIC_SECRET_NAME
+			this._config.vaultMnemonicId ?? EntityStorageWalletConnector._DEFAULT_MNEMONIC_SECRET_NAME
 		);
 
 		const seed = Bip39.mnemonicToSeed(mnemonic);
