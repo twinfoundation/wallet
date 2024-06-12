@@ -81,7 +81,7 @@ export async function actionCommandTransfer(opts: {
 
 	CLIDisplay.value(I18n.formatMessage("commands.common.labels.node"), nodeEndpoint);
 	CLIDisplay.value(I18n.formatMessage("commands.common.labels.address"), address);
-	CLIDisplay.value(I18n.formatMessage("commands.transfer.labels.dest-address"), destAddress);
+	CLIDisplay.value(I18n.formatMessage("commands.transfer.labels.destAddress"), destAddress);
 	CLIDisplay.break();
 
 	CLIDisplay.task(I18n.formatMessage("commands.transfer.progress.transferringFunds"));
@@ -121,7 +121,7 @@ export async function actionCommandTransfer(opts: {
 	CLIDisplay.spinnerStop();
 
 	CLIDisplay.value(
-		I18n.formatMessage("commands.common.labels.explorer"),
+		I18n.formatMessage("commands.common.labels.explore"),
 		`${StringHelper.trimTrailingSlashes(explorerEndpoint)}/block/${blockId}`
 	);
 	CLIDisplay.break();

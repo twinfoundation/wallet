@@ -127,7 +127,7 @@ export async function actionCommandFaucet(opts: {
 	CLIDisplay.break();
 
 	CLIDisplay.value(
-		I18n.formatMessage("commands.common.labels.explorer"),
+		I18n.formatMessage("commands.common.labels.explore"),
 		`${StringHelper.trimTrailingSlashes(explorerEndpoint)}/addr/${address}`
 	);
 	CLIDisplay.break();

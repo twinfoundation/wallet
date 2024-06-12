@@ -1,6 +1,6 @@
 // Copyright 2024 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
-import { Guards } from "@gtsc/core";
+import { BaseError, GeneralError, Guards, type IError, Is } from "@gtsc/core";
 import { nameof } from "@gtsc/nameof";
 import type { IRequestContext } from "@gtsc/services";
 import type { IFaucetConnector } from "@gtsc/wallet-models";
@@ -66,22 +66,31 @@ export class IotaFaucetConnector implements IFaucetConnector {
 		address: string,
 		timeoutInSeconds: number = 60
 	): Promise<bigint> {
-		const client = await this.createClient();
+		try {
+			const client = await this.createClient();
 
-		const oldBalance = await this.getBalance(address);
-		await client.requestFundsFromFaucet(this._config.endpoint, address);
+			const oldBalance = await this.getBalance(address);
+			await client.requestFundsFromFaucet(this._config.endpoint, address);
 
-		const numTries = Math.ceil(timeoutInSeconds / 5);
+			const numTries = Math.ceil(timeoutInSeconds / 5);
 
-		for (let i = 0; i < numTries; i++) {
-			const newBalance = await this.getBalance(address);
-			if (newBalance > oldBalance) {
-				// The balance increased so we can return the new balance
-				return newBalance - oldBalance;
+			for (let i = 0; i < numTries; i++) {
+				const newBalance = await this.getBalance(address);
+				if (newBalance > oldBalance) {
+					// The balance increased so we can return the new balance
+					return newBalance - oldBalance;
+				}
+
+				// Still waiting for the balance to update so wait and try again
+				await new Promise(resolve => setTimeout(resolve, 5000));
 			}
-
-			// Still waiting for the balance to update so wait and try again
-			await new Promise(resolve => setTimeout(resolve, 5000));
+		} catch (error) {
+			throw new GeneralError(
+				IotaFaucetConnector._CLASS_NAME,
+				"fundingFailed",
+				undefined,
+				this.extractPayloadError(error)
+			);
 		}
 
 		return 0n;
@@ -120,5 +129,22 @@ export class IotaFaucetConnector implements IFaucetConnector {
 			this._client = new Client(this._config.clientOptions);
 		}
 		return this._client;
+	}
+
+	/**
+	 * Extract error from SDK payload.
+	 * @param error The error to extract.
+	 * @returns The extracted error.
+	 */
+	private extractPayloadError(error: unknown): IError {
+		if (Is.json(error)) {
+			const obj = JSON.parse(error);
+			return {
+				name: "IOTA",
+				message: obj.payload?.error
+			};
+		}
+
+		return BaseError.fromError(error);
 	}
 }

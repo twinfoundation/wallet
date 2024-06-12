@@ -50,7 +50,7 @@
 				"transferringFunds": "Transferring"
 			},
 			"labels": {
-				"dest-address": "Destination Address"
+				"destAddress": "Destination Address"
 			}
 		},
 		"common": {
@@ -68,7 +68,8 @@
 				"address": "Address",
 				"balance": "Balance",
 				"node": "Node",
-				"explorer": "Explorer"
+				"explorer": "Explorer",
+				"explore": "Explore"
 			}
 		}
 	}
