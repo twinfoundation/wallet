@@ -13,7 +13,7 @@ import {
 import type { IVaultConnector } from "@gtsc/vault-models";
 import * as dotenv from "dotenv";
 
-process.stdout.write("Setting up test environment from .env and .env.dev files\n");
+console.debug("Setting up test environment from .env and .env.dev files");
 
 dotenv.config({ path: [path.join(__dirname, ".env"), path.join(__dirname, ".env.dev")] });
 

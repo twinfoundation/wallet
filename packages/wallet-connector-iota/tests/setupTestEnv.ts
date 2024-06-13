@@ -18,7 +18,7 @@ import * as dotenv from "dotenv";
 import { IotaFaucetConnector } from "../src/iotaFaucetConnector";
 import { IotaWalletConnector } from "../src/iotaWalletConnector";
 
-process.stdout.write("Setting up test environment from .env and .env.dev files\n");
+console.debug("Setting up test environment from .env and .env.dev files");
 
 dotenv.config({ path: [path.join(__dirname, ".env"), path.join(__dirname, ".env.dev")] });
 
@@ -99,8 +99,8 @@ export const TEST_ADDRESS_BECH32 = addresses[0];
  * Setup the test environment.
  */
 export async function setupTestEnv(): Promise<void> {
-	process.stdout.write(
-		`Wallet Address: ${process.env.TEST_EXPLORER_URL}addr/${TEST_ADDRESS_BECH32}\n`
+	console.debug(
+		"Wallet Address", `${process.env.TEST_EXPLORER_URL}addr/${TEST_ADDRESS_BECH32}`
 	);
 	await TEST_WALLET_CONNECTOR.ensureBalance(TEST_CONTEXT, TEST_ADDRESS_BECH32, 1000000000n);
 }
