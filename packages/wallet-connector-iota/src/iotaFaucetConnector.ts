@@ -139,9 +139,13 @@ export class IotaFaucetConnector implements IFaucetConnector {
 	private extractPayloadError(error: unknown): IError {
 		if (Is.json(error)) {
 			const obj = JSON.parse(error);
+			let message = obj.payload?.error;
+			if (message === "no input with matching ed25519 address provided") {
+				message = "There were insufficient funds to complete the operation";
+			}
 			return {
 				name: "IOTA",
-				message: obj.payload?.error
+				message
 			};
 		}
 

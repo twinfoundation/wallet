@@ -99,8 +99,6 @@ export const TEST_ADDRESS_BECH32 = addresses[0];
  * Setup the test environment.
  */
 export async function setupTestEnv(): Promise<void> {
-	console.debug(
-		"Wallet Address", `${process.env.TEST_EXPLORER_URL}addr/${TEST_ADDRESS_BECH32}`
-	);
+	console.debug("Wallet Address", `${process.env.TEST_EXPLORER_URL}addr/${TEST_ADDRESS_BECH32}`);
 	await TEST_WALLET_CONNECTOR.ensureBalance(TEST_CONTEXT, TEST_ADDRESS_BECH32, 1000000000n);
 }
