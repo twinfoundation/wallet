@@ -83,3 +83,23 @@ The bech32 encoded address to get the balance.
 `Promise`\<`bigint`\>
 
 The amount available on the wallet address.
+
+***
+
+### extractPayloadError()
+
+> `private` **extractPayloadError**(`error`): `IError`
+
+Extract error from SDK payload.
+
+#### Parameters
+
+• **error**: `unknown`
+
+The error to extract.
+
+#### Returns
+
+`IError`
+
+The extracted error.

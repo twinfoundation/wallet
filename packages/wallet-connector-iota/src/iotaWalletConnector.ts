@@ -11,8 +11,7 @@ import {
 	CoinType,
 	Utils,
 	type Block,
-	type IBuildBlockOptions,
-	type IRent
+	type IBuildBlockOptions
 } from "@iota/sdk-wasm/node/lib/index.js";
 import type { IIotaWalletConnectorConfig } from "./models/IIotaWalletConnectorConfig";
 
@@ -66,12 +65,6 @@ export class IotaWalletConnector implements IWalletConnector {
 	private readonly _config: IIotaWalletConnectorConfig;
 
 	/**
-	 * The IOTA Wallet client.
-	 * @internal
-	 */
-	private _client?: Client;
-
-	/**
 	 * The vault for the mnemonic or seed.
 	 * @internal
 	 */
@@ -82,12 +75,6 @@ export class IotaWalletConnector implements IWalletConnector {
 	 * @internal
 	 */
 	private readonly _faucetConnector?: IFaucetConnector;
-
-	/**
-	 * Information about the rent structure.
-	 * @internal
-	 */
-	private _rentInfo?: IRent;
 
 	/**
 	 * Create a new instance of IotaWalletConnector.
@@ -245,7 +232,7 @@ export class IotaWalletConnector implements IWalletConnector {
 		);
 		Guards.stringValue(IotaWalletConnector._CLASS_NAME, nameof(address), address);
 
-		const client = await this.createClient();
+		const client = new Client(this._config.clientOptions);
 
 		const outputIds = await client.basicOutputIds([
 			{ address },
@@ -288,27 +275,25 @@ export class IotaWalletConnector implements IWalletConnector {
 		);
 		Guards.stringValue(IotaWalletConnector._CLASS_NAME, nameof(address), address);
 
-		const client = await this.createClient();
+		const client = new Client(this._config.clientOptions);
+		const info = await client.getInfo();
+		const rentInfo = info.nodeInfo.protocol.rentStructure;
 
-		if (this._rentInfo) {
-			const outputIds = await client.basicOutputIds([
-				{ address },
-				{ hasExpiration: false },
-				{ hasTimelock: false },
-				{ hasStorageDepositReturn: false }
-			]);
+		const outputIds = await client.basicOutputIds([
+			{ address },
+			{ hasExpiration: false },
+			{ hasTimelock: false },
+			{ hasStorageDepositReturn: false }
+		]);
 
-			const outputs = await client.getOutputs(outputIds.items);
+		const outputs = await client.getOutputs(outputIds.items);
 
-			let totalStorageCosts = BigInt(0);
-			for (const output of outputs) {
-				totalStorageCosts += Utils.computeStorageDeposit(output.output, this._rentInfo);
-			}
-
-			return totalStorageCosts;
+		let totalStorageCosts = BigInt(0);
+		for (const output of outputs) {
+			totalStorageCosts += Utils.computeStorageDeposit(output.output, rentInfo);
 		}
 
-		return 0n;
+		return totalStorageCosts;
 	}
 
 	/**
@@ -404,7 +389,7 @@ export class IotaWalletConnector implements IWalletConnector {
 		Guards.bigint(IotaWalletConnector._CLASS_NAME, nameof(amount), amount);
 
 		try {
-			const client = await this.createClient();
+			const client = new Client(this._config.clientOptions);
 
 			const inputs = await client.findInputs([addressSource], amount);
 
@@ -497,20 +482,6 @@ export class IotaWalletConnector implements IWalletConnector {
 	}
 
 	/**
-	 * Create a client for the IOTA network.
-	 * @returns The client.
-	 * @internal
-	 */
-	private async createClient(): Promise<Client> {
-		if (!this._client) {
-			this._client = new Client(this._config.clientOptions);
-			const info = await this._client.getInfo();
-			this._rentInfo = info.nodeInfo.protocol.rentStructure;
-		}
-		return this._client;
-	}
-
-	/**
 	 * Prepare a transaction for sending, post and wait for inclusion.
 	 * @param requestContext The context for the request.
 	 * @param client The client to use.
@@ -585,9 +556,13 @@ export class IotaWalletConnector implements IWalletConnector {
 	private extractPayloadError(error: unknown): IError {
 		if (Is.json(error)) {
 			const obj = JSON.parse(error);
+			let message = obj.payload?.error;
+			if (message === "no input with matching ed25519 address provided") {
+				message = "There were insufficient funds to complete the operation";
+			}
 			return {
 				name: "IOTA",
-				message: obj.payload?.error
+				message
 			};
 		}
 
