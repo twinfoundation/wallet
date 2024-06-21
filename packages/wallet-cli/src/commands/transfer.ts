@@ -2,18 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0.
 import { CLIDisplay, CLIParam } from "@gtsc/cli-core";
 import { Converter, I18n, StringHelper } from "@gtsc/core";
-import { EntitySchemaFactory, EntitySchemaHelper } from "@gtsc/entity";
-import { MemoryEntityStorageConnector } from "@gtsc/entity-storage-connector-memory";
-import { EntityStorageConnectorFactory } from "@gtsc/entity-storage-models";
-import { nameof } from "@gtsc/nameof";
-import {
-	EntityStorageVaultConnector,
-	VaultKey,
-	VaultSecret
-} from "@gtsc/vault-connector-entity-storage";
 import { VaultConnectorFactory } from "@gtsc/vault-models";
 import { IotaWalletConnector } from "@gtsc/wallet-connector-iota";
 import { Command } from "commander";
+import { setupVault } from "./setupCommands";
 
 /**
  * Build the transfer command to be consumed by the CLI.
@@ -92,28 +84,7 @@ export async function actionCommandTransfer(opts: {
 
 	CLIDisplay.spinnerStart();
 
-	EntitySchemaFactory.register(nameof(VaultKey), () => EntitySchemaHelper.getSchema(VaultKey));
-	EntitySchemaFactory.register(nameof(VaultSecret), () =>
-		EntitySchemaHelper.getSchema(VaultSecret)
-	);
-
-	EntityStorageConnectorFactory.register(
-		"vault-key",
-		() =>
-			new MemoryEntityStorageConnector<VaultKey>({
-				entitySchema: nameof(VaultKey)
-			})
-	);
-	EntityStorageConnectorFactory.register(
-		"vault-secret",
-		() =>
-			new MemoryEntityStorageConnector<VaultSecret>({
-				entitySchema: nameof(VaultSecret)
-			})
-	);
-
-	const vaultConnector = new EntityStorageVaultConnector();
-	VaultConnectorFactory.register("vault", () => vaultConnector);
+	setupVault();
 
 	const requestContext = { identity: "local", tenantId: "local" };
 	const vaultSeedId = "local-seed";
@@ -128,6 +99,7 @@ export async function actionCommandTransfer(opts: {
 		}
 	});
 
+	const vaultConnector = VaultConnectorFactory.get("vault");
 	await vaultConnector.setSecret(requestContext, vaultSeedId, Converter.bytesToBase64(seed));
 
 	const blockId = await iotaWallet.transfer(requestContext, address, destAddress, amount);
