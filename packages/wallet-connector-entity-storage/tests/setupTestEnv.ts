@@ -2,15 +2,17 @@
 // SPDX-License-Identifier: Apache-2.0.
 
 import path from "node:path";
-import { EntitySchemaHelper } from "@gtsc/entity";
+import { EntitySchemaFactory, EntitySchemaHelper } from "@gtsc/entity";
 import { MemoryEntityStorageConnector } from "@gtsc/entity-storage-connector-memory";
+import { EntityStorageConnectorFactory } from "@gtsc/entity-storage-models";
+import { nameof } from "@gtsc/nameof";
 import type { IRequestContext } from "@gtsc/services";
 import {
 	EntityStorageVaultConnector,
 	VaultKey,
 	VaultSecret
 } from "@gtsc/vault-connector-entity-storage";
-import type { IVaultConnector } from "@gtsc/vault-models";
+import { VaultConnectorFactory } from "@gtsc/vault-models";
 import * as dotenv from "dotenv";
 
 console.debug("Setting up test environment from .env and .env.dev files");
@@ -19,20 +21,29 @@ dotenv.config({ path: [path.join(__dirname, ".env"), path.join(__dirname, ".env.
 
 export const TEST_TENANT_ID = "test-tenant";
 export const TEST_IDENTITY_ID = "test-identity";
+export const TEST_IDENTITY_ID_2 = "test-identity-2";
 
 export const TEST_CONTEXT: IRequestContext = {
 	tenantId: TEST_TENANT_ID,
 	identity: TEST_IDENTITY_ID
 };
 
-export const TEST_VAULT_KEY_STORAGE = new MemoryEntityStorageConnector<VaultKey>(
-	EntitySchemaHelper.getSchema(VaultKey)
+EntitySchemaFactory.register(nameof(VaultKey), () => EntitySchemaHelper.getSchema(VaultKey));
+EntitySchemaFactory.register(nameof(VaultSecret), () => EntitySchemaHelper.getSchema(VaultSecret));
+
+EntityStorageConnectorFactory.register(
+	"vault-key",
+	() =>
+		new MemoryEntityStorageConnector<VaultKey>({
+			entitySchema: nameof(VaultKey)
+		})
 );
-export const TEST_VAULT_SECRET_STORAGE = new MemoryEntityStorageConnector<VaultSecret>(
-	EntitySchemaHelper.getSchema(VaultSecret)
+EntityStorageConnectorFactory.register(
+	"vault-secret",
+	() =>
+		new MemoryEntityStorageConnector<VaultSecret>({
+			entitySchema: nameof(VaultSecret)
+		})
 );
 
-export const TEST_VAULT_CONNECTOR: IVaultConnector = new EntityStorageVaultConnector({
-	vaultKeyEntityStorageConnector: TEST_VAULT_KEY_STORAGE,
-	vaultSecretEntityStorageConnector: TEST_VAULT_SECRET_STORAGE
-});
+VaultConnectorFactory.register("vault", () => new EntityStorageVaultConnector());

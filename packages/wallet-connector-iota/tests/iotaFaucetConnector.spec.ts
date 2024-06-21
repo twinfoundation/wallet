@@ -2,10 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0.
 import { Bip44, KeyType } from "@gtsc/crypto";
 import {
+	TEST_BECH32_HRP,
 	TEST_CLIENT_OPTIONS,
 	TEST_COIN_TYPE,
 	TEST_CONTEXT,
-	TEST_BECH32_HRP,
 	TEST_SEED,
 	setupTestEnv
 } from "./setupTestEnv";
@@ -17,15 +17,30 @@ describe("IotaFaucetConnector", () => {
 		await setupTestEnv();
 	});
 
-	test("can fail to construct a faucet with no config", () => {
+	test("can fail to construct a faucet with no options", () => {
 		expect(
-			() => new IotaFaucetConnector(undefined as unknown as IIotaFaucetConnectorConfig)
+			() => new IotaFaucetConnector(undefined as unknown as { config: IIotaFaucetConnectorConfig })
 		).toThrow(
 			expect.objectContaining({
 				name: "GuardError",
 				message: "guard.objectUndefined",
 				properties: {
-					property: "config",
+					property: "options",
+					value: "undefined"
+				}
+			})
+		);
+	});
+
+	test("can fail to construct a faucet with no config", () => {
+		expect(
+			() => new IotaFaucetConnector({} as unknown as { config: IIotaFaucetConnectorConfig })
+		).toThrow(
+			expect.objectContaining({
+				name: "GuardError",
+				message: "guard.objectUndefined",
+				properties: {
+					property: "options.config",
 					value: "undefined"
 				}
 			})
@@ -33,12 +48,15 @@ describe("IotaFaucetConnector", () => {
 	});
 
 	test("can fail to construct a faucet with no config client options", () => {
-		expect(() => new IotaFaucetConnector({} as unknown as IIotaFaucetConnectorConfig)).toThrow(
+		expect(
+			() =>
+				new IotaFaucetConnector({ config: {} } as unknown as { config: IIotaFaucetConnectorConfig })
+		).toThrow(
 			expect.objectContaining({
 				name: "GuardError",
 				message: "guard.objectUndefined",
 				properties: {
-					property: "config.clientOptions",
+					property: "options.config.clientOptions",
 					value: "undefined"
 				}
 			})
@@ -47,13 +65,16 @@ describe("IotaFaucetConnector", () => {
 
 	test("can fail to construct a faucet with no endpoint", () => {
 		expect(
-			() => new IotaFaucetConnector({ clientOptions: {} } as unknown as IIotaFaucetConnectorConfig)
+			() =>
+				new IotaFaucetConnector({ config: { clientOptions: {} } } as unknown as {
+					config: IIotaFaucetConnectorConfig;
+				})
 		).toThrow(
 			expect.objectContaining({
 				name: "GuardError",
 				message: "guard.string",
 				properties: {
-					property: "config.endpoint",
+					property: "options.config.endpoint",
 					value: "undefined"
 				}
 			})
@@ -62,8 +83,10 @@ describe("IotaFaucetConnector", () => {
 
 	test("can construct a faucet with details", () => {
 		const faucet = new IotaFaucetConnector({
-			clientOptions: TEST_CLIENT_OPTIONS,
-			endpoint: process.env.TEST_FAUCET_ENDPOINT ?? ""
+			config: {
+				clientOptions: TEST_CLIENT_OPTIONS,
+				endpoint: process.env.TEST_FAUCET_ENDPOINT ?? ""
+			}
 		});
 		expect(faucet).toBeDefined();
 	});
@@ -81,8 +104,10 @@ describe("IotaFaucetConnector", () => {
 		);
 
 		const faucet = new IotaFaucetConnector({
-			clientOptions: TEST_CLIENT_OPTIONS,
-			endpoint: process.env.TEST_FAUCET_ENDPOINT ?? ""
+			config: {
+				clientOptions: TEST_CLIENT_OPTIONS,
+				endpoint: process.env.TEST_FAUCET_ENDPOINT ?? ""
+			}
 		});
 
 		const amountAdded = await faucet.fundAddress(TEST_CONTEXT, addressKeyPair.address);

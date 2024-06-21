@@ -10,25 +10,25 @@ Class for performing wallet operations on IOTA.
 
 ### new IotaWalletConnector()
 
-> **new IotaWalletConnector**(`dependencies`, `config`): [`IotaWalletConnector`](IotaWalletConnector.md)
+> **new IotaWalletConnector**(`options`): [`IotaWalletConnector`](IotaWalletConnector.md)
 
 Create a new instance of IotaWalletConnector.
 
 #### Parameters
 
-• **dependencies**
+• **options**
 
-The dependencies for the wallet connector.
+The options for the wallet connector.
 
-• **dependencies.vaultConnector**: `IVaultConnector`
+• **options.vaultConnectorType?**: `string`
 
-Vault connector to use for wallet secrets.
+Vault connector to use for wallet secrets, defaults to "vault".
 
-• **dependencies.faucetConnector?**: `IFaucetConnector`
+• **options.faucetConnectorType?**: `string`
 
-Optional faucet for requesting funds.
+Optional faucet for requesting funds, defaults to "faucet".
 
-• **config**: [`IIotaWalletConnectorConfig`](../interfaces/IIotaWalletConnectorConfig.md)
+• **options.config**: [`IIotaWalletConnectorConfig`](../interfaces/IIotaWalletConnectorConfig.md)
 
 The configuration to use.
 

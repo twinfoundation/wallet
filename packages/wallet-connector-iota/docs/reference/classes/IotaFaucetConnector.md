@@ -10,13 +10,17 @@ Class for performing faucet operations on IOTA.
 
 ### new IotaFaucetConnector()
 
-> **new IotaFaucetConnector**(`config`): [`IotaFaucetConnector`](IotaFaucetConnector.md)
+> **new IotaFaucetConnector**(`options`): [`IotaFaucetConnector`](IotaFaucetConnector.md)
 
-Create a new instance of IotaWalletConnector.
+Create a new instance of IotaFaucetConnector.
 
 #### Parameters
 
-• **config**: [`IIotaFaucetConnectorConfig`](../interfaces/IIotaFaucetConnectorConfig.md)
+• **options**
+
+The options for the connector.
+
+• **options.config**: [`IIotaFaucetConnectorConfig`](../interfaces/IIotaFaucetConnectorConfig.md)
 
 The configuration to use.
 

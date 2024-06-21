@@ -1,120 +1,86 @@
 // Copyright 2024 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
-import { EntitySchemaHelper } from "@gtsc/entity";
+import { EntitySchemaFactory, EntitySchemaHelper } from "@gtsc/entity";
 import { MemoryEntityStorageConnector } from "@gtsc/entity-storage-connector-memory";
-import type { IEntityStorageConnector } from "@gtsc/entity-storage-models";
-import type { IVaultConnector } from "@gtsc/vault-models";
-import type { IFaucetConnector } from "@gtsc/wallet-models";
-import {
-	TEST_CONTEXT,
-	TEST_IDENTITY_ID,
-	TEST_TENANT_ID,
-	TEST_VAULT_CONNECTOR,
-	TEST_VAULT_SECRET_STORAGE
-} from "./setupTestEnv";
+import { EntityStorageConnectorFactory } from "@gtsc/entity-storage-models";
+import { nameof } from "@gtsc/nameof";
+import type { VaultSecret } from "@gtsc/vault-connector-entity-storage";
+import { FaucetConnectorFactory } from "@gtsc/wallet-models";
+import { TEST_CONTEXT, TEST_IDENTITY_ID, TEST_IDENTITY_ID_2, TEST_TENANT_ID } from "./setupTestEnv";
 import { WalletAddress } from "../src/entities/walletAddress";
 import { EntityStorageFaucetConnector } from "../src/entityStorageFaucetConnector";
 import { EntityStorageWalletConnector } from "../src/entityStorageWalletConnector";
-import type { IEntityStorageWalletConnectorConfig } from "../src/models/IEntityStorageWalletConnectorConfig";
 
 let walletAddressEntityStorage: MemoryEntityStorageConnector<WalletAddress>;
 let faucetConnector: EntityStorageFaucetConnector;
 
-const walletAddressSchema = EntitySchemaHelper.getSchema(WalletAddress);
 let testAddresses: string[] = [];
 
 describe("EntityStorageWalletConnector", () => {
+	beforeAll(() => {
+		EntitySchemaFactory.register(nameof(WalletAddress), () =>
+			EntitySchemaHelper.getSchema(WalletAddress)
+		);
+	});
+
 	beforeEach(() => {
-		walletAddressEntityStorage = new MemoryEntityStorageConnector<WalletAddress>(
-			walletAddressSchema
-		);
-		faucetConnector = new EntityStorageFaucetConnector({ walletAddressEntityStorage });
-	});
-
-	test("can fail to construct a wallet with no dependencies", () => {
-		expect(
-			() =>
-				new EntityStorageWalletConnector(
-					undefined as unknown as {
-						vaultConnector: IVaultConnector;
-						faucetConnector?: IFaucetConnector;
-						walletAddressEntityStorage: IEntityStorageConnector<WalletAddress>;
-					},
-					{} as IEntityStorageWalletConnectorConfig
-				)
-		).toThrow(
-			expect.objectContaining({
-				name: "GuardError",
-				message: "guard.objectUndefined",
-				properties: {
-					property: "dependencies",
-					value: "undefined"
-				}
-			})
-		);
-	});
-
-	test("can construct a wallet with details", () => {
-		const faucet = new EntityStorageWalletConnector({
-			walletAddressEntityStorage,
-			vaultConnector: TEST_VAULT_CONNECTOR,
-			faucetConnector
+		walletAddressEntityStorage = new MemoryEntityStorageConnector<WalletAddress>({
+			entitySchema: nameof<WalletAddress>()
 		});
+		EntityStorageConnectorFactory.register("wallet-address", () => walletAddressEntityStorage);
+		faucetConnector = new EntityStorageFaucetConnector();
+		FaucetConnectorFactory.register("faucet", () => faucetConnector);
+	});
+
+	afterEach(() => {
+		EntityStorageConnectorFactory.unregister("wallet-address");
+	});
+
+	test("can construct a wallet", () => {
+		const faucet = new EntityStorageWalletConnector();
 		expect(faucet).toBeDefined();
 	});
 
 	test("can create a new wallet", async () => {
-		const wallet = new EntityStorageWalletConnector({
-			walletAddressEntityStorage,
-			vaultConnector: TEST_VAULT_CONNECTOR
-		});
+		const wallet = new EntityStorageWalletConnector();
 
 		await wallet.create(TEST_CONTEXT);
 
-		const store = TEST_VAULT_SECRET_STORAGE.getStore(TEST_TENANT_ID);
+		const store =
+			EntityStorageConnectorFactory.get<MemoryEntityStorageConnector<VaultSecret>>(
+				"vault-secret"
+			).getStore(TEST_TENANT_ID);
 		expect(store?.[0].id).toEqual(`${TEST_IDENTITY_ID}/wallet-mnemonic`);
 		expect(JSON.parse(store?.[0].data ?? "").split(" ").length).toEqual(24);
 	});
 
 	test("can generate addresses for the wallet", async () => {
-		const wallet = new EntityStorageWalletConnector({
-			walletAddressEntityStorage,
-			vaultConnector: TEST_VAULT_CONNECTOR
-		});
+		const wallet = new EntityStorageWalletConnector();
 
 		testAddresses = await wallet.getAddresses(TEST_CONTEXT, 0, 10);
 		expect(testAddresses.length).toEqual(10);
 	});
 
 	test("can fail to ensure a balance on an address with no faucet available", async () => {
-		const wallet = new EntityStorageWalletConnector({
-			walletAddressEntityStorage,
-			vaultConnector: TEST_VAULT_CONNECTOR
-		});
+		FaucetConnectorFactory.unregister("faucet");
+		const wallet = new EntityStorageWalletConnector();
 
 		const ensured = await wallet.ensureBalance(TEST_CONTEXT, testAddresses[0], 1000000000n);
 		expect(ensured).toBeFalsy();
 	});
 
 	test("can fail to ensure a balance with faucet depleted", async () => {
-		const wallet = new EntityStorageWalletConnector({
-			walletAddressEntityStorage,
-			vaultConnector: TEST_VAULT_CONNECTOR,
-			faucetConnector: {
-				fundAddress: async (): Promise<bigint> => 0n
-			}
-		});
+		FaucetConnectorFactory.register("faucet", () => ({
+			fundAddress: async (): Promise<bigint> => 0n
+		}));
+		const wallet = new EntityStorageWalletConnector();
 
 		const ensured = await wallet.ensureBalance(TEST_CONTEXT, testAddresses[0], 1000000000n);
 		expect(ensured).toBeFalsy();
 	});
 
 	test("can ensure a balance on an address with retries", async () => {
-		const wallet = new EntityStorageWalletConnector({
-			walletAddressEntityStorage,
-			vaultConnector: TEST_VAULT_CONNECTOR,
-			faucetConnector
-		});
+		const wallet = new EntityStorageWalletConnector();
 
 		const ensured = await wallet.ensureBalance(TEST_CONTEXT, testAddresses[0], 2000000000n);
 
@@ -127,11 +93,7 @@ describe("EntityStorageWalletConnector", () => {
 	});
 
 	test("can ensure a balance on an address", async () => {
-		const wallet = new EntityStorageWalletConnector({
-			walletAddressEntityStorage,
-			vaultConnector: TEST_VAULT_CONNECTOR,
-			faucetConnector
-		});
+		const wallet = new EntityStorageWalletConnector();
 
 		const ensured = await wallet.ensureBalance(TEST_CONTEXT, testAddresses[0], 1000000000n);
 
@@ -144,26 +106,13 @@ describe("EntityStorageWalletConnector", () => {
 	});
 
 	test("can get a balance for an address", async () => {
-		walletAddressEntityStorage = new MemoryEntityStorageConnector<WalletAddress>(
-			walletAddressSchema,
-			{
-				initialValues: {
-					[TEST_TENANT_ID]: [
-						{
-							address: testAddresses[0],
-							identity: TEST_IDENTITY_ID,
-							balance: "1000000000"
-						}
-					]
-				}
-			}
-		);
-
-		const wallet = new EntityStorageWalletConnector({
-			walletAddressEntityStorage,
-			vaultConnector: TEST_VAULT_CONNECTOR,
-			faucetConnector
+		await walletAddressEntityStorage.set(TEST_CONTEXT, {
+			address: testAddresses[0],
+			identity: TEST_IDENTITY_ID,
+			balance: "1000000000"
 		});
+
+		const wallet = new EntityStorageWalletConnector();
 
 		const balance = await wallet.getBalance(TEST_CONTEXT, testAddresses[0]);
 
@@ -171,11 +120,7 @@ describe("EntityStorageWalletConnector", () => {
 	});
 
 	test("can get storage costs for an address", async () => {
-		const wallet = new EntityStorageWalletConnector({
-			walletAddressEntityStorage,
-			vaultConnector: TEST_VAULT_CONNECTOR,
-			faucetConnector
-		});
+		const wallet = new EntityStorageWalletConnector();
 
 		const storageCosts = await wallet.getStorageCosts(TEST_CONTEXT, testAddresses[0]);
 
@@ -183,11 +128,7 @@ describe("EntityStorageWalletConnector", () => {
 	});
 
 	test("can fail to transfer with insufficient funds", async () => {
-		const wallet = new EntityStorageWalletConnector({
-			walletAddressEntityStorage,
-			vaultConnector: TEST_VAULT_CONNECTOR,
-			faucetConnector
-		});
+		const wallet = new EntityStorageWalletConnector();
 
 		await expect(wallet.transfer(TEST_CONTEXT, "addr1", "addr2", 100n)).rejects.toMatchObject({
 			name: "GeneralError",
@@ -196,31 +137,18 @@ describe("EntityStorageWalletConnector", () => {
 	});
 
 	test("can transfer to another address that does not exist", async () => {
-		walletAddressEntityStorage = new MemoryEntityStorageConnector<WalletAddress>(
-			walletAddressSchema,
-			{
-				initialValues: {
-					[TEST_TENANT_ID]: [
-						{
-							address: testAddresses[0],
-							identity: TEST_IDENTITY_ID,
-							balance: "1"
-						},
-						{
-							address: testAddresses[1],
-							identity: TEST_IDENTITY_ID,
-							balance: "1000000000"
-						}
-					]
-				}
-			}
-		);
-
-		const wallet = new EntityStorageWalletConnector({
-			walletAddressEntityStorage,
-			vaultConnector: TEST_VAULT_CONNECTOR,
-			faucetConnector
+		await walletAddressEntityStorage.set(TEST_CONTEXT, {
+			address: testAddresses[0],
+			identity: TEST_IDENTITY_ID,
+			balance: "1"
 		});
+		await walletAddressEntityStorage.set(TEST_CONTEXT, {
+			address: testAddresses[1],
+			identity: TEST_IDENTITY_ID,
+			balance: "1000000000"
+		});
+
+		const wallet = new EntityStorageWalletConnector();
 
 		await wallet.transfer(TEST_CONTEXT, testAddresses[1], testAddresses[2], 100n);
 
@@ -240,36 +168,23 @@ describe("EntityStorageWalletConnector", () => {
 	});
 
 	test("can transfer to another address that exists", async () => {
-		walletAddressEntityStorage = new MemoryEntityStorageConnector<WalletAddress>(
-			walletAddressSchema,
-			{
-				initialValues: {
-					[TEST_TENANT_ID]: [
-						{
-							address: testAddresses[0],
-							identity: TEST_IDENTITY_ID,
-							balance: "1"
-						},
-						{
-							address: testAddresses[1],
-							identity: TEST_IDENTITY_ID,
-							balance: "1000000000"
-						},
-						{
-							address: testAddresses[2],
-							identity: "test-identity-2",
-							balance: "500"
-						}
-					]
-				}
-			}
-		);
-
-		const wallet = new EntityStorageWalletConnector({
-			walletAddressEntityStorage,
-			vaultConnector: TEST_VAULT_CONNECTOR,
-			faucetConnector
+		await walletAddressEntityStorage.set(TEST_CONTEXT, {
+			address: testAddresses[0],
+			identity: TEST_IDENTITY_ID,
+			balance: "1"
 		});
+		await walletAddressEntityStorage.set(TEST_CONTEXT, {
+			address: testAddresses[1],
+			identity: TEST_IDENTITY_ID,
+			balance: "1000000000"
+		});
+		await walletAddressEntityStorage.set(TEST_CONTEXT, {
+			address: testAddresses[2],
+			identity: TEST_IDENTITY_ID_2,
+			balance: "500"
+		});
+
+		const wallet = new EntityStorageWalletConnector();
 
 		await wallet.transfer(TEST_CONTEXT, testAddresses[1], testAddresses[2], 100n);
 

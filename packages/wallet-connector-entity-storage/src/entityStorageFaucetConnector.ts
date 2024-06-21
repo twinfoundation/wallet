@@ -1,7 +1,10 @@
 // Copyright 2024 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
 import { Coerce, Guards, Is } from "@gtsc/core";
-import type { IEntityStorageConnector } from "@gtsc/entity-storage-models";
+import {
+	EntityStorageConnectorFactory,
+	type IEntityStorageConnector
+} from "@gtsc/entity-storage-models";
 import { nameof } from "@gtsc/nameof";
 import type { IRequestContext } from "@gtsc/services";
 import type { IFaucetConnector } from "@gtsc/wallet-models";
@@ -29,25 +32,14 @@ export class EntityStorageFaucetConnector implements IFaucetConnector {
 	private readonly _walletAddressEntityStorage: IEntityStorageConnector<WalletAddress>;
 
 	/**
-	 * Create a new instance of MemoryFaucetConnector.
-	 * @param dependencies The dependencies for the wallet connector.
-	 * @param dependencies.walletAddressEntityStorage The entity storage for wallet addresses.
+	 * Create a new instance of EntityStorageFaucetConnector.
+	 * @param options The options for the wallet connector.
+	 * @param options.walletAddressEntityStorageType The entity storage type for wallet addresses, defaults to "wallet-address".
 	 */
-	constructor(dependencies: {
-		walletAddressEntityStorage: IEntityStorageConnector<WalletAddress>;
-	}) {
-		Guards.object<EntityStorageFaucetConnector>(
-			EntityStorageFaucetConnector._CLASS_NAME,
-			nameof(dependencies),
-			dependencies
+	constructor(options?: { walletAddressEntityStorageType?: string }) {
+		this._walletAddressEntityStorage = EntityStorageConnectorFactory.get(
+			options?.walletAddressEntityStorageType ?? "wallet-address"
 		);
-		Guards.object<EntityStorageFaucetConnector>(
-			EntityStorageFaucetConnector._CLASS_NAME,
-			nameof(dependencies.walletAddressEntityStorage),
-			dependencies.walletAddressEntityStorage
-		);
-
-		this._walletAddressEntityStorage = dependencies.walletAddressEntityStorage;
 	}
 
 	/**

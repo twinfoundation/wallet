@@ -1,7 +1,10 @@
 // Copyright 2024 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
 import { Bip44, KeyType } from "@gtsc/crypto";
-import type { IVaultConnector } from "@gtsc/vault-models";
+import type { MemoryEntityStorageConnector } from "@gtsc/entity-storage-connector-memory";
+import { EntityStorageConnectorFactory } from "@gtsc/entity-storage-models";
+import type { VaultSecret } from "@gtsc/vault-connector-entity-storage";
+import { FaucetConnectorFactory } from "@gtsc/wallet-models";
 import {
 	TEST_ADDRESS_BECH32,
 	TEST_BECH32_HRP,
@@ -12,11 +15,8 @@ import {
 	TEST_MNEMONIC_NAME,
 	TEST_SEED,
 	TEST_TENANT_ID,
-	TEST_VAULT_CONNECTOR,
-	TEST_VAULT_SECRET_STORAGE,
 	setupTestEnv
 } from "./setupTestEnv";
-import { IotaFaucetConnector } from "../src/iotaFaucetConnector";
 import { IotaWalletConnector } from "../src/iotaWalletConnector";
 import type { IIotaWalletConnectorConfig } from "../src/models/IIotaWalletConnectorConfig";
 
@@ -25,38 +25,20 @@ describe("IotaWalletConnector", () => {
 		await setupTestEnv();
 	});
 
-	test("can fail to construct a wallet with no dependencies", () => {
+	test("can fail to construct a wallet with no options", () => {
 		expect(
 			() =>
 				new IotaWalletConnector(
-					undefined as unknown as { vaultConnector: IVaultConnector },
-					undefined as unknown as IIotaWalletConnectorConfig
+					undefined as unknown as {
+						config: IIotaWalletConnectorConfig;
+					}
 				)
 		).toThrow(
 			expect.objectContaining({
 				name: "GuardError",
 				message: "guard.objectUndefined",
 				properties: {
-					property: "dependencies",
-					value: "undefined"
-				}
-			})
-		);
-	});
-
-	test("can fail to construct a wallet with no vault", () => {
-		expect(
-			() =>
-				new IotaWalletConnector(
-					{ vaultConnector: undefined as unknown as IVaultConnector },
-					undefined as unknown as IIotaWalletConnectorConfig
-				)
-		).toThrow(
-			expect.objectContaining({
-				name: "GuardError",
-				message: "guard.objectUndefined",
-				properties: {
-					property: "dependencies.vaultConnector",
+					property: "options",
 					value: "undefined"
 				}
 			})
@@ -65,17 +47,13 @@ describe("IotaWalletConnector", () => {
 
 	test("can fail to construct a wallet with no config", () => {
 		expect(
-			() =>
-				new IotaWalletConnector(
-					{ vaultConnector: {} as unknown as IVaultConnector },
-					undefined as unknown as IIotaWalletConnectorConfig
-				)
+			() => new IotaWalletConnector({} as unknown as { config: IIotaWalletConnectorConfig })
 		).toThrow(
 			expect.objectContaining({
 				name: "GuardError",
 				message: "guard.objectUndefined",
 				properties: {
-					property: "config",
+					property: "options.config",
 					value: "undefined"
 				}
 			})
@@ -85,16 +63,13 @@ describe("IotaWalletConnector", () => {
 	test("can fail to construct a wallet with no config client options", () => {
 		expect(
 			() =>
-				new IotaWalletConnector(
-					{ vaultConnector: {} as unknown as IVaultConnector },
-					{} as unknown as IIotaWalletConnectorConfig
-				)
+				new IotaWalletConnector({ config: {} } as unknown as { config: IIotaWalletConnectorConfig })
 		).toThrow(
 			expect.objectContaining({
 				name: "GuardError",
 				message: "guard.objectUndefined",
 				properties: {
-					property: "config.clientOptions",
+					property: "options.config.clientOptions",
 					value: "undefined"
 				}
 			})
@@ -102,52 +77,46 @@ describe("IotaWalletConnector", () => {
 	});
 
 	test("can construct a wallet with details", () => {
-		const wallet = new IotaWalletConnector(
-			{
-				vaultConnector: TEST_VAULT_CONNECTOR
-			},
-			{
+		const wallet = new IotaWalletConnector({
+			config: {
 				clientOptions: TEST_CLIENT_OPTIONS,
 				vaultMnemonicId: TEST_MNEMONIC_NAME,
 				coinType: TEST_COIN_TYPE,
 				bech32Hrp: TEST_BECH32_HRP
 			}
-		);
+		});
 		expect(wallet).toBeDefined();
 	});
 
 	test("can create a new wallet", async () => {
-		const wallet = new IotaWalletConnector(
-			{
-				vaultConnector: TEST_VAULT_CONNECTOR
-			},
-			{
+		const wallet = new IotaWalletConnector({
+			config: {
 				clientOptions: TEST_CLIENT_OPTIONS,
 				vaultMnemonicId: TEST_MNEMONIC_NAME,
 				coinType: TEST_COIN_TYPE,
 				bech32Hrp: TEST_BECH32_HRP
 			}
-		);
+		});
 
 		await wallet.create(TEST_CONTEXT);
 
-		const store = TEST_VAULT_SECRET_STORAGE.getStore(TEST_TENANT_ID);
+		const store =
+			EntityStorageConnectorFactory.get<MemoryEntityStorageConnector<VaultSecret>>(
+				"vault-secret"
+			).getStore(TEST_TENANT_ID);
 		expect(store?.[0].id).toEqual(`${TEST_IDENTITY_ID}/${TEST_MNEMONIC_NAME}`);
 		expect(JSON.parse(store?.[0].data ?? "").split(" ").length).toEqual(24);
 	});
 
 	test("can generate addresses for the wallet", async () => {
-		const wallet = new IotaWalletConnector(
-			{
-				vaultConnector: TEST_VAULT_CONNECTOR
-			},
-			{
+		const wallet = new IotaWalletConnector({
+			config: {
 				clientOptions: TEST_CLIENT_OPTIONS,
 				vaultMnemonicId: TEST_MNEMONIC_NAME,
 				coinType: TEST_COIN_TYPE,
 				bech32Hrp: TEST_BECH32_HRP
 			}
-		);
+		});
 
 		await wallet.create(TEST_CONTEXT);
 
@@ -156,20 +125,20 @@ describe("IotaWalletConnector", () => {
 	});
 
 	test("can fail to ensure a balance on an address with no faucet available", async () => {
-		const wallet = new IotaWalletConnector(
-			{
-				vaultConnector: TEST_VAULT_CONNECTOR
-			},
-			{
+		const faucet = FaucetConnectorFactory.get("faucet");
+		FaucetConnectorFactory.unregister("faucet");
+		const wallet = new IotaWalletConnector({
+			config: {
 				clientOptions: TEST_CLIENT_OPTIONS,
 				vaultMnemonicId: TEST_MNEMONIC_NAME,
 				coinType: TEST_COIN_TYPE,
 				bech32Hrp: TEST_BECH32_HRP
 			}
-		);
+		});
 
 		const ensured = await wallet.ensureBalance(TEST_CONTEXT, TEST_ADDRESS_BECH32, 1000000000n);
 		expect(ensured).toBeFalsy();
+		FaucetConnectorFactory.register("faucet", () => faucet);
 	});
 
 	test("can ensure a balance on an address", async () => {
@@ -184,21 +153,14 @@ describe("IotaWalletConnector", () => {
 			Math.floor(Math.random() * 100000000) + 1000
 		);
 
-		const wallet = new IotaWalletConnector(
-			{
-				vaultConnector: TEST_VAULT_CONNECTOR,
-				faucetConnector: new IotaFaucetConnector({
-					clientOptions: TEST_CLIENT_OPTIONS,
-					endpoint: process.env.TEST_FAUCET_ENDPOINT ?? ""
-				})
-			},
-			{
+		const wallet = new IotaWalletConnector({
+			config: {
 				clientOptions: TEST_CLIENT_OPTIONS,
 				vaultMnemonicId: TEST_MNEMONIC_NAME,
 				coinType: TEST_COIN_TYPE,
 				bech32Hrp: TEST_BECH32_HRP
 			}
-		);
+		});
 
 		const ensured = await wallet.ensureBalance(TEST_CONTEXT, addressKeyPair.address, 1000000000n);
 
@@ -206,17 +168,14 @@ describe("IotaWalletConnector", () => {
 	});
 
 	test("can get a balance for an address", async () => {
-		const wallet = new IotaWalletConnector(
-			{
-				vaultConnector: TEST_VAULT_CONNECTOR
-			},
-			{
+		const wallet = new IotaWalletConnector({
+			config: {
 				clientOptions: TEST_CLIENT_OPTIONS,
 				vaultMnemonicId: TEST_MNEMONIC_NAME,
 				coinType: TEST_COIN_TYPE,
 				bech32Hrp: TEST_BECH32_HRP
 			}
-		);
+		});
 
 		const balance = await wallet.getBalance(TEST_CONTEXT, TEST_ADDRESS_BECH32);
 
@@ -224,17 +183,14 @@ describe("IotaWalletConnector", () => {
 	});
 
 	test("can get storage costs for an address", async () => {
-		const wallet = new IotaWalletConnector(
-			{
-				vaultConnector: TEST_VAULT_CONNECTOR
-			},
-			{
+		const wallet = new IotaWalletConnector({
+			config: {
 				clientOptions: TEST_CLIENT_OPTIONS,
 				vaultMnemonicId: TEST_MNEMONIC_NAME,
 				coinType: TEST_COIN_TYPE,
 				bech32Hrp: TEST_BECH32_HRP
 			}
-		);
+		});
 
 		const storageCosts = await wallet.getStorageCosts(TEST_CONTEXT, TEST_ADDRESS_BECH32);
 

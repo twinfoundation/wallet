@@ -35,23 +35,29 @@ export class IotaFaucetConnector implements IFaucetConnector {
 	private _client?: Client;
 
 	/**
-	 * Create a new instance of IotaWalletConnector.
-	 * @param config The configuration to use.
+	 * Create a new instance of IotaFaucetConnector.
+	 * @param options The options for the connector.
+	 * @param options.config The configuration to use.
 	 */
-	constructor(config: IIotaFaucetConnectorConfig) {
+	constructor(options: { config: IIotaFaucetConnectorConfig }) {
+		Guards.object(IotaFaucetConnector._CLASS_NAME, nameof(options), options);
 		Guards.object<IIotaFaucetConnectorConfig>(
 			IotaFaucetConnector._CLASS_NAME,
-			nameof(config),
-			config
+			nameof(options.config),
+			options.config
 		);
 		Guards.object<IIotaFaucetConnectorConfig["clientOptions"]>(
 			IotaFaucetConnector._CLASS_NAME,
-			nameof(config.clientOptions),
-			config.clientOptions
+			nameof(options.config.clientOptions),
+			options.config.clientOptions
 		);
-		Guards.stringValue(IotaFaucetConnector._CLASS_NAME, nameof(config.endpoint), config.endpoint);
+		Guards.stringValue(
+			IotaFaucetConnector._CLASS_NAME,
+			nameof(options.config.endpoint),
+			options.config.endpoint
+		);
 
-		this._config = config;
+		this._config = options.config;
 	}
 
 	/**

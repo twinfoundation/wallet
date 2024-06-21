@@ -3,11 +3,18 @@
 import { Coerce, GeneralError, Guards, Is } from "@gtsc/core";
 import { Bip39, Bip44, Ed25519, KeyType, Secp256k1 } from "@gtsc/crypto";
 import { ComparisonOperator, LogicalOperator } from "@gtsc/entity";
-import type { IEntityStorageConnector } from "@gtsc/entity-storage-models";
+import {
+	EntityStorageConnectorFactory,
+	type IEntityStorageConnector
+} from "@gtsc/entity-storage-models";
 import { nameof } from "@gtsc/nameof";
 import type { IRequestContext } from "@gtsc/services";
-import type { IVaultConnector } from "@gtsc/vault-models";
-import type { IFaucetConnector, IWalletConnector } from "@gtsc/wallet-models";
+import { VaultConnectorFactory, type IVaultConnector } from "@gtsc/vault-models";
+import {
+	FaucetConnectorFactory,
+	type IFaucetConnector,
+	type IWalletConnector
+} from "@gtsc/wallet-models";
 import type { WalletAddress } from "./entities/walletAddress";
 import type { IEntityStorageWalletConnectorConfig } from "./models/IEntityStorageWalletConnectorConfig";
 
@@ -69,40 +76,26 @@ export class EntityStorageWalletConnector implements IWalletConnector {
 
 	/**
 	 * Create a new instance of EntityStorageWalletConnector.
-	 * @param dependencies The dependencies for the wallet connector.
-	 * @param dependencies.vaultConnector Vault connector to use for wallet secrets.
-	 * @param dependencies.faucetConnector Optional faucet for requesting funds.
-	 * @param dependencies.walletAddressEntityStorage The entity storage for wallets.
-	 * @param config The configuration to use.
+	 * @param options The options for the wallet connector.
+	 * @param options.vaultConnectorType Vault connector to use for wallet secrets, defaults to "vault".
+	 * @param options.faucetConnectorType Optional faucet for requesting funds, defaults to "faucet".
+	 * @param options.walletAddressEntityStorageType The entity storage for wallets, defaults to "wallet-address".
+	 * @param options.config The configuration to use.
 	 */
-	constructor(
-		dependencies: {
-			vaultConnector: IVaultConnector;
-			faucetConnector?: IFaucetConnector;
-			walletAddressEntityStorage: IEntityStorageConnector<WalletAddress>;
-		},
-		config?: IEntityStorageWalletConnectorConfig
-	) {
-		Guards.object<EntityStorageWalletConnector>(
-			EntityStorageWalletConnector._CLASS_NAME,
-			nameof(dependencies),
-			dependencies
+	constructor(options?: {
+		vaultConnectorType?: string;
+		faucetConnectorType?: string;
+		walletAddressEntityStorageType?: string;
+		config?: IEntityStorageWalletConnectorConfig;
+	}) {
+		this._vaultConnector = VaultConnectorFactory.get(options?.vaultConnectorType ?? "vault");
+		this._faucetConnector = FaucetConnectorFactory.getIfExists(
+			options?.faucetConnectorType ?? "faucet"
 		);
-		Guards.object<IVaultConnector>(
-			EntityStorageWalletConnector._CLASS_NAME,
-			nameof(dependencies.vaultConnector),
-			dependencies.vaultConnector
+		this._walletAddressEntityStorage = EntityStorageConnectorFactory.get(
+			options?.walletAddressEntityStorageType ?? "wallet-address"
 		);
-		Guards.object<EntityStorageWalletConnector>(
-			EntityStorageWalletConnector._CLASS_NAME,
-			nameof(dependencies.walletAddressEntityStorage),
-			dependencies.walletAddressEntityStorage
-		);
-
-		this._walletAddressEntityStorage = dependencies.walletAddressEntityStorage;
-		this._vaultConnector = dependencies.vaultConnector;
-		this._faucetConnector = dependencies.faucetConnector;
-		this._config = config ?? {};
+		this._config = options?.config ?? {};
 		this._config.coinType ??= EntityStorageWalletConnector._DEFAULT_COIN_TYPE;
 		this._config.bech32Hrp ??= EntityStorageWalletConnector._DEFAULT_BECH32_HRP;
 	}

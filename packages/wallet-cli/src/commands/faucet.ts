@@ -2,14 +2,18 @@
 // SPDX-License-Identifier: Apache-2.0.
 import { CLIDisplay, CLIParam } from "@gtsc/cli-core";
 import { I18n, StringHelper } from "@gtsc/core";
-import { EntitySchemaHelper } from "@gtsc/entity";
+import { EntitySchemaFactory, EntitySchemaHelper } from "@gtsc/entity";
 import { MemoryEntityStorageConnector } from "@gtsc/entity-storage-connector-memory";
+import { EntityStorageConnectorFactory } from "@gtsc/entity-storage-models";
+import { nameof } from "@gtsc/nameof";
 import {
 	EntityStorageVaultConnector,
 	VaultKey,
 	VaultSecret
 } from "@gtsc/vault-connector-entity-storage";
+import { VaultConnectorFactory } from "@gtsc/vault-models";
 import { IotaFaucetConnector, IotaWalletConnector } from "@gtsc/wallet-connector-iota";
+import { FaucetConnectorFactory } from "@gtsc/wallet-models";
 import { Command } from "commander";
 
 /**
@@ -76,16 +80,19 @@ export async function actionCommandFaucet(opts: {
 	CLIDisplay.spinnerStart();
 
 	const iotaFaucet = new IotaFaucetConnector({
-		clientOptions: {
-			primaryNode: nodeEndpoint
-		},
-		endpoint: faucetEndpoint
+		config: {
+			clientOptions: {
+				primaryNode: nodeEndpoint
+			},
+			endpoint: faucetEndpoint
+		}
 	});
 
 	const fundsAdded = await iotaFaucet.fundAddress(
 		{ identity: "dummy", tenantId: "dummy" },
 		address
 	);
+	FaucetConnectorFactory.register("faucet", () => iotaFaucet);
 
 	CLIDisplay.spinnerStop();
 
@@ -100,26 +107,35 @@ export async function actionCommandFaucet(opts: {
 	CLIDisplay.task(I18n.formatMessage("commands.faucet.progress.requestingBalance"));
 	CLIDisplay.break();
 
-	const vault = new EntityStorageVaultConnector({
-		vaultKeyEntityStorageConnector: new MemoryEntityStorageConnector<VaultKey>(
-			EntitySchemaHelper.getSchema(VaultKey)
-		),
-		vaultSecretEntityStorageConnector: new MemoryEntityStorageConnector<VaultSecret>(
-			EntitySchemaHelper.getSchema(VaultSecret)
-		)
-	});
+	EntitySchemaFactory.register(nameof(VaultKey), () => EntitySchemaHelper.getSchema(VaultKey));
+	EntitySchemaFactory.register(nameof(VaultSecret), () =>
+		EntitySchemaHelper.getSchema(VaultSecret)
+	);
 
-	const iotaWallet = new IotaWalletConnector(
-		{
-			vaultConnector: vault,
-			faucetConnector: iotaFaucet
-		},
-		{
+	EntityStorageConnectorFactory.register(
+		"vault-key",
+		() =>
+			new MemoryEntityStorageConnector<VaultKey>({
+				entitySchema: nameof(VaultKey)
+			})
+	);
+	EntityStorageConnectorFactory.register(
+		"vault-secret",
+		() =>
+			new MemoryEntityStorageConnector<VaultSecret>({
+				entitySchema: nameof(VaultSecret)
+			})
+	);
+
+	VaultConnectorFactory.register("vault", () => new EntityStorageVaultConnector());
+
+	const iotaWallet = new IotaWalletConnector({
+		config: {
 			clientOptions: {
 				primaryNode: nodeEndpoint
 			}
 		}
-	);
+	});
 
 	const balance = await iotaWallet.getBalance({ identity: "dummy", tenantId: "dummy" }, address);
 

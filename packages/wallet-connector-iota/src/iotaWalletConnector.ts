@@ -4,8 +4,12 @@ import { BaseError, Converter, GeneralError, Guards, Is, type IError } from "@gt
 import { Bip39, Bip44, Ed25519, KeyType, Secp256k1 } from "@gtsc/crypto";
 import { nameof } from "@gtsc/nameof";
 import type { IRequestContext } from "@gtsc/services";
-import type { IVaultConnector } from "@gtsc/vault-models";
-import type { IFaucetConnector, IWalletConnector } from "@gtsc/wallet-models";
+import { VaultConnectorFactory, type IVaultConnector } from "@gtsc/vault-models";
+import {
+	FaucetConnectorFactory,
+	type IFaucetConnector,
+	type IWalletConnector
+} from "@gtsc/wallet-models";
 import {
 	Client,
 	CoinType,
@@ -78,42 +82,33 @@ export class IotaWalletConnector implements IWalletConnector {
 
 	/**
 	 * Create a new instance of IotaWalletConnector.
-	 * @param dependencies The dependencies for the wallet connector.
-	 * @param dependencies.vaultConnector Vault connector to use for wallet secrets.
-	 * @param dependencies.faucetConnector Optional faucet for requesting funds.
-	 * @param config The configuration to use.
+	 * @param options The options for the wallet connector.
+	 * @param options.vaultConnectorType Vault connector to use for wallet secrets, defaults to "vault".
+	 * @param options.faucetConnectorType Optional faucet for requesting funds, defaults to "faucet".
+	 * @param options.config The configuration to use.
 	 */
-	constructor(
-		dependencies: {
-			vaultConnector: IVaultConnector;
-			faucetConnector?: IFaucetConnector;
-		},
-		config: IIotaWalletConnectorConfig
-	) {
+	constructor(options: {
+		vaultConnectorType?: string;
+		faucetConnectorType?: string;
+		config: IIotaWalletConnectorConfig;
+	}) {
+		Guards.object(IotaWalletConnector._CLASS_NAME, nameof(options), options);
 		Guards.object<IIotaWalletConnectorConfig>(
 			IotaWalletConnector._CLASS_NAME,
-			nameof(dependencies),
-			dependencies
+			nameof(options.config),
+			options.config
 		);
-		Guards.object<IIotaWalletConnectorConfig>(
+		Guards.object<IIotaWalletConnectorConfig["clientOptions"]>(
 			IotaWalletConnector._CLASS_NAME,
-			nameof(dependencies.vaultConnector),
-			dependencies.vaultConnector
-		);
-		Guards.object<IIotaWalletConnectorConfig>(
-			IotaWalletConnector._CLASS_NAME,
-			nameof(config),
-			config
-		);
-		Guards.object<IIotaWalletConnectorConfig>(
-			IotaWalletConnector._CLASS_NAME,
-			nameof(config.clientOptions),
-			config.clientOptions
+			nameof(options.config.clientOptions),
+			options.config.clientOptions
 		);
 
-		this._vaultConnector = dependencies.vaultConnector;
-		this._faucetConnector = dependencies.faucetConnector;
-		this._config = config;
+		this._vaultConnector = VaultConnectorFactory.get(options?.vaultConnectorType ?? "vault");
+		this._faucetConnector = FaucetConnectorFactory.getIfExists(
+			options?.faucetConnectorType ?? "faucet"
+		);
+		this._config = options.config;
 		this._config.vaultMnemonicId ??= IotaWalletConnector._DEFAULT_MNEMONIC_SECRET_NAME;
 		this._config.vaultSeedId ??= IotaWalletConnector._DEFAULT_SEED_SECRET_NAME;
 		this._config.coinType ??= IotaWalletConnector._DEFAULT_COIN_TYPE;

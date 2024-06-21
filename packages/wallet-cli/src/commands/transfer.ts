@@ -2,13 +2,16 @@
 // SPDX-License-Identifier: Apache-2.0.
 import { CLIDisplay, CLIParam } from "@gtsc/cli-core";
 import { Converter, I18n, StringHelper } from "@gtsc/core";
-import { EntitySchemaHelper } from "@gtsc/entity";
+import { EntitySchemaFactory, EntitySchemaHelper } from "@gtsc/entity";
 import { MemoryEntityStorageConnector } from "@gtsc/entity-storage-connector-memory";
+import { EntityStorageConnectorFactory } from "@gtsc/entity-storage-models";
+import { nameof } from "@gtsc/nameof";
 import {
 	EntityStorageVaultConnector,
 	VaultKey,
 	VaultSecret
 } from "@gtsc/vault-connector-entity-storage";
+import { VaultConnectorFactory } from "@gtsc/vault-models";
 import { IotaWalletConnector } from "@gtsc/wallet-connector-iota";
 import { Command } from "commander";
 
@@ -89,30 +92,41 @@ export async function actionCommandTransfer(opts: {
 
 	CLIDisplay.spinnerStart();
 
-	const vaultConnector = new EntityStorageVaultConnector({
-		vaultKeyEntityStorageConnector: new MemoryEntityStorageConnector<VaultKey>(
-			EntitySchemaHelper.getSchema(VaultKey)
-		),
-		vaultSecretEntityStorageConnector: new MemoryEntityStorageConnector<VaultSecret>(
-			EntitySchemaHelper.getSchema(VaultSecret)
-		)
-	});
+	EntitySchemaFactory.register(nameof(VaultKey), () => EntitySchemaHelper.getSchema(VaultKey));
+	EntitySchemaFactory.register(nameof(VaultSecret), () =>
+		EntitySchemaHelper.getSchema(VaultSecret)
+	);
+
+	EntityStorageConnectorFactory.register(
+		"vault-key",
+		() =>
+			new MemoryEntityStorageConnector<VaultKey>({
+				entitySchema: nameof(VaultKey)
+			})
+	);
+	EntityStorageConnectorFactory.register(
+		"vault-secret",
+		() =>
+			new MemoryEntityStorageConnector<VaultSecret>({
+				entitySchema: nameof(VaultSecret)
+			})
+	);
+
+	const vaultConnector = new EntityStorageVaultConnector();
+	VaultConnectorFactory.register("vault", () => vaultConnector);
 
 	const requestContext = { identity: "local", tenantId: "local" };
 	const vaultSeedId = "local-seed";
 
-	const iotaWallet = new IotaWalletConnector(
-		{
-			vaultConnector
-		},
-		{
+	const iotaWallet = new IotaWalletConnector({
+		config: {
 			clientOptions: {
 				nodes: [nodeEndpoint],
 				localPow: true
 			},
 			vaultSeedId
 		}
-	);
+	});
 
 	await vaultConnector.setSecret(requestContext, vaultSeedId, Converter.bytesToBase64(seed));
 

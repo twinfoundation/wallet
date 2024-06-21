@@ -10,29 +10,29 @@ Class for performing wallet operations using in-memory storage.
 
 ### new EntityStorageWalletConnector()
 
-> **new EntityStorageWalletConnector**(`dependencies`, `config`?): [`EntityStorageWalletConnector`](EntityStorageWalletConnector.md)
+> **new EntityStorageWalletConnector**(`options`?): [`EntityStorageWalletConnector`](EntityStorageWalletConnector.md)
 
 Create a new instance of EntityStorageWalletConnector.
 
 #### Parameters
 
-• **dependencies**
+• **options?**
 
-The dependencies for the wallet connector.
+The options for the wallet connector.
 
-• **dependencies.vaultConnector**: `IVaultConnector`
+• **options.vaultConnectorType?**: `string`
 
-Vault connector to use for wallet secrets.
+Vault connector to use for wallet secrets, defaults to "vault".
 
-• **dependencies.faucetConnector?**: `IFaucetConnector`
+• **options.faucetConnectorType?**: `string`
 
-Optional faucet for requesting funds.
+Optional faucet for requesting funds, defaults to "faucet".
 
-• **dependencies.walletAddressEntityStorage?**: `IEntityStorageConnector`\<[`WalletAddress`](WalletAddress.md)\>
+• **options.walletAddressEntityStorageType?**: `string`
 
-The entity storage for wallets.
+The entity storage for wallets, defaults to "wallet-address".
 
-• **config?**: [`IEntityStorageWalletConnectorConfig`](../interfaces/IEntityStorageWalletConnectorConfig.md)
+• **options.config?**: [`IEntityStorageWalletConnectorConfig`](../interfaces/IEntityStorageWalletConnectorConfig.md)
 
 The configuration to use.
 
