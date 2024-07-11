@@ -71,6 +71,7 @@ describe("EntityStorageWalletConnector", () => {
 
 	test("can fail to ensure a balance with faucet depleted", async () => {
 		FaucetConnectorFactory.register("faucet", () => ({
+			CLASS_NAME: "foo",
 			fundAddress: async (): Promise<bigint> => 0n
 		}));
 		const wallet = new EntityStorageWalletConnector();

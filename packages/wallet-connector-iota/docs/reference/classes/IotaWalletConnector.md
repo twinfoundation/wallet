@@ -60,6 +60,18 @@ Default name for the mnemonic secret.
 
 Default name for the seed secret.
 
+***
+
+### CLASS\_NAME
+
+> `readonly` **CLASS\_NAME**: `string`
+
+Runtime name for the class.
+
+#### Implementation of
+
+`IWalletConnector.CLASS_NAME`
+
 ## Methods
 
 ### create()

@@ -21,9 +21,8 @@ export class EntityStorageFaucetConnector implements IFaucetConnector {
 
 	/**
 	 * Runtime name for the class.
-	 * @internal
 	 */
-	private static readonly _CLASS_NAME: string = nameof<EntityStorageFaucetConnector>();
+	public readonly CLASS_NAME: string = nameof<EntityStorageFaucetConnector>();
 
 	/**
 	 * The entity storage for wallets.
@@ -54,21 +53,9 @@ export class EntityStorageFaucetConnector implements IFaucetConnector {
 		address: string,
 		timeoutInSeconds: number = 60
 	): Promise<bigint> {
-		Guards.object<IRequestContext>(
-			EntityStorageFaucetConnector._CLASS_NAME,
-			nameof(requestContext),
-			requestContext
-		);
-		Guards.stringValue(
-			EntityStorageFaucetConnector._CLASS_NAME,
-			nameof(requestContext.tenantId),
-			requestContext.tenantId
-		);
-		Guards.stringValue(
-			EntityStorageFaucetConnector._CLASS_NAME,
-			nameof(requestContext.identity),
-			requestContext.identity
-		);
+		Guards.object<IRequestContext>(this.CLASS_NAME, nameof(requestContext), requestContext);
+		Guards.stringValue(this.CLASS_NAME, nameof(requestContext.tenantId), requestContext.tenantId);
+		Guards.stringValue(this.CLASS_NAME, nameof(requestContext.identity), requestContext.identity);
 
 		let walletAddress = await this._walletAddressEntityStorage.get(requestContext, address);
 		if (Is.empty(walletAddress)) {

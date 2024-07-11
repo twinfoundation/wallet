@@ -18,9 +18,8 @@ export class IotaFaucetConnector implements IFaucetConnector {
 
 	/**
 	 * Runtime name for the class.
-	 * @internal
 	 */
-	private static readonly _CLASS_NAME: string = nameof<IotaFaucetConnector>();
+	public readonly CLASS_NAME: string = nameof<IotaFaucetConnector>();
 
 	/**
 	 * The configuration to use for tangle operations.
@@ -40,22 +39,18 @@ export class IotaFaucetConnector implements IFaucetConnector {
 	 * @param options.config The configuration to use.
 	 */
 	constructor(options: { config: IIotaFaucetConnectorConfig }) {
-		Guards.object(IotaFaucetConnector._CLASS_NAME, nameof(options), options);
+		Guards.object(this.CLASS_NAME, nameof(options), options);
 		Guards.object<IIotaFaucetConnectorConfig>(
-			IotaFaucetConnector._CLASS_NAME,
+			this.CLASS_NAME,
 			nameof(options.config),
 			options.config
 		);
 		Guards.object<IIotaFaucetConnectorConfig["clientOptions"]>(
-			IotaFaucetConnector._CLASS_NAME,
+			this.CLASS_NAME,
 			nameof(options.config.clientOptions),
 			options.config.clientOptions
 		);
-		Guards.stringValue(
-			IotaFaucetConnector._CLASS_NAME,
-			nameof(options.config.endpoint),
-			options.config.endpoint
-		);
+		Guards.stringValue(this.CLASS_NAME, nameof(options.config.endpoint), options.config.endpoint);
 
 		this._config = options.config;
 	}
@@ -92,7 +87,7 @@ export class IotaFaucetConnector implements IFaucetConnector {
 			}
 		} catch (error) {
 			throw new GeneralError(
-				IotaFaucetConnector._CLASS_NAME,
+				this.CLASS_NAME,
 				"fundingFailed",
 				undefined,
 				this.extractPayloadError(error)
@@ -145,9 +140,9 @@ export class IotaFaucetConnector implements IFaucetConnector {
 	private extractPayloadError(error: unknown): IError {
 		if (Is.json(error)) {
 			const obj = JSON.parse(error);
-			let message = obj.payload?.error;
+			const message = obj.payload?.error;
 			if (message === "no input with matching ed25519 address provided") {
-				message = "There were insufficient funds to complete the operation";
+				return new GeneralError(this.CLASS_NAME, "insufficientFunds");
 			}
 			return {
 				name: "IOTA",

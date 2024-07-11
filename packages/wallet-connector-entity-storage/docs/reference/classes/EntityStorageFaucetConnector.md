@@ -36,6 +36,18 @@ The entity storage type for wallet addresses, defaults to "wallet-address".
 
 The namespace supported by the wallet connector.
 
+***
+
+### CLASS\_NAME
+
+> `readonly` **CLASS\_NAME**: `string`
+
+Runtime name for the class.
+
+#### Implementation of
+
+`IFaucetConnector.CLASS_NAME`
+
 ## Methods
 
 ### fundAddress()
