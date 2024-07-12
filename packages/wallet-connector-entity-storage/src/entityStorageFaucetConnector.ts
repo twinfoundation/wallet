@@ -6,7 +6,7 @@ import {
 	type IEntityStorageConnector
 } from "@gtsc/entity-storage-models";
 import { nameof } from "@gtsc/nameof";
-import type { IRequestContext } from "@gtsc/services";
+import type { IServiceRequestContext } from "@gtsc/services";
 import type { IFaucetConnector } from "@gtsc/wallet-models";
 import type { WalletAddress } from "./entities/walletAddress";
 
@@ -43,21 +43,23 @@ export class EntityStorageFaucetConnector implements IFaucetConnector {
 
 	/**
 	 * Fund the wallet from the faucet.
-	 * @param requestContext The context for the request.
 	 * @param address The bech32 encoded address of the address to fund.
 	 * @param timeoutInSeconds The timeout in seconds to wait for the funding to complete.
+	 * @param requestContext The context for the request.
 	 * @returns The amount added to the address by the faucet.
 	 */
 	public async fundAddress(
-		requestContext: IRequestContext,
 		address: string,
-		timeoutInSeconds: number = 60
+		timeoutInSeconds: number = 60,
+		requestContext?: IServiceRequestContext
 	): Promise<bigint> {
-		Guards.object<IRequestContext>(this.CLASS_NAME, nameof(requestContext), requestContext);
-		Guards.stringValue(this.CLASS_NAME, nameof(requestContext.tenantId), requestContext.tenantId);
-		Guards.stringValue(this.CLASS_NAME, nameof(requestContext.identity), requestContext.identity);
+		Guards.stringValue(this.CLASS_NAME, nameof(requestContext?.identity), requestContext?.identity);
 
-		let walletAddress = await this._walletAddressEntityStorage.get(requestContext, address);
+		let walletAddress = await this._walletAddressEntityStorage.get(
+			address,
+			undefined,
+			requestContext
+		);
 		if (Is.empty(walletAddress)) {
 			walletAddress = {
 				identity: requestContext.identity,
@@ -70,7 +72,7 @@ export class EntityStorageFaucetConnector implements IFaucetConnector {
 		const balance = Coerce.bigint(walletAddress.balance) ?? 0n;
 		walletAddress.balance = (balance + maxFundAmount).toString();
 
-		await this._walletAddressEntityStorage.set(requestContext, walletAddress);
+		await this._walletAddressEntityStorage.set(walletAddress, requestContext);
 
 		return maxFundAmount;
 	}

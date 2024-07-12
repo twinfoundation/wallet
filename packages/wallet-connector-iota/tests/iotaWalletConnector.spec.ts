@@ -14,7 +14,7 @@ import {
 	TEST_IDENTITY_ID,
 	TEST_MNEMONIC_NAME,
 	TEST_SEED,
-	TEST_TENANT_ID,
+	TEST_PARTITION_ID,
 	setupTestEnv
 } from "./setupTestEnv";
 import { IotaWalletConnector } from "../src/iotaWalletConnector";
@@ -103,7 +103,7 @@ describe("IotaWalletConnector", () => {
 		const store =
 			EntityStorageConnectorFactory.get<MemoryEntityStorageConnector<VaultSecret>>(
 				"vault-secret"
-			).getStore(TEST_TENANT_ID);
+			).getStore(TEST_PARTITION_ID);
 		expect(store?.[0].id).toEqual(`${TEST_IDENTITY_ID}/${TEST_MNEMONIC_NAME}`);
 		expect(JSON.parse(store?.[0].data ?? "").split(" ").length).toEqual(24);
 	});
@@ -120,7 +120,7 @@ describe("IotaWalletConnector", () => {
 
 		await wallet.create(TEST_CONTEXT);
 
-		const testAddresses = await wallet.getAddresses(TEST_CONTEXT, 0, 10);
+		const testAddresses = await wallet.getAddresses(0, 10, TEST_CONTEXT);
 		expect(testAddresses.length).toEqual(10);
 	});
 
@@ -136,7 +136,12 @@ describe("IotaWalletConnector", () => {
 			}
 		});
 
-		const ensured = await wallet.ensureBalance(TEST_CONTEXT, TEST_ADDRESS_BECH32, 1000000000n);
+		const ensured = await wallet.ensureBalance(
+			TEST_ADDRESS_BECH32,
+			1000000000n,
+			undefined,
+			TEST_CONTEXT
+		);
 		expect(ensured).toBeFalsy();
 		FaucetConnectorFactory.register("faucet", () => faucet);
 	});
@@ -162,7 +167,12 @@ describe("IotaWalletConnector", () => {
 			}
 		});
 
-		const ensured = await wallet.ensureBalance(TEST_CONTEXT, addressKeyPair.address, 1000000000n);
+		const ensured = await wallet.ensureBalance(
+			addressKeyPair.address,
+			1000000000n,
+			undefined,
+			TEST_CONTEXT
+		);
 
 		expect(ensured).toBeTruthy();
 	});
@@ -177,7 +187,7 @@ describe("IotaWalletConnector", () => {
 			}
 		});
 
-		const balance = await wallet.getBalance(TEST_CONTEXT, TEST_ADDRESS_BECH32);
+		const balance = await wallet.getBalance(TEST_ADDRESS_BECH32, TEST_CONTEXT);
 
 		expect(balance).toBeGreaterThan(0n);
 	});
@@ -192,7 +202,7 @@ describe("IotaWalletConnector", () => {
 			}
 		});
 
-		const storageCosts = await wallet.getStorageCosts(TEST_CONTEXT, TEST_ADDRESS_BECH32);
+		const storageCosts = await wallet.getStorageCosts(TEST_ADDRESS_BECH32, TEST_CONTEXT);
 
 		expect(storageCosts).toBeGreaterThan(0);
 	});

@@ -3,7 +3,7 @@
 import { BaseError, Converter, GeneralError, Guards, Is, type IError } from "@gtsc/core";
 import { Bip39, Bip44, Ed25519, KeyType, Secp256k1 } from "@gtsc/crypto";
 import { nameof } from "@gtsc/nameof";
-import type { IRequestContext } from "@gtsc/services";
+import type { IServiceRequestContext } from "@gtsc/services";
 import { VaultConnectorFactory, type IVaultConnector } from "@gtsc/vault-models";
 import {
 	FaucetConnectorFactory,
@@ -120,40 +120,33 @@ export class IotaWalletConnector implements IWalletConnector {
 	 * @param requestContext The context for the request.
 	 * @returns Nothing.
 	 */
-	public async create(requestContext: IRequestContext): Promise<void> {
-		Guards.object<IRequestContext>(this.CLASS_NAME, nameof(requestContext), requestContext);
-		Guards.stringValue(this.CLASS_NAME, nameof(requestContext.tenantId), requestContext.tenantId);
-		Guards.stringValue(this.CLASS_NAME, nameof(requestContext.identity), requestContext.identity);
-
+	public async create(requestContext?: IServiceRequestContext): Promise<void> {
 		const mnemonic = Bip39.randomMnemonic();
 		await this._vaultConnector.setSecret<string>(
-			requestContext,
 			this._config.vaultMnemonicId ?? IotaWalletConnector._DEFAULT_MNEMONIC_SECRET_NAME,
-			mnemonic
+			mnemonic,
+			requestContext
 		);
 		const seed = Bip39.mnemonicToSeed(mnemonic);
 		await this._vaultConnector.setSecret<string>(
-			requestContext,
 			this._config.vaultSeedId ?? IotaWalletConnector._DEFAULT_SEED_SECRET_NAME,
-			Converter.bytesToBase64(seed)
+			Converter.bytesToBase64(seed),
+			requestContext
 		);
 	}
 
 	/**
 	 * Get the addresses for the requested range.
-	 * @param requestContext The context for the request.
 	 * @param startAddressIndex The start index for the addresses.
 	 * @param count The number of addresses to generate.
+	 * @param requestContext The context for the request.
 	 * @returns The list of addresses.
 	 */
 	public async getAddresses(
-		requestContext: IRequestContext,
 		startAddressIndex: number,
-		count: number
+		count: number,
+		requestContext?: IServiceRequestContext
 	): Promise<string[]> {
-		Guards.object<IRequestContext>(this.CLASS_NAME, nameof(requestContext), requestContext);
-		Guards.stringValue(this.CLASS_NAME, nameof(requestContext.tenantId), requestContext.tenantId);
-		Guards.stringValue(this.CLASS_NAME, nameof(requestContext.identity), requestContext.identity);
 		Guards.integer(this.CLASS_NAME, nameof(startAddressIndex), startAddressIndex);
 		Guards.integer(this.CLASS_NAME, nameof(count), count);
 
@@ -180,14 +173,14 @@ export class IotaWalletConnector implements IWalletConnector {
 
 	/**
 	 * Get the balance for an address in a wallet.
-	 * @param requestContext The context for the request.
 	 * @param address The bech32 encoded address.
+	 * @param requestContext The context for the request.
 	 * @returns The balance of the wallet address.
 	 */
-	public async getBalance(requestContext: IRequestContext, address: string): Promise<bigint> {
-		Guards.object<IRequestContext>(this.CLASS_NAME, nameof(requestContext), requestContext);
-		Guards.stringValue(this.CLASS_NAME, nameof(requestContext.tenantId), requestContext.tenantId);
-		Guards.stringValue(this.CLASS_NAME, nameof(requestContext.identity), requestContext.identity);
+	public async getBalance(
+		address: string,
+		requestContext?: IServiceRequestContext
+	): Promise<bigint> {
 		Guards.stringValue(this.CLASS_NAME, nameof(address), address);
 
 		const client = new Client(this._config.clientOptions);
@@ -211,14 +204,14 @@ export class IotaWalletConnector implements IWalletConnector {
 
 	/**
 	 * Get the storage costs for an address in a wallet.
-	 * @param requestContext The context for the request.
 	 * @param address The bech32 encoded address.
+	 * @param requestContext The context for the request.
 	 * @returns The storage costs for the address.
 	 */
-	public async getStorageCosts(requestContext: IRequestContext, address: string): Promise<bigint> {
-		Guards.object<IRequestContext>(this.CLASS_NAME, nameof(requestContext), requestContext);
-		Guards.stringValue(this.CLASS_NAME, nameof(requestContext.tenantId), requestContext.tenantId);
-		Guards.stringValue(this.CLASS_NAME, nameof(requestContext.identity), requestContext.identity);
+	public async getStorageCosts(
+		address: string,
+		requestContext?: IServiceRequestContext
+	): Promise<bigint> {
 		Guards.stringValue(this.CLASS_NAME, nameof(address), address);
 
 		const client = new Client(this._config.clientOptions);
@@ -244,33 +237,30 @@ export class IotaWalletConnector implements IWalletConnector {
 
 	/**
 	 * Ensure the balance for an address in a wallet.
-	 * @param requestContext The context for the request.
 	 * @param address The bech32 encoded address.
 	 * @param ensureBalance The balance to ensure on the address.
 	 * @param timeoutInSeconds The timeout in seconds to wait for the funding to complete.
+	 * @param requestContext The context for the request.
 	 * @returns True if the balance has been ensured.
 	 */
 	public async ensureBalance(
-		requestContext: IRequestContext,
 		address: string,
 		ensureBalance: bigint,
-		timeoutInSeconds?: number
+		timeoutInSeconds?: number,
+		requestContext?: IServiceRequestContext
 	): Promise<boolean> {
-		Guards.object<IRequestContext>(this.CLASS_NAME, nameof(requestContext), requestContext);
-		Guards.stringValue(this.CLASS_NAME, nameof(requestContext.tenantId), requestContext.tenantId);
-		Guards.stringValue(this.CLASS_NAME, nameof(requestContext.identity), requestContext.identity);
 		Guards.stringValue(this.CLASS_NAME, nameof(address), address);
 		Guards.bigint(this.CLASS_NAME, nameof(ensureBalance), ensureBalance);
 
 		if (this._faucetConnector) {
 			let retryCount = 10;
-			let currentBalance = await this.getBalance(requestContext, address);
+			let currentBalance = await this.getBalance(address, requestContext);
 
 			while (currentBalance < ensureBalance && retryCount > 0) {
 				const addedBalance = await this._faucetConnector.fundAddress(
-					requestContext,
 					address,
-					timeoutInSeconds
+					timeoutInSeconds,
+					requestContext
 				);
 				if (addedBalance === 0n) {
 					// The balance has not increased, so return.
@@ -291,21 +281,18 @@ export class IotaWalletConnector implements IWalletConnector {
 
 	/**
 	 * Transfer funds to an address.
-	 * @param requestContext The context for the request.
 	 * @param addressSource The bech32 encoded address to send the funds from.
 	 * @param addressDest The bech32 encoded address to send the funds to.
 	 * @param amount The amount to transfer.
+	 * @param requestContext The context for the request.
 	 * @returns An identifier for the transfer if there was one.
 	 */
 	public async transfer(
-		requestContext: IRequestContext,
 		addressSource: string,
 		addressDest: string,
-		amount: bigint
+		amount: bigint,
+		requestContext?: IServiceRequestContext
 	): Promise<string | undefined> {
-		Guards.object<IRequestContext>(this.CLASS_NAME, nameof(requestContext), requestContext);
-		Guards.stringValue(this.CLASS_NAME, nameof(requestContext.tenantId), requestContext.tenantId);
-		Guards.stringValue(this.CLASS_NAME, nameof(requestContext.identity), requestContext.identity);
 		Guards.stringValue(this.CLASS_NAME, nameof(addressSource), addressSource);
 		Guards.stringValue(this.CLASS_NAME, nameof(addressDest), addressDest);
 		Guards.bigint(this.CLASS_NAME, nameof(amount), amount);
@@ -315,13 +302,17 @@ export class IotaWalletConnector implements IWalletConnector {
 
 			const inputs = await client.findInputs([addressSource], amount);
 
-			const blockDetails = await this.prepareAndPostTransaction(requestContext, client, {
-				inputs,
-				output: {
-					address: addressDest,
-					amount: amount.toString()
-				}
-			});
+			const blockDetails = await this.prepareAndPostTransaction(
+				client,
+				{
+					inputs,
+					output: {
+						address: addressDest,
+						amount: amount.toString()
+					}
+				},
+				requestContext
+			);
 
 			return blockDetails.blockId;
 		} catch (error) {
@@ -336,24 +327,21 @@ export class IotaWalletConnector implements IWalletConnector {
 
 	/**
 	 * Sign data using a wallet based key.
-	 * @param requestContext The context for the request.
 	 * @param signatureType The type of signature to create.
 	 * @param addressIndex The index for the address.
 	 * @param data The data bytes.
+	 * @param requestContext The context for the request.
 	 * @returns The signature and public key bytes.
 	 */
 	public async sign(
-		requestContext: IRequestContext,
 		signatureType: KeyType,
 		addressIndex: number,
-		data: Uint8Array
+		data: Uint8Array,
+		requestContext?: IServiceRequestContext
 	): Promise<{
 		publicKey: Uint8Array;
 		signature: Uint8Array;
 	}> {
-		Guards.object<IRequestContext>(this.CLASS_NAME, nameof(requestContext), requestContext);
-		Guards.stringValue(this.CLASS_NAME, nameof(requestContext.tenantId), requestContext.tenantId);
-		Guards.stringValue(this.CLASS_NAME, nameof(requestContext.identity), requestContext.identity);
 		Guards.arrayOneOf(
 			this.CLASS_NAME,
 			nameof(signatureType),
@@ -364,8 +352,8 @@ export class IotaWalletConnector implements IWalletConnector {
 		Guards.uint8Array(this.CLASS_NAME, nameof(data), data);
 
 		const mnemonic = await this._vaultConnector.getSecret<string>(
-			requestContext,
-			this._config.vaultMnemonicId ?? IotaWalletConnector._DEFAULT_MNEMONIC_SECRET_NAME
+			this._config.vaultMnemonicId ?? IotaWalletConnector._DEFAULT_MNEMONIC_SECRET_NAME,
+			requestContext
 		);
 
 		const seed = Bip39.mnemonicToSeed(mnemonic);
@@ -393,16 +381,16 @@ export class IotaWalletConnector implements IWalletConnector {
 
 	/**
 	 * Prepare a transaction for sending, post and wait for inclusion.
-	 * @param requestContext The context for the request.
 	 * @param client The client to use.
 	 * @param options The options for the transaction.
+	 * @param requestContext The context for the request.
 	 * @returns The block id and block.
 	 * @internal
 	 */
 	private async prepareAndPostTransaction(
-		requestContext: IRequestContext,
 		client: Client,
-		options: IBuildBlockOptions
+		options: IBuildBlockOptions,
+		requestContext?: IServiceRequestContext
 	): Promise<{ blockId: string; block: Block }> {
 		const seed = await this.getSeed(requestContext);
 		const secretManager = { hexSeed: Converter.bytesToHex(seed, true) };
@@ -441,18 +429,18 @@ export class IotaWalletConnector implements IWalletConnector {
 	 * @returns The seed.
 	 * @internal
 	 */
-	private async getSeed(requestContext: IRequestContext): Promise<Uint8Array> {
+	private async getSeed(requestContext?: IServiceRequestContext): Promise<Uint8Array> {
 		try {
 			const seedBase64 = await this._vaultConnector.getSecret<string>(
-				requestContext,
-				this._config.vaultSeedId ?? IotaWalletConnector._DEFAULT_SEED_SECRET_NAME
+				this._config.vaultSeedId ?? IotaWalletConnector._DEFAULT_SEED_SECRET_NAME,
+				requestContext
 			);
 			return Converter.base64ToBytes(seedBase64);
 		} catch {}
 
 		const mnemonic = await this._vaultConnector.getSecret<string>(
-			requestContext,
-			this._config.vaultMnemonicId ?? IotaWalletConnector._DEFAULT_MNEMONIC_SECRET_NAME
+			this._config.vaultMnemonicId ?? IotaWalletConnector._DEFAULT_MNEMONIC_SECRET_NAME,
+			requestContext
 		);
 
 		return Bip39.mnemonicToSeed(mnemonic);

@@ -22,13 +22,13 @@ The name of the service.
 
 ### bootstrap()?
 
-> `optional` **bootstrap**(`requestContext`): `Promise`\<`void`\>
+> `optional` **bootstrap**(`requestContext`?): `Promise`\<`void`\>
 
 Bootstrap the service by creating and initializing any resources it needs.
 
 #### Parameters
 
-• **requestContext**: `IRequestContext`
+• **requestContext?**: `IServiceRequestContext`
 
 The request context for bootstrapping.
 
@@ -82,15 +82,11 @@ Nothing.
 
 ### fundAddress()
 
-> **fundAddress**(`requestContext`, `address`, `timeoutInSeconds`?): `Promise`\<`bigint`\>
+> **fundAddress**(`address`, `timeoutInSeconds`?, `requestContext`?): `Promise`\<`bigint`\>
 
 Fund the wallet from the faucet.
 
 #### Parameters
-
-• **requestContext**: `IRequestContext`
-
-The context for the request.
 
 • **address**: `string`
 
@@ -99,6 +95,10 @@ The bech32 encoded address of the address to fund.
 • **timeoutInSeconds?**: `number`
 
 The timeout in seconds to wait for the funding to complete.
+
+• **requestContext?**: `IServiceRequestContext`
+
+The context for the request.
 
 #### Returns
 

@@ -8,7 +8,7 @@ import {
 	type IEntityStorageConnector
 } from "@gtsc/entity-storage-models";
 import { nameof } from "@gtsc/nameof";
-import type { IRequestContext } from "@gtsc/services";
+import type { IServiceRequestContext } from "@gtsc/services";
 import { VaultConnectorFactory, type IVaultConnector } from "@gtsc/vault-models";
 import {
 	FaucetConnectorFactory,
@@ -104,40 +104,33 @@ export class EntityStorageWalletConnector implements IWalletConnector {
 	 * @param requestContext The context for the request.
 	 * @returns Nothing.
 	 */
-	public async create(requestContext: IRequestContext): Promise<void> {
-		Guards.object<IRequestContext>(this.CLASS_NAME, nameof(requestContext), requestContext);
-		Guards.stringValue(this.CLASS_NAME, nameof(requestContext.tenantId), requestContext.tenantId);
-		Guards.stringValue(this.CLASS_NAME, nameof(requestContext.identity), requestContext.identity);
-
+	public async create(requestContext?: IServiceRequestContext): Promise<void> {
 		const mnemonic = Bip39.randomMnemonic();
 		await this._vaultConnector.setSecret<string>(
-			requestContext,
 			this._config.vaultMnemonicId ?? EntityStorageWalletConnector._DEFAULT_MNEMONIC_SECRET_NAME,
-			mnemonic
+			mnemonic,
+			requestContext
 		);
 	}
 
 	/**
 	 * Get the addresses for the requested range.
-	 * @param requestContext The context for the request.
 	 * @param startAddressIndex The start index for the addresses.
 	 * @param count The number of addresses to generate.
+	 * @param requestContext The context for the request.
 	 * @returns The list of addresses.
 	 */
 	public async getAddresses(
-		requestContext: IRequestContext,
 		startAddressIndex: number,
-		count: number
+		count: number,
+		requestContext?: IServiceRequestContext
 	): Promise<string[]> {
-		Guards.object<IRequestContext>(this.CLASS_NAME, nameof(requestContext), requestContext);
-		Guards.stringValue(this.CLASS_NAME, nameof(requestContext.tenantId), requestContext.tenantId);
-		Guards.stringValue(this.CLASS_NAME, nameof(requestContext.identity), requestContext.identity);
 		Guards.integer(this.CLASS_NAME, nameof(startAddressIndex), startAddressIndex);
 		Guards.integer(this.CLASS_NAME, nameof(count), count);
 
 		const mnemonic = await this._vaultConnector.getSecret<string>(
-			requestContext,
-			this._config.vaultMnemonicId ?? EntityStorageWalletConnector._DEFAULT_MNEMONIC_SECRET_NAME
+			this._config.vaultMnemonicId ?? EntityStorageWalletConnector._DEFAULT_MNEMONIC_SECRET_NAME,
+			requestContext
 		);
 
 		const seed = Bip39.mnemonicToSeed(mnemonic);
@@ -163,57 +156,64 @@ export class EntityStorageWalletConnector implements IWalletConnector {
 
 	/**
 	 * Get the balance for an address in a wallet.
-	 * @param requestContext The context for the request.
 	 * @param address The bech32 encoded address.
+	 * @param requestContext The context for the request.
 	 * @returns The balance of the wallet address.
 	 */
-	public async getBalance(requestContext: IRequestContext, address: string): Promise<bigint> {
-		Guards.object<IRequestContext>(this.CLASS_NAME, nameof(requestContext), requestContext);
-		Guards.stringValue(this.CLASS_NAME, nameof(requestContext.tenantId), requestContext.tenantId);
-		Guards.stringValue(this.CLASS_NAME, nameof(requestContext.identity), requestContext.identity);
+	public async getBalance(
+		address: string,
+		requestContext?: IServiceRequestContext
+	): Promise<bigint> {
+		Guards.stringValue(this.CLASS_NAME, nameof(address), address);
 
-		const walletAddress = await this._walletAddressEntityStorage.get(requestContext, address);
+		const walletAddress = await this._walletAddressEntityStorage.get(
+			address,
+			undefined,
+			requestContext
+		);
 
 		return Coerce.bigint(walletAddress?.balance) ?? 0n;
 	}
 
 	/**
 	 * Get the storage costs for an address in a wallet.
-	 * @param requestContext The context for the request.
 	 * @param address The bech32 encoded address.
+	 * @param requestContext The context for the request.
 	 * @returns The storage costs for the address.
 	 */
-	public async getStorageCosts(requestContext: IRequestContext, address: string): Promise<bigint> {
+	public async getStorageCosts(
+		address: string,
+		requestContext?: IServiceRequestContext
+	): Promise<bigint> {
 		return 0n;
 	}
 
 	/**
 	 * Ensure the balance for an address in a wallet.
-	 * @param requestContext The context for the request.
 	 * @param address The bech32 encoded address.
 	 * @param ensureBalance The balance to ensure on the address.
 	 * @param timeoutInSeconds The timeout in seconds to wait for the funding to complete.
+	 * @param requestContext The context for the request.
 	 * @returns True if the balance has been ensured.
 	 */
 	public async ensureBalance(
-		requestContext: IRequestContext,
 		address: string,
 		ensureBalance: bigint,
-		timeoutInSeconds?: number
+		timeoutInSeconds?: number,
+		requestContext?: IServiceRequestContext
 	): Promise<boolean> {
-		Guards.object<IRequestContext>(this.CLASS_NAME, nameof(requestContext), requestContext);
-		Guards.stringValue(this.CLASS_NAME, nameof(requestContext.tenantId), requestContext.tenantId);
-		Guards.stringValue(this.CLASS_NAME, nameof(requestContext.identity), requestContext.identity);
+		Guards.stringValue(this.CLASS_NAME, nameof(address), address);
+		Guards.bigint(this.CLASS_NAME, nameof(ensureBalance), ensureBalance);
 
 		if (this._faucetConnector) {
 			let retryCount = 10;
-			let currentBalance = await this.getBalance(requestContext, address);
+			let currentBalance = await this.getBalance(address, requestContext);
 
 			while (currentBalance < ensureBalance && retryCount > 0) {
 				const addedBalance = await this._faucetConnector.fundAddress(
-					requestContext,
 					address,
-					timeoutInSeconds
+					timeoutInSeconds,
+					requestContext
 				);
 				if (addedBalance === 0n) {
 					// The balance has not increased, so return.
@@ -234,40 +234,45 @@ export class EntityStorageWalletConnector implements IWalletConnector {
 
 	/**
 	 * Transfer funds to an address.
-	 * @param requestContext The context for the request.
 	 * @param addressSource The bech32 encoded address to send the funds from.
 	 * @param addressDest The bech32 encoded address to send the funds to.
 	 * @param amount The amount to transfer.
+	 * @param requestContext The context for the request.
 	 * @returns An identifier for the transfer if there was one.
 	 */
 	public async transfer(
-		requestContext: IRequestContext,
 		addressSource: string,
 		addressDest: string,
-		amount: bigint
+		amount: bigint,
+		requestContext?: IServiceRequestContext
 	): Promise<string | undefined> {
-		Guards.object<IRequestContext>(this.CLASS_NAME, nameof(requestContext), requestContext);
-		Guards.stringValue(this.CLASS_NAME, nameof(requestContext.tenantId), requestContext.tenantId);
-		Guards.stringValue(this.CLASS_NAME, nameof(requestContext.identity), requestContext.identity);
 		Guards.stringValue(this.CLASS_NAME, nameof(addressSource), addressSource);
 		Guards.stringValue(this.CLASS_NAME, nameof(addressDest), addressDest);
 		Guards.bigint(this.CLASS_NAME, nameof(amount), amount);
+		Guards.stringValue(this.CLASS_NAME, nameof(requestContext?.identity), requestContext?.identity);
 
-		const walletAddresses = await this._walletAddressEntityStorage.query(requestContext, {
-			logicalOperator: LogicalOperator.And,
-			conditions: [
-				{
-					property: "identity",
-					operator: ComparisonOperator.Equals,
-					value: requestContext.identity
-				},
-				{
-					property: "address",
-					operator: ComparisonOperator.Equals,
-					value: addressSource
-				}
-			]
-		});
+		const walletAddresses = await this._walletAddressEntityStorage.query(
+			{
+				logicalOperator: LogicalOperator.And,
+				conditions: [
+					{
+						property: "identity",
+						operator: ComparisonOperator.Equals,
+						value: requestContext.identity
+					},
+					{
+						property: "address",
+						operator: ComparisonOperator.Equals,
+						value: addressSource
+					}
+				]
+			},
+			undefined,
+			undefined,
+			undefined,
+			undefined,
+			requestContext
+		);
 
 		let walletAddress: WalletAddress | undefined;
 		let balance = 0n;
@@ -282,11 +287,12 @@ export class EntityStorageWalletConnector implements IWalletConnector {
 		}
 
 		if (!Is.empty(walletAddress)) {
-			await this._walletAddressEntityStorage.set(requestContext, walletAddress);
+			await this._walletAddressEntityStorage.set(walletAddress, requestContext);
 
 			let destWalletAddress = await this._walletAddressEntityStorage.get(
-				requestContext,
-				addressDest
+				addressDest,
+				undefined,
+				requestContext
 			);
 
 			if (Is.empty(destWalletAddress)) {
@@ -299,7 +305,7 @@ export class EntityStorageWalletConnector implements IWalletConnector {
 
 			destWalletAddress.balance = (BigInt(destWalletAddress.balance) + amount).toString();
 
-			await this._walletAddressEntityStorage.set(requestContext, destWalletAddress);
+			await this._walletAddressEntityStorage.set(destWalletAddress, requestContext);
 		}
 
 		return undefined;
@@ -307,24 +313,21 @@ export class EntityStorageWalletConnector implements IWalletConnector {
 
 	/**
 	 * Sign data using a wallet based key.
-	 * @param requestContext The context for the request.
 	 * @param signatureType The type of signature to create.
 	 * @param addressIndex The index for the address.
 	 * @param data The data bytes.
+	 * @param requestContext The context for the request.
 	 * @returns The signature and public key bytes.
 	 */
 	public async sign(
-		requestContext: IRequestContext,
 		signatureType: KeyType,
 		addressIndex: number,
-		data: Uint8Array
+		data: Uint8Array,
+		requestContext?: IServiceRequestContext
 	): Promise<{
 		publicKey: Uint8Array;
 		signature: Uint8Array;
 	}> {
-		Guards.object<IRequestContext>(this.CLASS_NAME, nameof(requestContext), requestContext);
-		Guards.stringValue(this.CLASS_NAME, nameof(requestContext.tenantId), requestContext.tenantId);
-		Guards.stringValue(this.CLASS_NAME, nameof(requestContext.identity), requestContext.identity);
 		Guards.arrayOneOf(
 			this.CLASS_NAME,
 			nameof(signatureType),
@@ -335,8 +338,8 @@ export class EntityStorageWalletConnector implements IWalletConnector {
 		Guards.uint8Array(this.CLASS_NAME, nameof(data), data);
 
 		const mnemonic = await this._vaultConnector.getSecret<string>(
-			requestContext,
-			this._config.vaultMnemonicId ?? EntityStorageWalletConnector._DEFAULT_MNEMONIC_SECRET_NAME
+			this._config.vaultMnemonicId ?? EntityStorageWalletConnector._DEFAULT_MNEMONIC_SECRET_NAME,
+			requestContext
 		);
 
 		const seed = Bip39.mnemonicToSeed(mnemonic);

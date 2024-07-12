@@ -110,7 +110,7 @@ describe("IotaFaucetConnector", () => {
 			}
 		});
 
-		const amountAdded = await faucet.fundAddress(TEST_CONTEXT, addressKeyPair.address);
+		const amountAdded = await faucet.fundAddress(addressKeyPair.address, undefined, TEST_CONTEXT);
 
 		expect(amountAdded).toBeGreaterThan(0);
 	});
