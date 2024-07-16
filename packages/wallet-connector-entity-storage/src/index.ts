@@ -4,3 +4,4 @@ export * from "./entities/walletAddress";
 export * from "./entityStorageFaucetConnector";
 export * from "./entityStorageWalletConnector";
 export * from "./models/IEntityStorageWalletConnectorConfig";
+export * from "./schema";

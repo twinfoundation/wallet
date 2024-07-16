@@ -1,7 +1,6 @@
 // Copyright 2024 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
 import path from "node:path";
-import { EntitySchemaFactory, EntitySchemaHelper } from "@gtsc/entity";
 import { MemoryEntityStorageConnector } from "@gtsc/entity-storage-connector-memory";
 import { EntityStorageConnectorFactory } from "@gtsc/entity-storage-models";
 import { nameof } from "@gtsc/nameof";
@@ -9,7 +8,8 @@ import type { IServiceRequestContext } from "@gtsc/services";
 import {
 	EntityStorageVaultConnector,
 	VaultKey,
-	VaultSecret
+	VaultSecret,
+	initSchema
 } from "@gtsc/vault-connector-entity-storage";
 import { VaultConnectorFactory } from "@gtsc/vault-models";
 import * as dotenv from "dotenv";
@@ -27,8 +27,7 @@ export const TEST_CONTEXT: IServiceRequestContext = {
 	identity: TEST_IDENTITY_ID
 };
 
-EntitySchemaFactory.register(nameof(VaultKey), () => EntitySchemaHelper.getSchema(VaultKey));
-EntitySchemaFactory.register(nameof(VaultSecret), () => EntitySchemaHelper.getSchema(VaultSecret));
+initSchema();
 
 EntityStorageConnectorFactory.register(
 	"vault-key",

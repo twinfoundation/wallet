@@ -1,6 +1,6 @@
 {
 	"name": "@gtsc/wallet-models",
-	"version": "0.0.3-next.28",
+	"version": "0.0.3-next.29",
 	"description": "Models which define the structure of the wallet contracts and connectors",
 	"repository": {
 		"type": "git",

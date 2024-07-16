@@ -1,12 +1,12 @@
 // Copyright 2024 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
-import { EntitySchemaFactory, EntitySchemaHelper } from "@gtsc/entity";
 import { MemoryEntityStorageConnector } from "@gtsc/entity-storage-connector-memory";
 import { EntityStorageConnectorFactory } from "@gtsc/entity-storage-models";
 import { nameof } from "@gtsc/nameof";
 import { TEST_CONTEXT } from "./setupTestEnv";
-import { WalletAddress } from "../src/entities/walletAddress";
+import type { WalletAddress } from "../src/entities/walletAddress";
 import { EntityStorageFaucetConnector } from "../src/entityStorageFaucetConnector";
+import { initSchema } from "../src/schema";
 
 const TEST_PARTITION_ID = "test-partition";
 const TEST_IDENTITY_ID = "test-identity";
@@ -15,9 +15,7 @@ let walletAddressEntityStorage: MemoryEntityStorageConnector<WalletAddress>;
 
 describe("EntityStorageFaucetConnector", () => {
 	beforeAll(() => {
-		EntitySchemaFactory.register(nameof(WalletAddress), () =>
-			EntitySchemaHelper.getSchema(WalletAddress)
-		);
+		initSchema();
 	});
 
 	beforeEach(() => {

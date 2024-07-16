@@ -3,7 +3,6 @@
 import path from "node:path";
 import { Guards, Is } from "@gtsc/core";
 import { Bip39 } from "@gtsc/crypto";
-import { EntitySchemaFactory, EntitySchemaHelper } from "@gtsc/entity";
 import { MemoryEntityStorageConnector } from "@gtsc/entity-storage-connector-memory";
 import { EntityStorageConnectorFactory } from "@gtsc/entity-storage-models";
 import { nameof } from "@gtsc/nameof";
@@ -11,7 +10,8 @@ import type { IServiceRequestContext } from "@gtsc/services";
 import {
 	EntityStorageVaultConnector,
 	VaultKey,
-	VaultSecret
+	VaultSecret,
+	initSchema
 } from "@gtsc/vault-connector-entity-storage";
 import { VaultConnectorFactory } from "@gtsc/vault-models";
 import { FaucetConnectorFactory } from "@gtsc/wallet-models";
@@ -41,8 +41,7 @@ export const TEST_PARTITION_ID = "test-partition";
 export const TEST_IDENTITY_ID = "test-identity";
 export const TEST_MNEMONIC_NAME = "test-mnemonic";
 
-EntitySchemaFactory.register(nameof(VaultKey), () => EntitySchemaHelper.getSchema(VaultKey));
-EntitySchemaFactory.register(nameof(VaultSecret), () => EntitySchemaHelper.getSchema(VaultSecret));
+initSchema();
 
 EntityStorageConnectorFactory.register(
 	"vault-key",
