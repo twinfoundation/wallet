@@ -8,7 +8,7 @@ import { WalletAddress } from "./entities/walletAddress";
  * Initialize the schema for the wallet entity storage connector.
  */
 export function initSchema(): void {
-	EntitySchemaFactory.register(nameof(WalletAddress), () =>
+	EntitySchemaFactory.register(nameof<WalletAddress>(), () =>
 		EntitySchemaHelper.getSchema(WalletAddress)
 	);
 }

@@ -7,8 +7,8 @@ import { nameof } from "@gtsc/nameof";
 import type { IServiceRequestContext } from "@gtsc/services";
 import {
 	EntityStorageVaultConnector,
-	VaultKey,
-	VaultSecret,
+	type VaultKey,
+	type VaultSecret,
 	initSchema
 } from "@gtsc/vault-connector-entity-storage";
 import { VaultConnectorFactory } from "@gtsc/vault-models";
@@ -33,14 +33,14 @@ EntityStorageConnectorFactory.register(
 	"vault-key",
 	() =>
 		new MemoryEntityStorageConnector<VaultKey>({
-			entitySchema: nameof(VaultKey)
+			entitySchema: nameof<VaultKey>()
 		})
 );
 EntityStorageConnectorFactory.register(
 	"vault-secret",
 	() =>
 		new MemoryEntityStorageConnector<VaultSecret>({
-			entitySchema: nameof(VaultSecret)
+			entitySchema: nameof<VaultSecret>()
 		})
 );
 
