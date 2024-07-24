@@ -25,7 +25,7 @@ export class EntityStorageWalletConnector implements IWalletConnector {
 	/**
 	 * The namespace supported by the wallet connector.
 	 */
-	public static NAMESPACE: string = "entity-storage";
+	public static readonly NAMESPACE: string = "entity-storage";
 
 	/**
 	 * Default name for the mnemonic secret.

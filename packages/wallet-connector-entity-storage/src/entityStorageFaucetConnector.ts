@@ -17,7 +17,7 @@ export class EntityStorageFaucetConnector implements IFaucetConnector {
 	/**
 	 * The namespace supported by the wallet connector.
 	 */
-	public static NAMESPACE: string = "entity-storage";
+	public static readonly NAMESPACE: string = "entity-storage";
 
 	/**
 	 * Runtime name for the class.

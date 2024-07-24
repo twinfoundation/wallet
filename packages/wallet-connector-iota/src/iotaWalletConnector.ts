@@ -26,7 +26,7 @@ export class IotaWalletConnector implements IWalletConnector {
 	/**
 	 * The namespace supported by the wallet connector.
 	 */
-	public static NAMESPACE: string = "iota";
+	public static readonly NAMESPACE: string = "iota";
 
 	/**
 	 * Default name for the mnemonic secret.
