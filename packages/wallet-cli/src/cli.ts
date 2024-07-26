@@ -23,7 +23,7 @@ export class CLI extends CLIBase {
 			{
 				title: "GTSC Wallet",
 				appName: "gtsc-wallet",
-				version: "0.0.3-next.32",
+				version: "0.0.3-next.33",
 				icon: "🌍",
 				supportsEnvFiles: true
 			},

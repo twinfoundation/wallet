@@ -52,7 +52,7 @@ The namespace supported by the wallet connector.
 
 ### \_DEFAULT\_MNEMONIC\_SECRET\_NAME
 
-> `static` `private` `readonly` **\_DEFAULT\_MNEMONIC\_SECRET\_NAME**: `string` = `"wallet-mnemonic"`
+> `static` `private` `readonly` **\_DEFAULT\_MNEMONIC\_SECRET\_NAME**: `string` = `"mnemonic"`
 
 Default name for the mnemonic secret.
 

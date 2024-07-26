@@ -7,6 +7,7 @@
 export interface IEntityStorageWalletConnectorConfig {
 	/**
 	 * The id of the entry in the vault containing the mnemonic.
+	 * @default mnemonic
 	 */
 	vaultMnemonicId?: string;
 

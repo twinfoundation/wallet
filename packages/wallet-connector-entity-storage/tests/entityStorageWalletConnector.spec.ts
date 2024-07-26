@@ -53,7 +53,7 @@ describe("EntityStorageWalletConnector", () => {
 			EntityStorageConnectorFactory.get<MemoryEntityStorageConnector<VaultSecret>>(
 				"vault-secret"
 			).getStore(TEST_PARTITION_ID);
-		expect(store?.[0].id).toEqual(`${TEST_IDENTITY_ID}/wallet-mnemonic`);
+		expect(store?.[0].id).toEqual(`${TEST_IDENTITY_ID}/mnemonic`);
 		expect(JSON.parse(store?.[0].data ?? "").split(" ").length).toEqual(24);
 	});
 
