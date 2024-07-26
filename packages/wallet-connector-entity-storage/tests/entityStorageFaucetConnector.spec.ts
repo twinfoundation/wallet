@@ -39,7 +39,7 @@ describe("EntityStorageFaucetConnector", () => {
 
 		const amountAdded = await faucet.fundAddress("addr1", undefined, {
 			partitionId: TEST_PARTITION_ID,
-			identity: TEST_IDENTITY_ID
+			userIdentity: TEST_IDENTITY_ID
 		});
 
 		expect(amountAdded).toBeGreaterThan(0);
@@ -63,7 +63,7 @@ describe("EntityStorageFaucetConnector", () => {
 
 		const amountAdded = await faucet.fundAddress("addr1", undefined, {
 			partitionId: TEST_PARTITION_ID,
-			identity: TEST_IDENTITY_ID
+			userIdentity: TEST_IDENTITY_ID
 		});
 
 		expect(amountAdded).toBeGreaterThan(0);

@@ -249,7 +249,11 @@ export class EntityStorageWalletConnector implements IWalletConnector {
 		Guards.stringValue(this.CLASS_NAME, nameof(addressSource), addressSource);
 		Guards.stringValue(this.CLASS_NAME, nameof(addressDest), addressDest);
 		Guards.bigint(this.CLASS_NAME, nameof(amount), amount);
-		Guards.stringValue(this.CLASS_NAME, nameof(requestContext?.identity), requestContext?.identity);
+		Guards.stringValue(
+			this.CLASS_NAME,
+			nameof(requestContext?.userIdentity),
+			requestContext?.userIdentity
+		);
 
 		const walletAddresses = await this._walletAddressEntityStorage.query(
 			{
@@ -258,7 +262,7 @@ export class EntityStorageWalletConnector implements IWalletConnector {
 					{
 						property: "identity",
 						operator: ComparisonOperator.Equals,
-						value: requestContext.identity
+						value: requestContext.userIdentity
 					},
 					{
 						property: "address",

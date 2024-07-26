@@ -53,7 +53,11 @@ export class EntityStorageFaucetConnector implements IFaucetConnector {
 		timeoutInSeconds: number = 60,
 		requestContext?: IServiceRequestContext
 	): Promise<bigint> {
-		Guards.stringValue(this.CLASS_NAME, nameof(requestContext?.identity), requestContext?.identity);
+		Guards.stringValue(
+			this.CLASS_NAME,
+			nameof(requestContext?.userIdentity),
+			requestContext?.userIdentity
+		);
 
 		let walletAddress = await this._walletAddressEntityStorage.get(
 			address,
@@ -62,7 +66,7 @@ export class EntityStorageFaucetConnector implements IFaucetConnector {
 		);
 		if (Is.empty(walletAddress)) {
 			walletAddress = {
-				identity: requestContext.identity,
+				identity: requestContext.userIdentity,
 				balance: "0",
 				address
 			};

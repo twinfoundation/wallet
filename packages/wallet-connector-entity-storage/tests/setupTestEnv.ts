@@ -24,7 +24,7 @@ export const TEST_IDENTITY_ID_2 = "test-identity-2";
 
 export const TEST_CONTEXT: IServiceRequestContext = {
 	partitionId: TEST_PARTITION_ID,
-	identity: TEST_IDENTITY_ID
+	userIdentity: TEST_IDENTITY_ID
 };
 
 initSchema();
