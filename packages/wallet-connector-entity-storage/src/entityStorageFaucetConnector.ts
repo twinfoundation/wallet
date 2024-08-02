@@ -6,7 +6,6 @@ import {
 	type IEntityStorageConnector
 } from "@gtsc/entity-storage-models";
 import { nameof } from "@gtsc/nameof";
-import type { IServiceRequestContext } from "@gtsc/services";
 import type { IFaucetConnector } from "@gtsc/wallet-models";
 import type { WalletAddress } from "./entities/walletAddress";
 
@@ -43,31 +42,24 @@ export class EntityStorageFaucetConnector implements IFaucetConnector {
 
 	/**
 	 * Fund the wallet from the faucet.
+	 * @param identity The identity of the user to access the vault keys.
 	 * @param address The bech32 encoded address of the address to fund.
 	 * @param timeoutInSeconds The timeout in seconds to wait for the funding to complete.
-	 * @param requestContext The context for the request.
 	 * @returns The amount added to the address by the faucet.
 	 */
 	public async fundAddress(
+		identity: string,
 		address: string,
-		timeoutInSeconds: number = 60,
-		requestContext?: IServiceRequestContext
+		timeoutInSeconds: number = 60
 	): Promise<bigint> {
-		Guards.stringValue(
-			this.CLASS_NAME,
-			nameof(requestContext?.userIdentity),
-			requestContext?.userIdentity
-		);
+		Guards.stringValue(this.CLASS_NAME, nameof(identity), identity);
+		Guards.stringValue(this.CLASS_NAME, nameof(address), address);
 
-		let walletAddress = await this._walletAddressEntityStorage.get(
-			address,
-			undefined,
-			requestContext
-		);
+		let walletAddress = await this._walletAddressEntityStorage.get(address);
 		if (Is.empty(walletAddress)) {
 			walletAddress = {
-				identity: requestContext.userIdentity,
 				balance: "0",
+				identity,
 				address
 			};
 		}
@@ -76,7 +68,7 @@ export class EntityStorageFaucetConnector implements IFaucetConnector {
 		const balance = Coerce.bigint(walletAddress.balance) ?? 0n;
 		walletAddress.balance = (balance + maxFundAmount).toString();
 
-		await this._walletAddressEntityStorage.set(walletAddress, requestContext);
+		await this._walletAddressEntityStorage.set(walletAddress);
 
 		return maxFundAmount;
 	}

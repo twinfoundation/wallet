@@ -86,8 +86,8 @@ export async function actionCommandTransfer(opts: {
 
 	setupVault();
 
-	const requestContext = { userIdentity: "local", partitionId: "local" };
 	const vaultSeedId = "local-seed";
+	const localIdentity = "local-identity";
 
 	const iotaWallet = new IotaWalletConnector({
 		config: {
@@ -100,9 +100,9 @@ export async function actionCommandTransfer(opts: {
 	});
 
 	const vaultConnector = VaultConnectorFactory.get("vault");
-	await vaultConnector.setSecret(vaultSeedId, Converter.bytesToBase64(seed), requestContext);
+	await vaultConnector.setSecret(`${localIdentity}/${vaultSeedId}`, Converter.bytesToBase64(seed));
 
-	const blockId = await iotaWallet.transfer(address, destAddress, amount, requestContext);
+	const blockId = await iotaWallet.transfer(localIdentity, address, destAddress, amount);
 
 	CLIDisplay.spinnerStop();
 

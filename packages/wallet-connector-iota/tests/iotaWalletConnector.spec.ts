@@ -10,11 +10,9 @@ import {
 	TEST_BECH32_HRP,
 	TEST_CLIENT_OPTIONS,
 	TEST_COIN_TYPE,
-	TEST_CONTEXT,
 	TEST_IDENTITY_ID,
 	TEST_MNEMONIC_NAME,
 	TEST_SEED,
-	TEST_PARTITION_ID,
 	setupTestEnv
 } from "./setupTestEnv";
 import { IotaWalletConnector } from "../src/iotaWalletConnector";
@@ -98,14 +96,14 @@ describe("IotaWalletConnector", () => {
 			}
 		});
 
-		await wallet.create(TEST_CONTEXT);
+		await wallet.create(TEST_IDENTITY_ID);
 
 		const store =
 			EntityStorageConnectorFactory.get<MemoryEntityStorageConnector<VaultSecret>>(
 				"vault-secret"
-			).getStore(TEST_PARTITION_ID);
+			).getStore();
 		expect(store?.[0].id).toEqual(`${TEST_IDENTITY_ID}/${TEST_MNEMONIC_NAME}`);
-		expect(JSON.parse(store?.[0].data ?? "").split(" ").length).toEqual(24);
+		expect((store?.[0].data as string).split(" ").length).toEqual(24);
 	});
 
 	test("can generate addresses for the wallet", async () => {
@@ -118,9 +116,9 @@ describe("IotaWalletConnector", () => {
 			}
 		});
 
-		await wallet.create(TEST_CONTEXT);
+		await wallet.create(TEST_IDENTITY_ID);
 
-		const testAddresses = await wallet.getAddresses(0, 10, TEST_CONTEXT);
+		const testAddresses = await wallet.getAddresses(TEST_IDENTITY_ID, 0, 10);
 		expect(testAddresses.length).toEqual(10);
 	});
 
@@ -136,12 +134,7 @@ describe("IotaWalletConnector", () => {
 			}
 		});
 
-		const ensured = await wallet.ensureBalance(
-			TEST_ADDRESS_BECH32,
-			1000000000n,
-			undefined,
-			TEST_CONTEXT
-		);
+		const ensured = await wallet.ensureBalance(TEST_IDENTITY_ID, TEST_ADDRESS_BECH32, 1000000000n);
 		expect(ensured).toBeFalsy();
 		FaucetConnectorFactory.register("faucet", () => faucet);
 	});
@@ -168,10 +161,9 @@ describe("IotaWalletConnector", () => {
 		});
 
 		const ensured = await wallet.ensureBalance(
+			TEST_IDENTITY_ID,
 			addressKeyPair.address,
-			1000000000n,
-			undefined,
-			TEST_CONTEXT
+			1000000000n
 		);
 
 		expect(ensured).toBeTruthy();
@@ -187,23 +179,8 @@ describe("IotaWalletConnector", () => {
 			}
 		});
 
-		const balance = await wallet.getBalance(TEST_ADDRESS_BECH32, TEST_CONTEXT);
+		const balance = await wallet.getBalance(TEST_IDENTITY_ID, TEST_ADDRESS_BECH32);
 
 		expect(balance).toBeGreaterThan(0n);
-	});
-
-	test("can get storage costs for an address", async () => {
-		const wallet = new IotaWalletConnector({
-			config: {
-				clientOptions: TEST_CLIENT_OPTIONS,
-				vaultMnemonicId: TEST_MNEMONIC_NAME,
-				coinType: TEST_COIN_TYPE,
-				bech32Hrp: TEST_BECH32_HRP
-			}
-		});
-
-		const storageCosts = await wallet.getStorageCosts(TEST_ADDRESS_BECH32, TEST_CONTEXT);
-
-		expect(storageCosts).toBeGreaterThan(0);
 	});
 });

@@ -79,10 +79,9 @@ export async function actionCommandFaucet(opts: {
 		}
 	});
 
-	const fundsAdded = await iotaFaucet.fundAddress(address, undefined, {
-		userIdentity: "local",
-		partitionId: "local"
-	});
+	const localIdentity = "local-identity";
+
+	const fundsAdded = await iotaFaucet.fundAddress(localIdentity, address);
 	FaucetConnectorFactory.register("faucet", () => iotaFaucet);
 
 	CLIDisplay.spinnerStop();
@@ -108,10 +107,7 @@ export async function actionCommandFaucet(opts: {
 		}
 	});
 
-	const balance = await iotaWallet.getBalance(address, {
-		userIdentity: "local",
-		partitionId: "local"
-	});
+	const balance = await iotaWallet.getBalance(localIdentity, address);
 
 	CLIDisplay.value(I18n.formatMessage("commands.common.labels.balance"), balance.toString());
 	CLIDisplay.break();

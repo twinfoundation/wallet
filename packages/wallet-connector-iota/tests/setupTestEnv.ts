@@ -6,7 +6,6 @@ import { Bip39 } from "@gtsc/crypto";
 import { MemoryEntityStorageConnector } from "@gtsc/entity-storage-connector-memory";
 import { EntityStorageConnectorFactory } from "@gtsc/entity-storage-models";
 import { nameof } from "@gtsc/nameof";
-import type { IServiceRequestContext } from "@gtsc/services";
 import {
 	EntityStorageVaultConnector,
 	type VaultKey,
@@ -37,7 +36,6 @@ if (!Is.stringValue(process.env.TEST_MNEMONIC)) {
 	);
 }
 
-export const TEST_PARTITION_ID = "test-partition";
 export const TEST_IDENTITY_ID = "test-identity";
 export const TEST_MNEMONIC_NAME = "test-mnemonic";
 
@@ -86,20 +84,12 @@ export const TEST_WALLET_CONNECTOR = new IotaWalletConnector({
 	}
 });
 
-export const TEST_CONTEXT: IServiceRequestContext = {
-	partitionId: TEST_PARTITION_ID,
-	userIdentity: TEST_IDENTITY_ID
-};
+await secretEntityStorage.set({
+	id: `${TEST_IDENTITY_ID}/${TEST_MNEMONIC_NAME}`,
+	data: process.env.TEST_MNEMONIC
+});
 
-await secretEntityStorage.set(
-	{
-		id: `${TEST_IDENTITY_ID}/${TEST_MNEMONIC_NAME}`,
-		data: JSON.stringify(process.env.TEST_MNEMONIC)
-	},
-	TEST_CONTEXT
-);
-
-const addresses = await TEST_WALLET_CONNECTOR.getAddresses(0, 1, TEST_CONTEXT);
+const addresses = await TEST_WALLET_CONNECTOR.getAddresses(TEST_IDENTITY_ID, 0, 1);
 export const TEST_ADDRESS_BECH32 = addresses[0];
 
 /**
@@ -107,10 +97,5 @@ export const TEST_ADDRESS_BECH32 = addresses[0];
  */
 export async function setupTestEnv(): Promise<void> {
 	console.debug("Wallet Address", `${process.env.TEST_EXPLORER_URL}addr/${TEST_ADDRESS_BECH32}`);
-	await TEST_WALLET_CONNECTOR.ensureBalance(
-		TEST_ADDRESS_BECH32,
-		1000000000n,
-		undefined,
-		TEST_CONTEXT
-	);
+	await TEST_WALLET_CONNECTOR.ensureBalance(TEST_IDENTITY_ID, TEST_ADDRESS_BECH32, 1000000000n);
 }

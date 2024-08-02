@@ -1,14 +1,13 @@
 // Copyright 2024 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
 import { Coerce, GeneralError, Guards, Is } from "@gtsc/core";
-import { Bip39, Bip44, Ed25519, KeyType, Secp256k1 } from "@gtsc/crypto";
+import { Bip39, Bip44, KeyType } from "@gtsc/crypto";
 import { ComparisonOperator, LogicalOperator } from "@gtsc/entity";
 import {
 	EntityStorageConnectorFactory,
 	type IEntityStorageConnector
 } from "@gtsc/entity-storage-models";
 import { nameof } from "@gtsc/nameof";
-import type { IServiceRequestContext } from "@gtsc/services";
 import { VaultConnectorFactory, type IVaultConnector } from "@gtsc/vault-models";
 import {
 	FaucetConnectorFactory,
@@ -101,37 +100,33 @@ export class EntityStorageWalletConnector implements IWalletConnector {
 
 	/**
 	 * Create a new wallet.
-	 * @param requestContext The context for the request.
+	 * @param identity The identity of the user to access the vault keys.
 	 * @returns Nothing.
 	 */
-	public async create(requestContext?: IServiceRequestContext): Promise<void> {
+	public async create(identity: string): Promise<void> {
+		Guards.stringValue(this.CLASS_NAME, nameof(identity), identity);
+
 		const mnemonic = Bip39.randomMnemonic();
-		await this._vaultConnector.setSecret<string>(
-			this._config.vaultMnemonicId ?? EntityStorageWalletConnector._DEFAULT_MNEMONIC_SECRET_NAME,
-			mnemonic,
-			requestContext
-		);
+		await this._vaultConnector.setSecret<string>(this.buildMnemonicKey(identity), mnemonic);
 	}
 
 	/**
 	 * Get the addresses for the requested range.
+	 * @param identity The identity of the user to access the vault keys.
 	 * @param startAddressIndex The start index for the addresses.
 	 * @param count The number of addresses to generate.
-	 * @param requestContext The context for the request.
 	 * @returns The list of addresses.
 	 */
 	public async getAddresses(
+		identity: string,
 		startAddressIndex: number,
-		count: number,
-		requestContext?: IServiceRequestContext
+		count: number
 	): Promise<string[]> {
+		Guards.stringValue(this.CLASS_NAME, nameof(identity), identity);
 		Guards.integer(this.CLASS_NAME, nameof(startAddressIndex), startAddressIndex);
 		Guards.integer(this.CLASS_NAME, nameof(count), count);
 
-		const mnemonic = await this._vaultConnector.getSecret<string>(
-			this._config.vaultMnemonicId ?? EntityStorageWalletConnector._DEFAULT_MNEMONIC_SECRET_NAME,
-			requestContext
-		);
+		const mnemonic = await this._vaultConnector.getSecret<string>(this.buildMnemonicKey(identity));
 
 		const seed = Bip39.mnemonicToSeed(mnemonic);
 
@@ -156,64 +151,45 @@ export class EntityStorageWalletConnector implements IWalletConnector {
 
 	/**
 	 * Get the balance for an address in a wallet.
+	 * @param identity The identity of the user to access the vault keys.
 	 * @param address The bech32 encoded address.
-	 * @param requestContext The context for the request.
 	 * @returns The balance of the wallet address.
 	 */
-	public async getBalance(
-		address: string,
-		requestContext?: IServiceRequestContext
-	): Promise<bigint> {
+	public async getBalance(identity: string, address: string): Promise<bigint> {
 		Guards.stringValue(this.CLASS_NAME, nameof(address), address);
 
-		const walletAddress = await this._walletAddressEntityStorage.get(
-			address,
-			undefined,
-			requestContext
-		);
+		const walletAddress = await this._walletAddressEntityStorage.get(address);
 
 		return Coerce.bigint(walletAddress?.balance) ?? 0n;
 	}
 
 	/**
-	 * Get the storage costs for an address in a wallet.
-	 * @param address The bech32 encoded address.
-	 * @param requestContext The context for the request.
-	 * @returns The storage costs for the address.
-	 */
-	public async getStorageCosts(
-		address: string,
-		requestContext?: IServiceRequestContext
-	): Promise<bigint> {
-		return 0n;
-	}
-
-	/**
 	 * Ensure the balance for an address in a wallet.
+	 * @param identity The identity of the user to access the vault keys.
 	 * @param address The bech32 encoded address.
 	 * @param ensureBalance The balance to ensure on the address.
 	 * @param timeoutInSeconds The timeout in seconds to wait for the funding to complete.
-	 * @param requestContext The context for the request.
 	 * @returns True if the balance has been ensured.
 	 */
 	public async ensureBalance(
+		identity: string,
 		address: string,
 		ensureBalance: bigint,
-		timeoutInSeconds?: number,
-		requestContext?: IServiceRequestContext
+		timeoutInSeconds?: number
 	): Promise<boolean> {
+		Guards.stringValue(this.CLASS_NAME, nameof(identity), identity);
 		Guards.stringValue(this.CLASS_NAME, nameof(address), address);
 		Guards.bigint(this.CLASS_NAME, nameof(ensureBalance), ensureBalance);
 
 		if (this._faucetConnector) {
 			let retryCount = 10;
-			let currentBalance = await this.getBalance(address, requestContext);
+			let currentBalance = await this.getBalance(identity, address);
 
 			while (currentBalance < ensureBalance && retryCount > 0) {
 				const addedBalance = await this._faucetConnector.fundAddress(
+					identity,
 					address,
-					timeoutInSeconds,
-					requestContext
+					timeoutInSeconds
 				);
 				if (addedBalance === 0n) {
 					// The balance has not increased, so return.
@@ -234,49 +210,38 @@ export class EntityStorageWalletConnector implements IWalletConnector {
 
 	/**
 	 * Transfer funds to an address.
+	 * @param identity The identity of the user to access the vault keys.
 	 * @param addressSource The bech32 encoded address to send the funds from.
 	 * @param addressDest The bech32 encoded address to send the funds to.
 	 * @param amount The amount to transfer.
-	 * @param requestContext The context for the request.
 	 * @returns An identifier for the transfer if there was one.
 	 */
 	public async transfer(
+		identity: string,
 		addressSource: string,
 		addressDest: string,
-		amount: bigint,
-		requestContext?: IServiceRequestContext
+		amount: bigint
 	): Promise<string | undefined> {
+		Guards.stringValue(this.CLASS_NAME, nameof(identity), identity);
 		Guards.stringValue(this.CLASS_NAME, nameof(addressSource), addressSource);
 		Guards.stringValue(this.CLASS_NAME, nameof(addressDest), addressDest);
 		Guards.bigint(this.CLASS_NAME, nameof(amount), amount);
-		Guards.stringValue(
-			this.CLASS_NAME,
-			nameof(requestContext?.userIdentity),
-			requestContext?.userIdentity
-		);
 
-		const walletAddresses = await this._walletAddressEntityStorage.query(
-			{
-				logicalOperator: LogicalOperator.And,
-				conditions: [
-					{
-						property: "identity",
-						operator: ComparisonOperator.Equals,
-						value: requestContext.userIdentity
-					},
-					{
-						property: "address",
-						operator: ComparisonOperator.Equals,
-						value: addressSource
-					}
-				]
-			},
-			undefined,
-			undefined,
-			undefined,
-			undefined,
-			requestContext
-		);
+		const walletAddresses = await this._walletAddressEntityStorage.query({
+			logicalOperator: LogicalOperator.And,
+			conditions: [
+				{
+					property: "identity",
+					operator: ComparisonOperator.Equals,
+					value: identity
+				},
+				{
+					property: "address",
+					operator: ComparisonOperator.Equals,
+					value: addressSource
+				}
+			]
+		});
 
 		let walletAddress: WalletAddress | undefined;
 		let balance = 0n;
@@ -291,81 +256,33 @@ export class EntityStorageWalletConnector implements IWalletConnector {
 		}
 
 		if (!Is.empty(walletAddress)) {
-			await this._walletAddressEntityStorage.set(walletAddress, requestContext);
+			await this._walletAddressEntityStorage.set(walletAddress);
 
-			let destWalletAddress = await this._walletAddressEntityStorage.get(
-				addressDest,
-				undefined,
-				requestContext
-			);
+			let destWalletAddress = await this._walletAddressEntityStorage.get(addressDest);
 
 			if (Is.empty(destWalletAddress)) {
 				destWalletAddress = {
-					identity: "",
 					balance: "0",
+					identity: "",
 					address: addressDest
 				};
 			}
 
 			destWalletAddress.balance = (BigInt(destWalletAddress.balance) + amount).toString();
 
-			await this._walletAddressEntityStorage.set(destWalletAddress, requestContext);
+			await this._walletAddressEntityStorage.set(destWalletAddress);
 		}
 
 		return undefined;
 	}
 
 	/**
-	 * Sign data using a wallet based key.
-	 * @param signatureType The type of signature to create.
-	 * @param addressIndex The index for the address.
-	 * @param data The data bytes.
-	 * @param requestContext The context for the request.
-	 * @returns The signature and public key bytes.
+	 * Build the key name to access the mnemonic in the vault.
+	 * @param identity The identity of the user to access the vault keys.
+	 * @returns The vault key.
+	 * @internal
 	 */
-	public async sign(
-		signatureType: KeyType,
-		addressIndex: number,
-		data: Uint8Array,
-		requestContext?: IServiceRequestContext
-	): Promise<{
-		publicKey: Uint8Array;
-		signature: Uint8Array;
-	}> {
-		Guards.arrayOneOf(
-			this.CLASS_NAME,
-			nameof(signatureType),
-			signatureType,
-			Object.values(KeyType)
-		);
-		Guards.integer(this.CLASS_NAME, nameof(addressIndex), addressIndex);
-		Guards.uint8Array(this.CLASS_NAME, nameof(data), data);
-
-		const mnemonic = await this._vaultConnector.getSecret<string>(
-			this._config.vaultMnemonicId ?? EntityStorageWalletConnector._DEFAULT_MNEMONIC_SECRET_NAME,
-			requestContext
-		);
-
-		const seed = Bip39.mnemonicToSeed(mnemonic);
-
-		const addressKeyPair = Bip44.addressBech32(
-			seed,
-			signatureType,
-			this._config.bech32Hrp ?? EntityStorageWalletConnector._DEFAULT_BECH32_HRP,
-			this._config.coinType ?? EntityStorageWalletConnector._DEFAULT_COIN_TYPE,
-			0,
-			false,
-			addressIndex
-		);
-
-		const signature =
-			signatureType === KeyType.Ed25519
-				? Ed25519.sign(data, addressKeyPair.privateKey)
-				: Secp256k1.sign(data, addressKeyPair.privateKey);
-
-		return {
-			publicKey: addressKeyPair.publicKey,
-			signature
-		};
+	private buildMnemonicKey(identity: string): string {
+		return `${identity}/${this._config.vaultMnemonicId ?? EntityStorageWalletConnector._DEFAULT_MNEMONIC_SECRET_NAME}`;
 	}
 }

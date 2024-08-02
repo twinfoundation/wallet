@@ -3,13 +3,11 @@
 import { MemoryEntityStorageConnector } from "@gtsc/entity-storage-connector-memory";
 import { EntityStorageConnectorFactory } from "@gtsc/entity-storage-models";
 import { nameof } from "@gtsc/nameof";
-import { TEST_CONTEXT } from "./setupTestEnv";
 import type { WalletAddress } from "../src/entities/walletAddress";
 import { EntityStorageFaucetConnector } from "../src/entityStorageFaucetConnector";
 import { initSchema } from "../src/schema";
 
-const TEST_PARTITION_ID = "test-partition";
-const TEST_IDENTITY_ID = "test-identity";
+export const TEST_IDENTITY_ID = "test-identity";
 
 let walletAddressEntityStorage: MemoryEntityStorageConnector<WalletAddress>;
 
@@ -37,39 +35,32 @@ describe("EntityStorageFaucetConnector", () => {
 	test("can fund a non existent address from the faucet", async () => {
 		const faucet = new EntityStorageFaucetConnector();
 
-		const amountAdded = await faucet.fundAddress("addr1", undefined, {
-			partitionId: TEST_PARTITION_ID,
-			userIdentity: TEST_IDENTITY_ID
-		});
+		const amountAdded = await faucet.fundAddress(TEST_IDENTITY_ID, "addr1");
 
 		expect(amountAdded).toBeGreaterThan(0);
 
-		const store = walletAddressEntityStorage.getStore(TEST_PARTITION_ID);
+		const store = walletAddressEntityStorage.getStore();
 		expect(store?.[0].address).toEqual("addr1");
+		expect(store?.[0].identity).toEqual(TEST_IDENTITY_ID);
 		expect(store?.[0].balance).toEqual("1000000000");
 	});
 
 	test("can fund an existing address from the faucet", async () => {
-		await walletAddressEntityStorage.set(
-			{
-				address: "addr1",
-				identity: TEST_IDENTITY_ID,
-				balance: "1000"
-			},
-			TEST_CONTEXT
-		);
+		await walletAddressEntityStorage.set({
+			address: "addr1",
+			identity: TEST_IDENTITY_ID,
+			balance: "1000"
+		});
 
 		const faucet = new EntityStorageFaucetConnector();
 
-		const amountAdded = await faucet.fundAddress("addr1", undefined, {
-			partitionId: TEST_PARTITION_ID,
-			userIdentity: TEST_IDENTITY_ID
-		});
+		const amountAdded = await faucet.fundAddress(TEST_IDENTITY_ID, "addr1");
 
 		expect(amountAdded).toBeGreaterThan(0);
 
-		const store = walletAddressEntityStorage.getStore(TEST_PARTITION_ID);
+		const store = walletAddressEntityStorage.getStore();
 		expect(store?.[0].address).toEqual("addr1");
+		expect(store?.[0].identity).toEqual(TEST_IDENTITY_ID);
 		expect(store?.[0].balance).toEqual("1000001000");
 	});
 });

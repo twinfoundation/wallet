@@ -5,7 +5,7 @@ import {
 	TEST_BECH32_HRP,
 	TEST_CLIENT_OPTIONS,
 	TEST_COIN_TYPE,
-	TEST_CONTEXT,
+	TEST_IDENTITY_ID,
 	TEST_SEED,
 	setupTestEnv
 } from "./setupTestEnv";
@@ -110,7 +110,7 @@ describe("IotaFaucetConnector", () => {
 			}
 		});
 
-		const amountAdded = await faucet.fundAddress(addressKeyPair.address, undefined, TEST_CONTEXT);
+		const amountAdded = await faucet.fundAddress(TEST_IDENTITY_ID, addressKeyPair.address);
 
 		expect(amountAdded).toBeGreaterThan(0);
 	});
