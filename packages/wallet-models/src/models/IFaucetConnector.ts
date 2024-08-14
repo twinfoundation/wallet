@@ -1,11 +1,11 @@
 // Copyright 2024 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
-import type { IService } from "@gtsc/services";
+import type { IComponent } from "@gtsc/core";
 
 /**
  * Interface describing a faucet connector.
  */
-export interface IFaucetConnector extends IService {
+export interface IFaucetConnector extends IComponent {
 	/**
 	 * Fund the wallet from the faucet.
 	 * @param identity The identity of the user to access the vault keys.
