@@ -7,4 +7,4 @@ import type { IFaucetConnector } from "../models/IFaucetConnector";
  * Factory for creating faucets.
  */
 // eslint-disable-next-line @typescript-eslint/naming-convention
-export const FaucetConnectorFactory = Factory.createFactory<IFaucetConnector>("faucet");
+export const FaucetConnectorFactory = Factory.createFactory<IFaucetConnector>("faucet-connector");
