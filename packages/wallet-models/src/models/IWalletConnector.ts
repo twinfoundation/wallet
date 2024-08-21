@@ -16,11 +16,17 @@ export interface IWalletConnector extends IComponent {
 	/**
 	 * Get the addresses for the requested range.
 	 * @param identity The identity of the user to access the vault keys.
+	 * @param accountIndex The account index to get the addresses for.
 	 * @param startAddressIndex The start index for the addresses.
 	 * @param count The end index for the addresses.
 	 * @returns The list of addresses.
 	 */
-	getAddresses(identity: string, startAddressIndex: number, count: number): Promise<string[]>;
+	getAddresses(
+		identity: string,
+		accountIndex: number,
+		startAddressIndex: number,
+		count: number
+	): Promise<string[]>;
 
 	/**
 	 * Get the balance for an address in a wallet.

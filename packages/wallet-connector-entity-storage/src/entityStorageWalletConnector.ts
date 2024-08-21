@@ -114,12 +114,14 @@ export class EntityStorageWalletConnector implements IWalletConnector {
 	/**
 	 * Get the addresses for the requested range.
 	 * @param identity The identity of the user to access the vault keys.
+	 * @param accountIndex The account index to get the addresses for.
 	 * @param startAddressIndex The start index for the addresses.
 	 * @param count The number of addresses to generate.
 	 * @returns The list of addresses.
 	 */
 	public async getAddresses(
 		identity: string,
+		accountIndex: number,
 		startAddressIndex: number,
 		count: number
 	): Promise<string[]> {
@@ -139,7 +141,7 @@ export class EntityStorageWalletConnector implements IWalletConnector {
 				KeyType.Ed25519,
 				this._config.bech32Hrp ?? EntityStorageWalletConnector._DEFAULT_BECH32_HRP,
 				this._config.coinType ?? EntityStorageWalletConnector._DEFAULT_COIN_TYPE,
-				0,
+				accountIndex,
 				false,
 				i
 			);

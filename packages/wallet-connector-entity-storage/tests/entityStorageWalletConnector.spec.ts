@@ -55,7 +55,7 @@ describe("EntityStorageWalletConnector", () => {
 	test("can generate addresses for the wallet", async () => {
 		const wallet = new EntityStorageWalletConnector();
 
-		testAddresses = await wallet.getAddresses(TEST_IDENTITY_ID, 0, 10);
+		testAddresses = await wallet.getAddresses(TEST_IDENTITY_ID, 0, 0, 10);
 		expect(testAddresses.length).toEqual(10);
 	});
 

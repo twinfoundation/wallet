@@ -89,7 +89,7 @@ await secretEntityStorage.set({
 	data: process.env.TEST_MNEMONIC
 });
 
-const addresses = await TEST_WALLET_CONNECTOR.getAddresses(TEST_IDENTITY_ID, 0, 1);
+const addresses = await TEST_WALLET_CONNECTOR.getAddresses(TEST_IDENTITY_ID, 0, 0, 1);
 export const TEST_ADDRESS_BECH32 = addresses[0];
 
 /**
