@@ -28,6 +28,7 @@ export class EntityStorageWalletConnector implements IWalletConnector {
 
 	/**
 	 * Default name for the mnemonic secret.
+	 * @internal
 	 */
 	private static readonly _DEFAULT_MNEMONIC_SECRET_NAME: string = "mnemonic";
 
