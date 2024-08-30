@@ -1,6 +1,7 @@
 // Copyright 2024 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
-import { BaseError, GeneralError, Guards, type IError, Is } from "@gtsc/core";
+import { GeneralError, Guards } from "@gtsc/core";
+import { Iota } from "@gtsc/dlt-iota";
 import { nameof } from "@gtsc/nameof";
 import type { IFaucetConnector } from "@gtsc/wallet-models";
 import { Client } from "@iota/sdk-wasm/node/lib/index.js";
@@ -91,7 +92,7 @@ export class IotaFaucetConnector implements IFaucetConnector {
 				this.CLASS_NAME,
 				"fundingFailed",
 				undefined,
-				this.extractPayloadError(error)
+				Iota.extractPayloadError(error)
 			);
 		}
 
@@ -102,6 +103,7 @@ export class IotaFaucetConnector implements IFaucetConnector {
 	 * Calculate the balance on an address.
 	 * @param address The bech32 encoded address to get the balance.
 	 * @returns The amount available on the wallet address.
+	 * @internal
 	 */
 	private async getBalance(address: string): Promise<bigint> {
 		const client = await this.createClient();
@@ -131,26 +133,5 @@ export class IotaFaucetConnector implements IFaucetConnector {
 			this._client = new Client(this._config.clientOptions);
 		}
 		return this._client;
-	}
-
-	/**
-	 * Extract error from SDK payload.
-	 * @param error The error to extract.
-	 * @returns The extracted error.
-	 */
-	private extractPayloadError(error: unknown): IError {
-		if (Is.json(error)) {
-			const obj = JSON.parse(error);
-			const message = obj.payload?.error;
-			if (message === "no input with matching ed25519 address provided") {
-				return new GeneralError(this.CLASS_NAME, "insufficientFunds");
-			}
-			return {
-				name: "IOTA",
-				message
-			};
-		}
-
-		return BaseError.fromError(error);
 	}
 }
