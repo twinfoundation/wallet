@@ -1,7 +1,8 @@
 // Copyright 2024 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
-import { BaseError, Converter, GeneralError, Guards, Is, type IError } from "@gtsc/core";
-import { Bip39, Bip44, KeyType } from "@gtsc/crypto";
+import { Converter, GeneralError, Guards } from "@gtsc/core";
+import { Bip39 } from "@gtsc/crypto";
+import { Iota } from "@gtsc/dlt-iota";
 import { nameof } from "@gtsc/nameof";
 import { VaultConnectorFactory, type IVaultConnector } from "@gtsc/vault-models";
 import {
@@ -9,12 +10,7 @@ import {
 	type IFaucetConnector,
 	type IWalletConnector
 } from "@gtsc/wallet-models";
-import {
-	Client,
-	CoinType,
-	type Block,
-	type IBuildBlockOptions
-} from "@iota/sdk-wasm/node/lib/index.js";
+import { Client } from "@iota/sdk-wasm/node/lib/index.js";
 import type { IIotaWalletConnectorConfig } from "./models/IIotaWalletConnectorConfig";
 
 /**
@@ -25,35 +21,6 @@ export class IotaWalletConnector implements IWalletConnector {
 	 * The namespace supported by the wallet connector.
 	 */
 	public static readonly NAMESPACE: string = "iota";
-
-	/**
-	 * Default name for the mnemonic secret.
-	 * @internal
-	 */
-	private static readonly _DEFAULT_MNEMONIC_SECRET_NAME: string = "mnemonic";
-
-	/**
-	 * Default name for the seed secret.
-	 */
-	private static readonly _DEFAULT_SEED_SECRET_NAME: string = "seed";
-
-	/**
-	 * Default coin type.
-	 * @internal
-	 */
-	private static readonly _DEFAULT_COIN_TYPE: number = CoinType.IOTA;
-
-	/**
-	 * Default bech32 hrp.
-	 * @internal
-	 */
-	private static readonly _DEFAULT_BECH32_HRP: string = "iota";
-
-	/**
-	 * The default length of time to wait for the inclusion of a transaction in seconds.
-	 * @internal
-	 */
-	private static readonly _DEFAULT_INCLUSION_TIMEOUT: number = 60;
 
 	/**
 	 * Runtime name for the class.
@@ -107,11 +74,7 @@ export class IotaWalletConnector implements IWalletConnector {
 			options?.faucetConnectorType ?? "faucet"
 		);
 		this._config = options.config;
-		this._config.vaultMnemonicId ??= IotaWalletConnector._DEFAULT_MNEMONIC_SECRET_NAME;
-		this._config.vaultSeedId ??= IotaWalletConnector._DEFAULT_SEED_SECRET_NAME;
-		this._config.coinType ??= IotaWalletConnector._DEFAULT_COIN_TYPE;
-		this._config.bech32Hrp ??= IotaWalletConnector._DEFAULT_BECH32_HRP;
-		this._config.inclusionTimeoutSeconds ??= IotaWalletConnector._DEFAULT_INCLUSION_TIMEOUT;
+		Iota.populateConfig(this._config);
 	}
 
 	/**
@@ -122,10 +85,13 @@ export class IotaWalletConnector implements IWalletConnector {
 	public async create(identity: string): Promise<void> {
 		Guards.stringValue(this.CLASS_NAME, nameof(identity), identity);
 		const mnemonic = Bip39.randomMnemonic();
-		await this._vaultConnector.setSecret<string>(this.buildMnemonicKey(identity), mnemonic);
+		await this._vaultConnector.setSecret<string>(
+			Iota.buildMnemonicKey(this._config, identity),
+			mnemonic
+		);
 		const seed = Bip39.mnemonicToSeed(mnemonic);
 		await this._vaultConnector.setSecret<string>(
-			this.buildSeedKey(identity),
+			Iota.buildSeedKey(this._config, identity),
 			Converter.bytesToBase64(seed)
 		);
 	}
@@ -144,29 +110,14 @@ export class IotaWalletConnector implements IWalletConnector {
 		startAddressIndex: number,
 		count: number
 	): Promise<string[]> {
-		Guards.stringValue(this.CLASS_NAME, nameof(identity), identity);
-		Guards.integer(this.CLASS_NAME, nameof(startAddressIndex), startAddressIndex);
-		Guards.integer(this.CLASS_NAME, nameof(count), count);
-
-		const seed = await this.getSeed(identity);
-
-		const keyPairs: string[] = [];
-
-		for (let i = startAddressIndex; i < startAddressIndex + count; i++) {
-			const addressKeyPair = Bip44.addressBech32(
-				seed,
-				KeyType.Ed25519,
-				this._config.bech32Hrp ?? IotaWalletConnector._DEFAULT_BECH32_HRP,
-				this._config.coinType ?? IotaWalletConnector._DEFAULT_COIN_TYPE,
-				accountIndex,
-				false,
-				i
-			);
-
-			keyPairs.push(addressKeyPair.address);
-		}
-
-		return keyPairs;
+		return Iota.getAddresses(
+			this._config,
+			this._vaultConnector,
+			identity,
+			accountIndex,
+			startAddressIndex,
+			count
+		);
 	}
 
 	/**
@@ -267,13 +218,19 @@ export class IotaWalletConnector implements IWalletConnector {
 
 			const inputs = await client.findInputs([addressSource], amount);
 
-			const blockDetails = await this.prepareAndPostTransaction(identity, client, {
-				inputs,
-				output: {
-					address: addressDest,
-					amount: amount.toString()
+			const blockDetails = await Iota.prepareAndPostTransaction(
+				this._config,
+				this._vaultConnector,
+				identity,
+				client,
+				{
+					inputs,
+					output: {
+						address: addressDest,
+						amount: amount.toString()
+					}
 				}
-			});
+			);
 
 			return blockDetails.blockId;
 		} catch (error) {
@@ -281,110 +238,8 @@ export class IotaWalletConnector implements IWalletConnector {
 				this.CLASS_NAME,
 				"transferFailed",
 				undefined,
-				this.extractPayloadError(error)
+				Iota.extractPayloadError(error)
 			);
 		}
-	}
-
-	/**
-	 * Prepare a transaction for sending, post and wait for inclusion.
-	 * @param identity The identity of the user to access the vault keys.
-	 * @param client The client to use.
-	 * @param options The options for the transaction.
-	 * @returns The block id and block.
-	 * @internal
-	 */
-	private async prepareAndPostTransaction(
-		identity: string,
-		client: Client,
-		options: IBuildBlockOptions
-	): Promise<{ blockId: string; block: Block }> {
-		const seed = await this.getSeed(identity);
-		const secretManager = { hexSeed: Converter.bytesToHex(seed, true) };
-		const prepared = await client.prepareTransaction(secretManager, {
-			coinType: this._config.coinType ?? IotaWalletConnector._DEFAULT_COIN_TYPE,
-			...options
-		});
-
-		const signed = await client.signTransaction(secretManager, prepared);
-
-		const blockIdAndBlock = await client.postBlockPayload(signed);
-
-		try {
-			const timeoutSeconds =
-				this._config.inclusionTimeoutSeconds ?? IotaWalletConnector._DEFAULT_INCLUSION_TIMEOUT;
-
-			await client.retryUntilIncluded(blockIdAndBlock[0], 2, Math.ceil(timeoutSeconds / 2));
-		} catch (error) {
-			throw new GeneralError(
-				this.CLASS_NAME,
-				"inclusionFailed",
-				undefined,
-				this.extractPayloadError(error)
-			);
-		}
-
-		return {
-			blockId: blockIdAndBlock[0],
-			block: blockIdAndBlock[1]
-		};
-	}
-
-	/**
-	 * Get the seed from the vault.
-	 * @param identity The identity of the user to access the vault keys.
-	 * @returns The seed.
-	 * @internal
-	 */
-	private async getSeed(identity: string): Promise<Uint8Array> {
-		try {
-			const seedBase64 = await this._vaultConnector.getSecret<string>(this.buildSeedKey(identity));
-			return Converter.base64ToBytes(seedBase64);
-		} catch {}
-
-		const mnemonic = await this._vaultConnector.getSecret<string>(this.buildMnemonicKey(identity));
-
-		return Bip39.mnemonicToSeed(mnemonic);
-	}
-
-	/**
-	 * Extract error from SDK payload.
-	 * @param error The error to extract.
-	 * @returns The extracted error.
-	 */
-	private extractPayloadError(error: unknown): IError {
-		if (Is.json(error)) {
-			const obj = JSON.parse(error);
-			const message = obj.payload?.error;
-			if (message === "no input with matching ed25519 address provided") {
-				return new GeneralError(this.CLASS_NAME, "insufficientFunds");
-			}
-			return {
-				name: "IOTA",
-				message
-			};
-		}
-
-		return BaseError.fromError(error);
-	}
-
-	/**
-	 * Build the key name to access the mnemonic in the vault.
-	 * @param identity The identity of the user to access the vault keys.
-	 * @returns The vault key.
-	 * @internal
-	 */
-	private buildMnemonicKey(identity: string): string {
-		return `${identity}/${this._config.vaultMnemonicId ?? IotaWalletConnector._DEFAULT_MNEMONIC_SECRET_NAME}`;
-	}
-
-	/**
-	 * Build the key name to access the seed in the vault.
-	 * @param identity The identity of the user to access the vault keys.
-	 * @returns The vault key.
-	 * @internal
-	 */
-	private buildSeedKey(identity: string): string {
-		return `${identity}/${this._config.vaultSeedId ?? IotaWalletConnector._DEFAULT_SEED_SECRET_NAME}`;
 	}
 }

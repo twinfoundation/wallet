@@ -27,7 +27,7 @@ describe("CLI", () => {
 		const exitCode = await cli.run(["", path.join(__dirname, "wallet-cli")], localesDirectory);
 		expect(exitCode).toBe(0);
 		expect(writeBuffer.length).toEqual(19);
-		expect(writeBuffer[0].includes("GTSC Wallet v0.0.5-next.4")).toEqual(true);
+		expect(writeBuffer[0].includes("GTSC Wallet v0.0.5-next.5")).toEqual(true);
 		expect(writeBuffer[1]).toEqual("");
 		expect(writeBuffer[2]).toEqual("");
 		expect(writeBuffer[3]).toEqual("");

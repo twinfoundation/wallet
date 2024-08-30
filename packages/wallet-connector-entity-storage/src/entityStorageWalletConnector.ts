@@ -235,12 +235,12 @@ export class EntityStorageWalletConnector implements IWalletConnector {
 			conditions: [
 				{
 					property: "identity",
-					operator: ComparisonOperator.Equals,
+					comparison: ComparisonOperator.Equals,
 					value: identity
 				},
 				{
 					property: "address",
-					operator: ComparisonOperator.Equals,
+					comparison: ComparisonOperator.Equals,
 					value: addressSource
 				}
 			]
