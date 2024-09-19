@@ -1,16 +1,16 @@
 // Copyright 2024 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
 import path from "node:path";
-import { MemoryEntityStorageConnector } from "@gtsc/entity-storage-connector-memory";
-import { EntityStorageConnectorFactory } from "@gtsc/entity-storage-models";
-import { nameof } from "@gtsc/nameof";
+import { MemoryEntityStorageConnector } from "@twin.org/entity-storage-connector-memory";
+import { EntityStorageConnectorFactory } from "@twin.org/entity-storage-models";
+import { nameof } from "@twin.org/nameof";
 import {
 	EntityStorageVaultConnector,
 	type VaultKey,
 	type VaultSecret,
 	initSchema
-} from "@gtsc/vault-connector-entity-storage";
-import { VaultConnectorFactory } from "@gtsc/vault-models";
+} from "@twin.org/vault-connector-entity-storage";
+import { VaultConnectorFactory } from "@twin.org/vault-models";
 import * as dotenv from "dotenv";
 
 console.debug("Setting up test environment from .env and .env.dev files");

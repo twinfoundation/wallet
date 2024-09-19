@@ -1,1 +1,1 @@
-# @gtsc/wallet-connector-entity-storage - Examples
+# @twin.org/wallet-connector-entity-storage - Examples

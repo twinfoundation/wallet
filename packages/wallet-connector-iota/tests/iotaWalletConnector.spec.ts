@@ -1,10 +1,10 @@
 // Copyright 2024 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
-import { Bip44, KeyType } from "@gtsc/crypto";
-import type { MemoryEntityStorageConnector } from "@gtsc/entity-storage-connector-memory";
-import { EntityStorageConnectorFactory } from "@gtsc/entity-storage-models";
-import type { VaultSecret } from "@gtsc/vault-connector-entity-storage";
-import { FaucetConnectorFactory } from "@gtsc/wallet-models";
+import { Bip44, KeyType } from "@twin.org/crypto";
+import type { MemoryEntityStorageConnector } from "@twin.org/entity-storage-connector-memory";
+import { EntityStorageConnectorFactory } from "@twin.org/entity-storage-models";
+import type { VaultSecret } from "@twin.org/vault-connector-entity-storage";
+import { FaucetConnectorFactory } from "@twin.org/wallet-models";
 import {
 	TEST_ADDRESS_BECH32,
 	TEST_BECH32_HRP,

@@ -1,16 +1,16 @@
 // Copyright 2024 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
-import { Converter, GeneralError, Guards } from "@gtsc/core";
-import { Bip39 } from "@gtsc/crypto";
-import { Iota } from "@gtsc/dlt-iota";
-import { nameof } from "@gtsc/nameof";
-import { VaultConnectorFactory, type IVaultConnector } from "@gtsc/vault-models";
+import { Client } from "@iota/sdk-wasm/node/lib/index.js";
+import { Converter, GeneralError, Guards } from "@twin.org/core";
+import { Bip39 } from "@twin.org/crypto";
+import { Iota } from "@twin.org/dlt-iota";
+import { nameof } from "@twin.org/nameof";
+import { VaultConnectorFactory, type IVaultConnector } from "@twin.org/vault-models";
 import {
 	FaucetConnectorFactory,
 	type IFaucetConnector,
 	type IWalletConnector
-} from "@gtsc/wallet-models";
-import { Client } from "@iota/sdk-wasm/node/lib/index.js";
+} from "@twin.org/wallet-models";
 import type { IIotaWalletConnectorConfig } from "./models/IIotaWalletConnectorConfig";
 
 /**

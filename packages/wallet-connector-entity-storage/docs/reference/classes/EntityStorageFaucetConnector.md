@@ -32,7 +32,7 @@ The entity storage type for wallet addresses, defaults to "wallet-address".
 
 ### NAMESPACE
 
-> `static` `readonly` **NAMESPACE**: `string` = `"entity-storage"`
+> `readonly` `static` **NAMESPACE**: `string` = `"entity-storage"`
 
 The namespace supported by the wallet connector.
 
@@ -66,7 +66,7 @@ The identity of the user to access the vault keys.
 
 The bech32 encoded address of the address to fund.
 
-• **timeoutInSeconds**: `number`= `60`
+• **timeoutInSeconds**: `number` = `60`
 
 The timeout in seconds to wait for the funding to complete.
 

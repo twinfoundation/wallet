@@ -1,4 +1,4 @@
-# @gtsc/wallet-models
+# @twin.org/wallet-models
 
 ## Interfaces
 

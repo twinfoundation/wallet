@@ -1,10 +1,10 @@
 // Copyright 2024 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
-import { GeneralError, Guards } from "@gtsc/core";
-import { Iota } from "@gtsc/dlt-iota";
-import { nameof } from "@gtsc/nameof";
-import type { IFaucetConnector } from "@gtsc/wallet-models";
 import { Client } from "@iota/sdk-wasm/node/lib/index.js";
+import { GeneralError, Guards } from "@twin.org/core";
+import { Iota } from "@twin.org/dlt-iota";
+import { nameof } from "@twin.org/nameof";
+import type { IFaucetConnector } from "@twin.org/wallet-models";
 import type { IIotaFaucetConnectorConfig } from "./models/IIotaFaucetConnectorConfig";
 
 /**

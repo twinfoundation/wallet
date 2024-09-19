@@ -40,7 +40,7 @@ The configuration to use.
 
 ### NAMESPACE
 
-> `static` `readonly` **NAMESPACE**: `string` = `"iota"`
+> `readonly` `static` **NAMESPACE**: `string` = `"iota"`
 
 The namespace supported by the wallet connector.
 

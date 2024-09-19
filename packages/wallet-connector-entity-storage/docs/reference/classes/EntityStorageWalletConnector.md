@@ -44,7 +44,7 @@ The configuration to use.
 
 ### NAMESPACE
 
-> `static` `readonly` **NAMESPACE**: `string` = `"entity-storage"`
+> `readonly` `static` **NAMESPACE**: `string` = `"entity-storage"`
 
 The namespace supported by the wallet connector.
 

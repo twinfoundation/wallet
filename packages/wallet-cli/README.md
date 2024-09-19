@@ -1,11 +1,11 @@
-# GTSC Wallet CLI
+# TWIN Wallet CLI
 
 A command line interface for interacting with the wallet APIs.
 
 ## Installation
 
 ```shell
-npm install @gtsc/wallet-cli
+npm install @twin.org/wallet-cli
 ```
 
 ## Examples
@@ -14,7 +14,7 @@ Usage of the tool is shown in the examples [docs/examples.md](docs/examples.md)
 
 ## Reference
 
-Detailed reference documentation for the API can be found in [docs/reference/globals.md](docs/reference/globals.md)
+Detailed reference documentation for the API can be found in [docs/reference/index.md](docs/reference/index.md)
 
 ## Changelog
 
