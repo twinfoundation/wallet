@@ -1,6 +1,6 @@
 // Copyright 2024 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
-import { Bip44, KeyType } from "@gtsc/crypto";
+import { Bip44, KeyType } from "@twin.org/crypto";
 import {
 	TEST_BECH32_HRP,
 	TEST_CLIENT_OPTIONS,

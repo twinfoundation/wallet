@@ -1,5 +1,5 @@
-# @gtsc/wallet-connector-entity-storage - Changelog
+# @twin.org/wallet-connector-entity-storage - Changelog
 
-## v0.0.1
+## v0.0.1-next.3
 
 - Initial Release

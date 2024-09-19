@@ -1,4 +1,4 @@
-# Type alias: IIotaWalletConnectorConfig
+# Type Alias: IIotaWalletConnectorConfig
 
 > **IIotaWalletConnectorConfig**: `IIotaConfig`
 

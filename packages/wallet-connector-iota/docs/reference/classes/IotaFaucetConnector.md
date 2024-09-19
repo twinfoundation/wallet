@@ -32,7 +32,7 @@ The configuration to use.
 
 ### NAMESPACE
 
-> `static` `readonly` **NAMESPACE**: `string` = `"iota"`
+> `readonly` `static` **NAMESPACE**: `string` = `"iota"`
 
 The namespace supported by the wallet connector.
 
@@ -66,7 +66,7 @@ The identity of the user to access the vault keys.
 
 The bech32 encoded address of the address to fund.
 
-• **timeoutInSeconds**: `number`= `60`
+• **timeoutInSeconds**: `number` = `60`
 
 The timeout in seconds to wait for the funding to complete.
 

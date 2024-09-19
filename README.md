@@ -1,6 +1,6 @@
-# GTSC Wallet
+# TWIN Wallet
 
-This mono-repository contains the packages to use with Wallets in GTSC applications.
+This mono-repository contains the packages to use with Wallets in TWIN applications.
 
 ## Packages
 

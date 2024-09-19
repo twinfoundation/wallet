@@ -1,4 +1,4 @@
-# @gtsc/wallet-cli
+# @twin.org/wallet-cli
 
 ## Classes
 

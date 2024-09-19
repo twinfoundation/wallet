@@ -1,4 +1,4 @@
-# @gtsc/wallet-connector-iota
+# @twin.org/wallet-connector-iota
 
 ## Classes
 

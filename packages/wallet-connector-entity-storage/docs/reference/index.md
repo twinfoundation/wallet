@@ -1,4 +1,4 @@
-# @gtsc/wallet-connector-entity-storage
+# @twin.org/wallet-connector-entity-storage
 
 ## Classes
 

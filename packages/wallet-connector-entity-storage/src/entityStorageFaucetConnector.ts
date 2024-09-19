@@ -1,12 +1,12 @@
 // Copyright 2024 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
-import { Coerce, Guards, Is } from "@gtsc/core";
+import { Coerce, Guards, Is } from "@twin.org/core";
 import {
 	EntityStorageConnectorFactory,
 	type IEntityStorageConnector
-} from "@gtsc/entity-storage-models";
-import { nameof } from "@gtsc/nameof";
-import type { IFaucetConnector } from "@gtsc/wallet-models";
+} from "@twin.org/entity-storage-models";
+import { nameof } from "@twin.org/nameof";
+import type { IFaucetConnector } from "@twin.org/wallet-models";
 import type { WalletAddress } from "./entities/walletAddress";
 
 /**

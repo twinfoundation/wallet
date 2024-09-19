@@ -1,1 +1,1 @@
-# @gtsc/wallet-models - Examples
+# @twin.org/wallet-models - Examples
