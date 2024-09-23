@@ -1,22 +1,21 @@
 # @twin.org/wallet-cli - Examples
 
-## Command Line Tool
-
-First install the tool with the following script.
-
-```shell
-npm install @twin.org/wallet-cli
-```
-
 ## Running
 
-If you run the tool with no command line options:
+To install and run the CLI locally use the following commands:
 
 ```shell
+npm install @twin.org/wallet-cli -g
 twin-wallet
 ```
 
-You should see output similar to the following
+or run directly using NPX:
+
+```shell
+npx "@twin.org/wallet-cli"
+```
+
+You should see output similar to the following:
 
 ```shell
 🌍 TWIN Wallet v1.0.0
