@@ -6,6 +6,7 @@ import { Iota } from "@twin.org/dlt-iota";
 import { nameof } from "@twin.org/nameof";
 import type { IFaucetConnector } from "@twin.org/wallet-models";
 import type { IIotaFaucetConnectorConfig } from "./models/IIotaFaucetConnectorConfig";
+import type { IIotaFaucetConnectorConstructorOptions } from "./models/IIotaFaucetConnectorConstructorOptions";
 
 /**
  * Class for performing faucet operations on IOTA.
@@ -36,9 +37,8 @@ export class IotaFaucetConnector implements IFaucetConnector {
 	/**
 	 * Create a new instance of IotaFaucetConnector.
 	 * @param options The options for the connector.
-	 * @param options.config The configuration to use.
 	 */
-	constructor(options: { config: IIotaFaucetConnectorConfig }) {
+	constructor(options: IIotaFaucetConnectorConstructorOptions) {
 		Guards.object(this.CLASS_NAME, nameof(options), options);
 		Guards.object<IIotaFaucetConnectorConfig>(
 			this.CLASS_NAME,
