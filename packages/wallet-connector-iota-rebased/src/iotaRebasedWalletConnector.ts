@@ -12,6 +12,7 @@ import {
 	type IWalletConnector
 } from "@twin.org/wallet-models";
 import type { IIotaRebasedWalletConnectorConfig } from "./models/IIotaRebasedWalletConnectorConfig";
+import type { IIotaRebasedWalletConnectorConstructorOptions } from "./models/IIotaRebasedWalletConnectorConstructorOptions";
 
 /**
  * Class for performing wallet operations on IOTA Rebased.
@@ -54,15 +55,8 @@ export class IotaRebasedWalletConnector implements IWalletConnector {
 	/**
 	 * Create a new instance of IOTA Rebased Wallet Connector.
 	 * @param options The options for the wallet connector.
-	 * @param options.vaultConnectorType Vault connector to use for wallet secrets, defaults to "vault".
-	 * @param options.faucetConnectorType Optional faucet for requesting funds, defaults to "faucet".
-	 * @param options.config The configuration to use.
 	 */
-	constructor(options: {
-		vaultConnectorType?: string;
-		faucetConnectorType?: string;
-		config: IIotaRebasedWalletConnectorConfig;
-	}) {
+	constructor(options: IIotaRebasedWalletConnectorConstructorOptions) {
 		Guards.object(this.CLASS_NAME, nameof(options), options);
 		Guards.object<IIotaRebasedWalletConnectorConfig>(
 			this.CLASS_NAME,

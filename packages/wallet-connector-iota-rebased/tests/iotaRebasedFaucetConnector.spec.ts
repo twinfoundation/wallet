@@ -5,7 +5,7 @@ import { TEST_CLIENT_OPTIONS, TEST_IDENTITY_ID, setupTestEnv } from "./setupTest
 import { IotaRebasedFaucetConnector } from "../src/iotaRebasedFaucetConnector";
 import type { IIotaRebasedFaucetConnectorConfig } from "../src/models/IIotaRebasedFaucetConnectorConfig";
 
-describe("SuiFaucetConnector", () => {
+describe("IotaRebasedFaucetConnector", () => {
 	beforeAll(async () => {
 		await setupTestEnv();
 	});

@@ -1,6 +1,6 @@
 # Class: IotaRebasedFaucetConnector
 
-Class for performing faucet operations on SUI.
+Class for performing faucet operations on IOTA Rebased.
 
 ## Implements
 
@@ -12,17 +12,13 @@ Class for performing faucet operations on SUI.
 
 > **new IotaRebasedFaucetConnector**(`options`): [`IotaRebasedFaucetConnector`](IotaRebasedFaucetConnector.md)
 
-Create a new instance of SuiFaucetConnector.
+Create a new instance of IotaRebasedFaucetConnector.
 
 #### Parameters
 
-• **options**
+• **options**: [`IIotaRebasedFaucetConnectorConstructorOptions`](../interfaces/IIotaRebasedFaucetConnectorConstructorOptions.md)
 
 The options for the connector.
-
-• **options.config**: [`IIotaRebasedFaucetConnectorConfig`](../interfaces/IIotaRebasedFaucetConnectorConfig.md)
-
-The configuration to use.
 
 #### Returns
 
@@ -54,7 +50,7 @@ Runtime name for the class.
 
 > **fundAddress**(`identity`, `address`, `timeoutInSeconds`): `Promise`\<`bigint`\>
 
-Fund an address with SUI from the faucet.
+Fund an address with IOTA Rebased from the faucet.
 
 #### Parameters
 

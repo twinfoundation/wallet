@@ -16,21 +16,9 @@ Create a new instance of IOTA Rebased Wallet Connector.
 
 #### Parameters
 
-• **options**
+• **options**: [`IIotaRebasedWalletConnectorConstructorOptions`](../interfaces/IIotaRebasedWalletConnectorConstructorOptions.md)
 
 The options for the wallet connector.
-
-• **options.vaultConnectorType?**: `string`
-
-Vault connector to use for wallet secrets, defaults to "vault".
-
-• **options.faucetConnectorType?**: `string`
-
-Optional faucet for requesting funds, defaults to "faucet".
-
-• **options.config**: [`IIotaRebasedWalletConnectorConfig`](../interfaces/IIotaRebasedWalletConnectorConfig.md)
-
-The configuration to use.
 
 #### Returns
 

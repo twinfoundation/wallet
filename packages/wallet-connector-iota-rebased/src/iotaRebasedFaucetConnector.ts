@@ -7,9 +7,10 @@ import { IotaRebased } from "@twin.org/dlt-iota-rebased";
 import { nameof } from "@twin.org/nameof";
 import type { IFaucetConnector } from "@twin.org/wallet-models";
 import type { IIotaRebasedFaucetConnectorConfig } from "./models/IIotaRebasedFaucetConnectorConfig";
+import type { IIotaRebasedFaucetConnectorConstructorOptions } from "./models/IIotaRebasedFaucetConnectorConstructorOptions";
 
 /**
- * Class for performing faucet operations on SUI.
+ * Class for performing faucet operations on IOTA Rebased.
  */
 export class IotaRebasedFaucetConnector implements IFaucetConnector {
 	/**
@@ -23,23 +24,22 @@ export class IotaRebasedFaucetConnector implements IFaucetConnector {
 	public readonly CLASS_NAME: string = nameof<IotaRebasedFaucetConnector>();
 
 	/**
-	 * The configuration to use for SUI operations.
+	 * The configuration to use for IOTA Rebased operations.
 	 * @internal
 	 */
 	private readonly _config: IIotaRebasedFaucetConnectorConfig;
 
 	/**
-	 * The SUI client.
+	 * The IOTA Rebased client.
 	 * @internal
 	 */
 	private readonly _client: IotaClient;
 
 	/**
-	 * Create a new instance of SuiFaucetConnector.
+	 * Create a new instance of IotaRebasedFaucetConnector.
 	 * @param options The options for the connector.
-	 * @param options.config The configuration to use.
 	 */
-	constructor(options: { config: IIotaRebasedFaucetConnectorConfig }) {
+	constructor(options: IIotaRebasedFaucetConnectorConstructorOptions) {
 		Guards.object(this.CLASS_NAME, nameof(options), options);
 		Guards.object<IIotaRebasedFaucetConnectorConfig>(
 			this.CLASS_NAME,
@@ -59,7 +59,7 @@ export class IotaRebasedFaucetConnector implements IFaucetConnector {
 	}
 
 	/**
-	 * Fund an address with SUI from the faucet.
+	 * Fund an address with IOTA Rebased from the faucet.
 	 * @param identity The identity of the user to access the vault keys.
 	 * @param address The address to fund.
 	 * @param timeoutInSeconds The timeout in seconds to wait for the funding to complete.
@@ -103,6 +103,8 @@ export class IotaRebasedFaucetConnector implements IFaucetConnector {
 				}
 			}
 		} catch (error) {
+			// eslint-disable-next-line no-console
+			console.log(error);
 			throw new GeneralError(
 				this.CLASS_NAME,
 				"fundingFailed",

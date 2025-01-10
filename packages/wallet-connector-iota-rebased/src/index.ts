@@ -4,3 +4,5 @@ export * from "./iotaRebasedFaucetConnector";
 export * from "./iotaRebasedWalletConnector";
 export * from "./models/IIotaRebasedFaucetConnectorConfig";
 export * from "./models/IIotaRebasedWalletConnectorConfig";
+export * from "./models/IIotaRebasedWalletConnectorConstructorOptions";
+export * from "./models/IIotaRebasedFaucetConnectorConstructorOptions";
