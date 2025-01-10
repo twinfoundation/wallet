@@ -10,3 +10,16 @@ coverage
 **/.tmp
 .env.dev
 vitest.config.ts.timestamp*
+
+# Move contract build artifacts
+**/build/
+**/Move.lock
+**/Move.toml.copy
+**/.coverage/
+**/.trace/
+
+# Exceptions for specific Move build artifacts
+# Only keep the necessary compiled modules and manifest
+!src/contracts/**/build/*.yaml
+!src/contracts/**/build/*/sources/*.mv
+!src/contracts/**/build/*/bytecode_modules/*.mv

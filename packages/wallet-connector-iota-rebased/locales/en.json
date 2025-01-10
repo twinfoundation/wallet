@@ -1,0 +1,10 @@
+{
+	"error": {
+		"iotaRebasedWalletConnector": {
+			"transferFailed": "The wallet transfer failed."
+		},
+		"iotaRebasedFaucetConnector": {
+			"fundingFailed": "Fund the address from faucet failed"
+		}
+	}
+}
