@@ -16,6 +16,7 @@ import {
 } from "@twin.org/wallet-models";
 import type { WalletAddress } from "./entities/walletAddress";
 import type { IEntityStorageWalletConnectorConfig } from "./models/IEntityStorageWalletConnectorConfig";
+import type { IEntityStorageWalletConnectorConstructorOptions } from "./models/IEntityStorageWalletConnectorConstructorOptions";
 
 /**
  * Class for performing wallet operations using in-memory storage.
@@ -76,17 +77,8 @@ export class EntityStorageWalletConnector implements IWalletConnector {
 	/**
 	 * Create a new instance of EntityStorageWalletConnector.
 	 * @param options The options for the wallet connector.
-	 * @param options.vaultConnectorType Vault connector to use for wallet secrets, defaults to "vault".
-	 * @param options.faucetConnectorType Optional faucet for requesting funds, defaults to "faucet".
-	 * @param options.walletAddressEntityStorageType The entity storage for wallets, defaults to "wallet-address".
-	 * @param options.config The configuration to use.
 	 */
-	constructor(options?: {
-		vaultConnectorType?: string;
-		faucetConnectorType?: string;
-		walletAddressEntityStorageType?: string;
-		config?: IEntityStorageWalletConnectorConfig;
-	}) {
+	constructor(options?: IEntityStorageWalletConnectorConstructorOptions) {
 		this._vaultConnector = VaultConnectorFactory.get(options?.vaultConnectorType ?? "vault");
 		this._faucetConnector = FaucetConnectorFactory.getIfExists(
 			options?.faucetConnectorType ?? "faucet"

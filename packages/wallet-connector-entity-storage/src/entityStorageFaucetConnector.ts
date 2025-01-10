@@ -8,6 +8,7 @@ import {
 import { nameof } from "@twin.org/nameof";
 import type { IFaucetConnector } from "@twin.org/wallet-models";
 import type { WalletAddress } from "./entities/walletAddress";
+import type { IEntityStorageFaucetConnectorConstructorOptions } from "./models/IEntityStorageFaucetConnectorConstructorOptions";
 
 /**
  * Class for performing faucet operations using entity storage.
@@ -32,9 +33,8 @@ export class EntityStorageFaucetConnector implements IFaucetConnector {
 	/**
 	 * Create a new instance of EntityStorageFaucetConnector.
 	 * @param options The options for the wallet connector.
-	 * @param options.walletAddressEntityStorageType The entity storage type for wallet addresses, defaults to "wallet-address".
 	 */
-	constructor(options?: { walletAddressEntityStorageType?: string }) {
+	constructor(options?: IEntityStorageFaucetConnectorConstructorOptions) {
 		this._walletAddressEntityStorage = EntityStorageConnectorFactory.get(
 			options?.walletAddressEntityStorageType ?? "wallet-address"
 		);

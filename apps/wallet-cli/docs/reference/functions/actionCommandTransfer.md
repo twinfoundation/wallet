@@ -6,31 +6,43 @@ Action the transfer command.
 
 ## Parameters
 
-• **opts**
+### opts
 
 The options for the command.
 
-• **opts.seed**: `string`
+#### seed
+
+`string`
 
 The seed to use for the wallet.
 
-• **opts.address**: `string`
+#### address
+
+`string`
 
 The address to source the funds from.
 
-• **opts.destAddress**: `string`
+#### destAddress
+
+`string`
 
 The address to send the funds to.
 
-• **opts.amount**: `string`
+#### amount
+
+`string`
 
 The amount of funds to transfer.
 
-• **opts.node**: `string`
+#### node
+
+`string`
 
 The node URL.
 
-• **opts.explorer**: `string`
+#### explorer
+
+`string`
 
 The explorer URL.
 
