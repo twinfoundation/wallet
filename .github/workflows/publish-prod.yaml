@@ -11,6 +11,7 @@ on:
           - 'packages/wallet-models'
           - 'packages/wallet-connector-entity-storage'
           - 'packages/wallet-connector-iota'
+          - 'packages/wallet-connector-iota-rebased'
           - 'apps/wallet-cli'
 jobs:
   publish:

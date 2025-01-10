@@ -1,13 +1,13 @@
 {
-	"name": "@twin.org/wallet-models",
+	"name": "@twin.org/wallet-connector-iota-rebased",
 	"version": "0.0.1-next.9",
-	"description": "Models which define the structure of the wallet contracts and connectors",
+	"description": "Wallet connector implementation using IOTA Rebased",
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/twinfoundation/wallet.git",
-		"directory": "packages/wallet-models"
+		"directory": "packages/wallet-connector-iota-rebased"
 	},
-	"author": "martyn.janes@iota.org",
+	"author": "cornel.filip@iota.org",
 	"license": "Apache-2.0",
 	"type": "module",
 	"engines": {
@@ -29,23 +29,33 @@
 		"prepare": "ts-patch install -s"
 	},
 	"dependencies": {
+		"@iota/iota-sdk": "^0.4.0",
 		"@twin.org/core": "next",
 		"@twin.org/crypto": "next",
-		"@twin.org/nameof": "next"
+		"@twin.org/nameof": "next",
+		"@twin.org/vault-models": "next",
+		"@twin.org/wallet-models": "0.0.1-next.9",
+		"@twin.org/dlt-iota-rebased": "next"
 	},
 	"devDependencies": {
+		"@twin.org/entity": "next",
+		"@twin.org/entity-storage-connector-memory": "next",
 		"@twin.org/nameof-transformer": "next",
 		"@twin.org/nameof-vitest-plugin": "next",
-		"@vitest/coverage-v8": "2.1.8",
+		"@twin.org/vault-connector-entity-storage": "next",
+		"@vitest/coverage-v8": "2.1.1",
 		"copyfiles": "2.4.1",
+		"dotenv": "16.4.5",
 		"rimraf": "6.0.1",
-		"rollup": "4.30.1",
-		"ts-patch": "3.3.0",
-		"tsc-watch": "6.2.1",
-		"typedoc": "0.27.6",
-		"typedoc-plugin-markdown": "4.4.1",
-		"typescript": "5.7.2",
-		"vitest": "2.1.8"
+		"rollup": "4.22.4",
+		"rollup-plugin-copy": "3.5.0",
+		"rollup-plugin-typescript2": "0.36.0",
+		"ts-patch": "3.2.1",
+		"tsc-watch": "6.2.0",
+		"typedoc": "0.26.7",
+		"typedoc-plugin-markdown": "4.2.8",
+		"typescript": "5.6.2",
+		"vitest": "2.1.1"
 	},
 	"main": "./dist/cjs/index.cjs",
 	"module": "./dist/esm/index.mjs",
@@ -56,7 +66,7 @@
 			"import": "./dist/esm/index.mjs",
 			"types": "./dist/types/index.d.ts"
 		},
-		"./locales/*.json": "./locales/*.json"
+		"./locales": "./locales"
 	},
 	"files": [
 		"dist/cjs",
