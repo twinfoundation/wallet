@@ -2,15 +2,11 @@
 
 Configuration for the IOTA Rebased Faucet Connector.
 
+## Extends
+
+- `IIotaRebasedConfig`
+
 ## Properties
-
-### clientOptions
-
-> **clientOptions**: `NetworkOrTransport`
-
-The client options for connecting to the IOTA Rebased network.
-
-***
 
 ### endpoint
 

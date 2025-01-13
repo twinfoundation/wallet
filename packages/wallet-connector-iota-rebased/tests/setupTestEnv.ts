@@ -28,6 +28,7 @@ Guards.stringValue("TestEnv", "TEST_NODE_ENDPOINT", process.env.TEST_NODE_ENDPOI
 Guards.stringValue("TestEnv", "TEST_FAUCET_ENDPOINT", process.env.TEST_FAUCET_ENDPOINT);
 Guards.stringValue("TestEnv", "TEST_COIN_TYPE", process.env.TEST_COIN_TYPE);
 Guards.stringValue("TestEnv", "TEST_EXPLORER_URL", process.env.TEST_EXPLORER_URL);
+Guards.stringValue("TestEnv", "TEST_NETWORK", process.env.TEST_NETWORK);
 
 if (!Is.stringValue(process.env.TEST_MNEMONIC)) {
 	// eslint-disable-next-line no-restricted-syntax
@@ -41,12 +42,12 @@ if (!Is.stringValue(process.env.TEST_MNEMONIC)) {
 
 export const TEST_IDENTITY_ID = "test-identity";
 export const TEST_MNEMONIC_NAME = "test-mnemonic";
-export const TEST_NETWORK = "testnet";
 
 export const TEST_CLIENT_OPTIONS = {
 	url: process.env.TEST_NODE_ENDPOINT
 };
 
+export const TEST_NETWORK = process.env.TEST_NETWORK;
 export const TEST_SEED = Bip39.mnemonicToSeed(process.env.TEST_MNEMONIC);
 export const TEST_COIN_TYPE = Number.parseInt(process.env.TEST_COIN_TYPE ?? "4218", 10);
 
@@ -92,6 +93,7 @@ VaultConnectorFactory.register("vault", () => new EntityStorageVaultConnector())
 const TEST_WALLET_CONNECTOR = new IotaRebasedWalletConnector({
 	config: {
 		clientOptions: TEST_CLIENT_OPTIONS,
+		network: TEST_NETWORK,
 		vaultMnemonicId: TEST_MNEMONIC_NAME,
 		coinType: TEST_COIN_TYPE
 	}
@@ -101,7 +103,10 @@ const TEST_WALLET_CONNECTOR = new IotaRebasedWalletConnector({
  * Setup the test environment.
  */
 export async function setupTestEnv(): Promise<void> {
-	console.debug("Wallet Address", `${process.env.TEST_EXPLORER_URL}address/${TEST_ADDRESS}`);
+	console.debug(
+		"Wallet Address",
+		`${process.env.TEST_EXPLORER_URL}address/${TEST_ADDRESS}?network=${TEST_NETWORK}`
+	);
 	await TEST_WALLET_CONNECTOR.create(TEST_IDENTITY_ID);
 	await TEST_WALLET_CONNECTOR.ensureBalance(TEST_IDENTITY_ID, TEST_ADDRESS, 1000000000n);
 }

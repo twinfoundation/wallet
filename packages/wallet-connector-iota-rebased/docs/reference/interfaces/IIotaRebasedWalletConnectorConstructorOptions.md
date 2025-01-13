@@ -22,6 +22,6 @@ Optional faucet connector for requesting funds.
 
 ### config
 
-> **config**: [`IIotaRebasedWalletConnectorConfig`](IIotaRebasedWalletConnectorConfig.md)
+> **config**: `IIotaRebasedConfig`
 
 The configuration for the connector.

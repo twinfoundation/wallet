@@ -9,5 +9,8 @@
 
 - [IIotaRebasedFaucetConnectorConfig](interfaces/IIotaRebasedFaucetConnectorConfig.md)
 - [IIotaRebasedFaucetConnectorConstructorOptions](interfaces/IIotaRebasedFaucetConnectorConstructorOptions.md)
-- [IIotaRebasedWalletConnectorConfig](interfaces/IIotaRebasedWalletConnectorConfig.md)
 - [IIotaRebasedWalletConnectorConstructorOptions](interfaces/IIotaRebasedWalletConnectorConstructorOptions.md)
+
+## Type Aliases
+
+- [IIotaRebasedWalletConnectorConfig](type-aliases/IIotaRebasedWalletConnectorConfig.md)
