@@ -58,7 +58,8 @@ FaucetConnectorFactory.register(
 		new IotaRebasedFaucetConnector({
 			config: {
 				clientOptions: TEST_CLIENT_OPTIONS,
-				endpoint: process.env.TEST_FAUCET_ENDPOINT ?? ""
+				endpoint: process.env.TEST_FAUCET_ENDPOINT ?? "",
+				network: TEST_NETWORK
 			}
 		})
 );
