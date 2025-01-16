@@ -6,7 +6,7 @@
 			"options": {
 				"address": {
 					"param": "--address '<'address'>'",
-					"description": "The address to fill from the faucet either in bech32 format, or start with ! to read environment variable."
+					"description": "The address to fill from the faucet either bech32 or hex format, or start with ! to read environment variable."
 				},
 				"faucet": {
 					"param": "--faucet '<'url'>'",
@@ -50,14 +50,23 @@
 				"transferringFunds": "Transferring"
 			},
 			"labels": {
-				"destAddress": "Destination Address"
+				"destAddress": "Destination Address",
+				"amount": "Amount"
 			}
 		},
 		"common": {
 			"options": {
+				"connector": {
+					"param": "--connector '<'connector'>'",
+					"description": "The connector to use for the wallet operation."
+				},
 				"node": {
 					"param": "--node '<'url'>'",
 					"description": "The url for the node endpoint, or an environment variable name containing the url."
+				},
+				"network": {
+					"param": "--network '<'network'>'",
+					"description": "The network to use for the identity operation."
 				},
 				"explorer": {
 					"param": "--explorer '<'url'>'",
@@ -69,7 +78,9 @@
 				"balance": "Balance",
 				"node": "Node",
 				"explorer": "Explorer",
-				"explore": "Explore"
+				"explore": "Explore",
+				"connector": "Connector",
+				"network": "Network"
 			}
 		}
 	}

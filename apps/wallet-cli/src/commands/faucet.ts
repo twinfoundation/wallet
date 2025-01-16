@@ -1,11 +1,10 @@
 // Copyright 2024 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
 import { CLIDisplay, CLIParam } from "@twin.org/cli-core";
-import { I18n, StringHelper } from "@twin.org/core";
-import { IotaFaucetConnector, IotaWalletConnector } from "@twin.org/wallet-connector-iota";
+import { Converter, I18n, Is, StringHelper } from "@twin.org/core";
 import { FaucetConnectorFactory } from "@twin.org/wallet-models";
 import { Command } from "commander";
-import { setupVault } from "./setupCommands";
+import { setupFaucetConnector, setupVault, setupWalletConnector } from "./setupCommands";
 
 /**
  * Build the faucet command to be consumed by the CLI.
@@ -22,9 +21,19 @@ export function buildCommandFaucet(): Command {
 			I18n.formatMessage("commands.faucet.options.address.description")
 		)
 		.option(
+			I18n.formatMessage("commands.common.options.connector.param"),
+			I18n.formatMessage("commands.common.options.connector.description"),
+			["iota", "iota-rebased"]
+		)
+		.option(
 			I18n.formatMessage("commands.common.options.node.param"),
 			I18n.formatMessage("commands.common.options.node.description"),
 			"!NODE_URL"
+		)
+		.option(
+			I18n.formatMessage("commands.common.options.network.param"),
+			I18n.formatMessage("commands.common.options.network.description"),
+			"!NETWORK"
 		)
 		.option(
 			I18n.formatMessage("commands.faucet.options.faucet.param"),
@@ -46,21 +55,37 @@ export function buildCommandFaucet(): Command {
  * @param opts The options for the command.
  * @param opts.address The address to fill from the faucet.
  * @param opts.faucet The faucet URL.
+ * @param opts.connector The connector to perform the operations with.
  * @param opts.node The node URL.
+ * @param opts.network The network to use for rebased connector.
  * @param opts.explorer The explorer URL.
  */
 export async function actionCommandFaucet(opts: {
 	address: string;
 	faucet: string;
+	connector?: string;
 	node: string;
+	network?: string;
 	explorer: string;
 }): Promise<void> {
-	const address: string = CLIParam.bech32("address", opts.address);
+	const address: string =
+		opts.connector === "iota-rebased"
+			? Converter.bytesToHex(CLIParam.hex("address", opts.address), true)
+			: CLIParam.bech32("address", opts.address);
 	const faucetEndpoint: string = CLIParam.url("faucet", opts.faucet);
 	const nodeEndpoint: string = CLIParam.url("node", opts.node);
+	const network: string | undefined =
+		opts.connector === "iota-rebased" ? CLIParam.stringValue("network", opts.network) : undefined;
 	const explorerEndpoint: string = CLIParam.url("explorer", opts.explorer);
 
+	CLIDisplay.value(
+		I18n.formatMessage("commands.common.labels.connector"),
+		opts.connector ?? "iota"
+	);
 	CLIDisplay.value(I18n.formatMessage("commands.common.labels.node"), nodeEndpoint);
+	if (Is.stringValue(network)) {
+		CLIDisplay.value(I18n.formatMessage("commands.common.labels.network"), network);
+	}
 	CLIDisplay.value(I18n.formatMessage("commands.faucet.labels.faucet"), faucetEndpoint);
 	CLIDisplay.value(I18n.formatMessage("commands.common.labels.address"), address);
 	CLIDisplay.break();
@@ -70,19 +95,15 @@ export async function actionCommandFaucet(opts: {
 
 	CLIDisplay.spinnerStart();
 
-	const iotaFaucet = new IotaFaucetConnector({
-		config: {
-			clientOptions: {
-				primaryNode: nodeEndpoint
-			},
-			endpoint: faucetEndpoint
-		}
-	});
+	const faucetConnector = setupFaucetConnector(
+		{ nodeEndpoint, network, endpoint: faucetEndpoint },
+		opts.connector
+	);
 
 	const localIdentity = "local-identity";
 
-	const fundsAdded = await iotaFaucet.fundAddress(localIdentity, address);
-	FaucetConnectorFactory.register("faucet", () => iotaFaucet);
+	const fundsAdded = await faucetConnector.fundAddress(localIdentity, address);
+	FaucetConnectorFactory.register("faucet", () => faucetConnector);
 
 	CLIDisplay.spinnerStop();
 
@@ -99,22 +120,18 @@ export async function actionCommandFaucet(opts: {
 
 	setupVault();
 
-	const iotaWallet = new IotaWalletConnector({
-		config: {
-			clientOptions: {
-				primaryNode: nodeEndpoint
-			}
-		}
-	});
+	const walletConnector = setupWalletConnector({ nodeEndpoint, network }, opts.connector);
 
-	const balance = await iotaWallet.getBalance(localIdentity, address);
+	const balance = await walletConnector.getBalance(localIdentity, address);
 
 	CLIDisplay.value(I18n.formatMessage("commands.common.labels.balance"), balance.toString());
 	CLIDisplay.break();
 
 	CLIDisplay.value(
 		I18n.formatMessage("commands.common.labels.explore"),
-		`${StringHelper.trimTrailingSlashes(explorerEndpoint)}/addr/${address}`
+		opts.connector === "iota-rebased"
+			? `${StringHelper.trimTrailingSlashes(explorerEndpoint)}/address/${address}?network=${network}`
+			: `${StringHelper.trimTrailingSlashes(explorerEndpoint)}/addr/${address}`
 	);
 	CLIDisplay.break();
 

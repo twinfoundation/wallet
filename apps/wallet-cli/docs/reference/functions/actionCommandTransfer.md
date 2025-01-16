@@ -34,11 +34,23 @@ The address to send the funds to.
 
 The amount of funds to transfer.
 
+#### connector
+
+`string`
+
+The connector to perform the operations with.
+
 #### node
 
 `string`
 
 The node URL.
+
+#### network
+
+`string`
+
+The network to use for rebased connector.
 
 #### explorer
 
