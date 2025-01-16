@@ -14,7 +14,8 @@ import {
 	TEST_CLIENT_OPTIONS,
 	TEST_COIN_TYPE,
 	TEST_IDENTITY_ID,
-	TEST_MNEMONIC_NAME
+	TEST_MNEMONIC_NAME,
+	TEST_NETWORK
 } from "./setupTestEnv";
 import { IotaRebasedWalletConnector } from "../src/iotaRebasedWalletConnector";
 import type { IIotaRebasedWalletConnectorConfig } from "../src/models/IIotaRebasedWalletConnectorConfig";
@@ -49,6 +50,7 @@ describe("IotaRebasedWalletConnector", () => {
 			config: {
 				clientOptions: TEST_CLIENT_OPTIONS,
 				vaultMnemonicId: TEST_MNEMONIC_NAME,
+				network: TEST_NETWORK,
 				vaultSeedId: "test-seed",
 				coinType: TEST_COIN_TYPE
 			}
@@ -97,6 +99,7 @@ describe("IotaRebasedWalletConnector", () => {
 		wallet = new IotaRebasedWalletConnector({
 			config: {
 				clientOptions: TEST_CLIENT_OPTIONS,
+				network: TEST_NETWORK,
 				vaultMnemonicId: TEST_MNEMONIC_NAME,
 				vaultSeedId: "test-seed",
 				coinType: TEST_COIN_TYPE
@@ -178,6 +181,7 @@ describe("IotaRebasedWalletConnector", () => {
 		wallet = new IotaRebasedWalletConnector({
 			config: {
 				clientOptions: TEST_CLIENT_OPTIONS,
+				network: TEST_NETWORK,
 				vaultMnemonicId: TEST_MNEMONIC_NAME,
 				vaultSeedId: "test-seed",
 				coinType: TEST_COIN_TYPE

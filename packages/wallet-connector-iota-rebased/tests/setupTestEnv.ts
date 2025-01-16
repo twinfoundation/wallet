@@ -1,9 +1,9 @@
 // Copyright 2024 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
 import path from "node:path";
-import { Ed25519Keypair } from "@iota/iota-sdk/keypairs/ed25519";
 import { Guards, Is } from "@twin.org/core";
-import { Bip39, Bip44, KeyType } from "@twin.org/crypto";
+import { Bip39 } from "@twin.org/crypto";
+import { IotaRebased } from "@twin.org/dlt-iota-rebased";
 import { MemoryEntityStorageConnector } from "@twin.org/entity-storage-connector-memory";
 import { EntityStorageConnectorFactory } from "@twin.org/entity-storage-models";
 import { nameof } from "@twin.org/nameof";
@@ -18,6 +18,7 @@ import { FaucetConnectorFactory } from "@twin.org/wallet-models";
 import dotenv from "dotenv";
 import { IotaRebasedFaucetConnector } from "../src/iotaRebasedFaucetConnector";
 import { IotaRebasedWalletConnector } from "../src/iotaRebasedWalletConnector";
+import type { IIotaRebasedFaucetConnectorConfig } from "../src/models/IIotaRebasedFaucetConnectorConfig";
 
 console.debug("Setting up test environment from .env and .env.dev files");
 
@@ -49,26 +50,28 @@ export const TEST_CLIENT_OPTIONS = {
 
 export const TEST_NETWORK = process.env.TEST_NETWORK;
 export const TEST_SEED = Bip39.mnemonicToSeed(process.env.TEST_MNEMONIC);
-export const TEST_COIN_TYPE = Number.parseInt(process.env.TEST_COIN_TYPE ?? "4218", 10);
+export const TEST_COIN_TYPE = Number.parseInt(process.env.TEST_COIN_TYPE, 10);
+
+const config: IIotaRebasedFaucetConnectorConfig = {
+	clientOptions: TEST_CLIENT_OPTIONS,
+	endpoint: process.env.TEST_FAUCET_ENDPOINT ?? "",
+	network: TEST_NETWORK,
+	coinType: TEST_COIN_TYPE
+};
 
 // Register faucet connector
 FaucetConnectorFactory.register(
 	"faucet",
 	() =>
 		new IotaRebasedFaucetConnector({
-			config: {
-				clientOptions: TEST_CLIENT_OPTIONS,
-				endpoint: process.env.TEST_FAUCET_ENDPOINT ?? "",
-				network: TEST_NETWORK
-			}
+			config
 		})
 );
 
 // Generate test address
-const keyPair = Bip44.keyPair(TEST_SEED, KeyType.Ed25519, TEST_COIN_TYPE, 0, false, 0);
+const addresses = IotaRebased.getAddresses(TEST_SEED, TEST_COIN_TYPE, 0, 0, 1);
 
-const keypair = Ed25519Keypair.fromSecretKey(keyPair.privateKey);
-export const TEST_ADDRESS = keypair.getPublicKey().toIotaAddress();
+export const TEST_ADDRESS = addresses[0];
 
 // Initialize schema for entity storage
 initSchema();

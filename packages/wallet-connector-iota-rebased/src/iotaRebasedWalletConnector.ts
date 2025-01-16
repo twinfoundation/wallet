@@ -82,12 +82,12 @@ export class IotaRebasedWalletConnector implements IWalletConnector {
 		Guards.stringValue(this.CLASS_NAME, nameof(identity), identity);
 		const mnemonic = Bip39.randomMnemonic();
 		await this._vaultConnector.setSecret<string>(
-			IotaRebased.buildMnemonicKey(identity, this._config),
+			IotaRebased.buildMnemonicKey(identity, this._config.vaultMnemonicId),
 			mnemonic
 		);
 		const seed = Bip39.mnemonicToSeed(mnemonic);
 		await this._vaultConnector.setSecret<string>(
-			IotaRebased.buildSeedKey(identity, this._config),
+			IotaRebased.buildSeedKey(identity, this._config.vaultSeedId),
 			Converter.bytesToBase64(seed)
 		);
 	}
@@ -110,14 +110,11 @@ export class IotaRebasedWalletConnector implements IWalletConnector {
 	): Promise<string[]> {
 		Guards.stringValue(this.CLASS_NAME, nameof(identity), identity);
 
-		const seedBase64 = await this._vaultConnector.getSecret<string>(
-			IotaRebased.buildSeedKey(identity, this._config)
-		);
-		const seed = Converter.base64ToBytes(seedBase64);
+		const seed = await IotaRebased.getSeed(this._config, this._vaultConnector, identity);
 
 		return IotaRebased.getAddresses(
 			seed,
-			this._config,
+			this._config.coinType ?? IotaRebased.DEFAULT_COIN_TYPE,
 			accountIndex,
 			startAddressIndex,
 			count,
