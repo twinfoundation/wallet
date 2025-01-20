@@ -16,6 +16,7 @@ import {
 	IotaRebasedWalletConnector
 } from "@twin.org/wallet-connector-iota-rebased";
 import type { IFaucetConnector, IWalletConnector } from "@twin.org/wallet-models";
+import type { WalletConnectorTypes } from "../models/walletConnectorTypes";
 
 /**
  * Setup the vault for use in the CLI commands.
@@ -53,7 +54,7 @@ export function setupVault(): void {
  */
 export function setupWalletConnector(
 	options: { nodeEndpoint: string; network?: string; vaultSeedId?: string },
-	connector?: string
+	connector?: WalletConnectorTypes
 ): IWalletConnector {
 	connector ??= "iota";
 
@@ -91,7 +92,7 @@ export function setupWalletConnector(
  */
 export function setupFaucetConnector(
 	options: { nodeEndpoint: string; network?: string; endpoint: string; vaultSeedId?: string },
-	connector?: string
+	connector?: WalletConnectorTypes
 ): IFaucetConnector {
 	connector ??= "iota";
 

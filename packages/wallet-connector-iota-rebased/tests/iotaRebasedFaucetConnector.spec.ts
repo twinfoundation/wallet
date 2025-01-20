@@ -1,7 +1,7 @@
 // Copyright 2024 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
 import { Ed25519Keypair } from "@iota/iota-sdk/keypairs/ed25519";
-import { TEST_CLIENT_OPTIONS, TEST_IDENTITY_ID, setupTestEnv } from "./setupTestEnv";
+import { TEST_CLIENT_OPTIONS, TEST_IDENTITY_ID, TEST_NETWORK, setupTestEnv } from "./setupTestEnv";
 import { IotaRebasedFaucetConnector } from "../src/iotaRebasedFaucetConnector";
 import type { IIotaRebasedFaucetConnectorConfig } from "../src/models/IIotaRebasedFaucetConnectorConfig";
 
@@ -86,6 +86,7 @@ describe("IotaRebasedFaucetConnector", () => {
 		const faucet = new IotaRebasedFaucetConnector({
 			config: {
 				clientOptions: TEST_CLIENT_OPTIONS,
+				network: TEST_NETWORK,
 				endpoint: process.env.TEST_FAUCET_ENDPOINT ?? ""
 			}
 		});
@@ -99,6 +100,7 @@ describe("IotaRebasedFaucetConnector", () => {
 		const faucet = new IotaRebasedFaucetConnector({
 			config: {
 				clientOptions: TEST_CLIENT_OPTIONS,
+				network: TEST_NETWORK,
 				endpoint: process.env.TEST_FAUCET_ENDPOINT ?? ""
 			}
 		});

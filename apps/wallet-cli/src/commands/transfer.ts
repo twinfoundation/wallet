@@ -3,8 +3,9 @@
 import { CLIDisplay, CLIParam } from "@twin.org/cli-core";
 import { Converter, I18n, Is, StringHelper } from "@twin.org/core";
 import { VaultConnectorFactory } from "@twin.org/vault-models";
-import { Command } from "commander";
+import { Command, Option } from "commander";
 import { setupVault, setupWalletConnector } from "./setupCommands";
+import { WalletConnectorTypes } from "../models/walletConnectorTypes";
 
 /**
  * Build the transfer command to be consumed by the CLI.
@@ -33,10 +34,13 @@ export function buildCommandTransfer(): Command {
 			I18n.formatMessage("commands.transfer.options.amount.param"),
 			I18n.formatMessage("commands.transfer.options.amount.description")
 		)
-		.option(
-			I18n.formatMessage("commands.common.options.connector.param"),
-			I18n.formatMessage("commands.common.options.connector.description"),
-			["iota", "iota-rebased"]
+		.addOption(
+			new Option(
+				I18n.formatMessage("commands.common.options.connector.param"),
+				I18n.formatMessage("commands.common.options.connector.description")
+			)
+				.choices(Object.values(WalletConnectorTypes))
+				.default(WalletConnectorTypes.Iota)
 		)
 		.option(
 			I18n.formatMessage("commands.common.options.node.param"),
@@ -75,29 +79,31 @@ export async function actionCommandTransfer(opts: {
 	address: string;
 	destAddress: string;
 	amount: string;
-	connector?: string;
+	connector?: WalletConnectorTypes;
 	node: string;
 	network?: string;
 	explorer: string;
 }): Promise<void> {
 	const seed: Uint8Array = CLIParam.hexBase64("seed", opts.seed);
 	const address: string =
-		opts.connector === "iota-rebased"
+		opts.connector === WalletConnectorTypes.IotaRebased
 			? Converter.bytesToHex(CLIParam.hex("address", opts.address), true)
 			: CLIParam.bech32("address", opts.address);
 	const destAddress: string =
-		opts.connector === "iota-rebased"
+		opts.connector === WalletConnectorTypes.IotaRebased
 			? Converter.bytesToHex(CLIParam.hex("destAddress", opts.destAddress), true)
 			: CLIParam.bech32("destAddress", opts.destAddress);
 	const amount: bigint = CLIParam.bigint("amount", opts.amount, false, 0n);
 	const nodeEndpoint: string = CLIParam.url("node", opts.node);
 	const network: string | undefined =
-		opts.connector === "iota-rebased" ? CLIParam.stringValue("network", opts.network) : undefined;
+		opts.connector === WalletConnectorTypes.IotaRebased
+			? CLIParam.stringValue("network", opts.network)
+			: undefined;
 	const explorerEndpoint: string = CLIParam.url("explorer", opts.explorer);
 
 	CLIDisplay.value(
 		I18n.formatMessage("commands.common.labels.connector"),
-		opts.connector ?? "iota"
+		opts.connector ?? WalletConnectorTypes.Iota
 	);
 	CLIDisplay.value(I18n.formatMessage("commands.common.labels.node"), nodeEndpoint);
 	if (Is.stringValue(network)) {
@@ -132,7 +138,7 @@ export async function actionCommandTransfer(opts: {
 
 	CLIDisplay.value(
 		I18n.formatMessage("commands.common.labels.explore"),
-		opts.connector === "iota-rebased"
+		opts.connector === WalletConnectorTypes.IotaRebased
 			? `${StringHelper.trimTrailingSlashes(explorerEndpoint)}/txblock/${blockId}?network=${network}`
 			: `${StringHelper.trimTrailingSlashes(explorerEndpoint)}/block/${blockId}`
 	);

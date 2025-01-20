@@ -3,8 +3,9 @@
 import { CLIDisplay, CLIParam } from "@twin.org/cli-core";
 import { Converter, I18n, Is, StringHelper } from "@twin.org/core";
 import { FaucetConnectorFactory } from "@twin.org/wallet-models";
-import { Command } from "commander";
+import { Command, Option } from "commander";
 import { setupFaucetConnector, setupVault, setupWalletConnector } from "./setupCommands";
+import { WalletConnectorTypes } from "../models/walletConnectorTypes";
 
 /**
  * Build the faucet command to be consumed by the CLI.
@@ -20,10 +21,13 @@ export function buildCommandFaucet(): Command {
 			I18n.formatMessage("commands.faucet.options.address.param"),
 			I18n.formatMessage("commands.faucet.options.address.description")
 		)
-		.option(
-			I18n.formatMessage("commands.common.options.connector.param"),
-			I18n.formatMessage("commands.common.options.connector.description"),
-			["iota", "iota-rebased"]
+		.addOption(
+			new Option(
+				I18n.formatMessage("commands.common.options.connector.param"),
+				I18n.formatMessage("commands.common.options.connector.description")
+			)
+				.choices(Object.values(WalletConnectorTypes))
+				.default(WalletConnectorTypes.Iota)
 		)
 		.option(
 			I18n.formatMessage("commands.common.options.node.param"),
@@ -63,24 +67,26 @@ export function buildCommandFaucet(): Command {
 export async function actionCommandFaucet(opts: {
 	address: string;
 	faucet: string;
-	connector?: string;
+	connector?: WalletConnectorTypes;
 	node: string;
 	network?: string;
 	explorer: string;
 }): Promise<void> {
 	const address: string =
-		opts.connector === "iota-rebased"
+		opts.connector === WalletConnectorTypes.IotaRebased
 			? Converter.bytesToHex(CLIParam.hex("address", opts.address), true)
 			: CLIParam.bech32("address", opts.address);
 	const faucetEndpoint: string = CLIParam.url("faucet", opts.faucet);
 	const nodeEndpoint: string = CLIParam.url("node", opts.node);
 	const network: string | undefined =
-		opts.connector === "iota-rebased" ? CLIParam.stringValue("network", opts.network) : undefined;
+		opts.connector === WalletConnectorTypes.IotaRebased
+			? CLIParam.stringValue("network", opts.network)
+			: undefined;
 	const explorerEndpoint: string = CLIParam.url("explorer", opts.explorer);
 
 	CLIDisplay.value(
 		I18n.formatMessage("commands.common.labels.connector"),
-		opts.connector ?? "iota"
+		opts.connector ?? WalletConnectorTypes.Iota
 	);
 	CLIDisplay.value(I18n.formatMessage("commands.common.labels.node"), nodeEndpoint);
 	if (Is.stringValue(network)) {
@@ -129,7 +135,7 @@ export async function actionCommandFaucet(opts: {
 
 	CLIDisplay.value(
 		I18n.formatMessage("commands.common.labels.explore"),
-		opts.connector === "iota-rebased"
+		opts.connector === WalletConnectorTypes.IotaRebased
 			? `${StringHelper.trimTrailingSlashes(explorerEndpoint)}/address/${address}?network=${network}`
 			: `${StringHelper.trimTrailingSlashes(explorerEndpoint)}/addr/${address}`
 	);
