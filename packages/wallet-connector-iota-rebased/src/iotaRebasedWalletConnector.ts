@@ -208,6 +208,7 @@ export class IotaRebasedWalletConnector implements IWalletConnector {
 				identity,
 				this._client,
 				{
+					source: addressSource,
 					amount,
 					recipient: addressDest
 				}

@@ -29,7 +29,7 @@ export class CLI extends CLIBase {
 			{
 				title: "TWIN Wallet",
 				appName: "twin-wallet",
-				version: "0.0.1-next.14",
+				version: "0.0.1-next.15",
 				icon: "🌍",
 				supportsEnvFiles: true,
 				overrideOutputWidth: options?.overrideOutputWidth
