@@ -3,6 +3,6 @@
 export * from "./iotaFaucetConnector";
 export * from "./iotaWalletConnector";
 export * from "./models/IIotaFaucetConnectorConfig";
-export * from "./models/IIotaFaucetConnectorConstructorOptions";
 export * from "./models/IIotaWalletConnectorConfig";
 export * from "./models/IIotaWalletConnectorConstructorOptions";
+export * from "./models/IIotaFaucetConnectorConstructorOptions";

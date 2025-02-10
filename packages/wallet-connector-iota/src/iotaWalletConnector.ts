@@ -1,6 +1,6 @@
 // Copyright 2024 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
-import { Client } from "@iota/sdk-wasm/node/lib/index.js";
+import type { IotaClient } from "@iota/iota-sdk/client";
 import { Converter, GeneralError, Guards } from "@twin.org/core";
 import { Bip39 } from "@twin.org/crypto";
 import { Iota } from "@twin.org/dlt-iota";
@@ -29,7 +29,7 @@ export class IotaWalletConnector implements IWalletConnector {
 	public readonly CLASS_NAME: string = nameof<IotaWalletConnector>();
 
 	/**
-	 * The configuration to use for tangle operations.
+	 * The configuration to use for IOTA operations.
 	 * @internal
 	 */
 	private readonly _config: IIotaWalletConnectorConfig;
@@ -47,7 +47,13 @@ export class IotaWalletConnector implements IWalletConnector {
 	private readonly _faucetConnector?: IFaucetConnector;
 
 	/**
-	 * Create a new instance of IotaWalletConnector.
+	 * The IOTA client.
+	 * @internal
+	 */
+	private readonly _client: IotaClient;
+
+	/**
+	 * Create a new instance of IOTA Wallet Connector.
 	 * @param options The options for the wallet connector.
 	 */
 	constructor(options: IIotaWalletConnectorConstructorOptions) {
@@ -57,11 +63,6 @@ export class IotaWalletConnector implements IWalletConnector {
 			nameof(options.config),
 			options.config
 		);
-		Guards.object<IIotaWalletConnectorConfig["clientOptions"]>(
-			this.CLASS_NAME,
-			nameof(options.config.clientOptions),
-			options.config.clientOptions
-		);
 
 		this._vaultConnector = VaultConnectorFactory.get(options?.vaultConnectorType ?? "vault");
 		this._faucetConnector = FaucetConnectorFactory.getIfExists(
@@ -69,6 +70,7 @@ export class IotaWalletConnector implements IWalletConnector {
 		);
 		this._config = options.config;
 		Iota.populateConfig(this._config);
+		this._client = Iota.createClient(this._config);
 	}
 
 	/**
@@ -80,76 +82,70 @@ export class IotaWalletConnector implements IWalletConnector {
 		Guards.stringValue(this.CLASS_NAME, nameof(identity), identity);
 		const mnemonic = Bip39.randomMnemonic();
 		await this._vaultConnector.setSecret<string>(
-			Iota.buildMnemonicKey(this._config, identity),
+			Iota.buildMnemonicKey(identity, this._config.vaultMnemonicId),
 			mnemonic
 		);
 		const seed = Bip39.mnemonicToSeed(mnemonic);
 		await this._vaultConnector.setSecret<string>(
-			Iota.buildSeedKey(this._config, identity),
+			Iota.buildSeedKey(identity, this._config.vaultSeedId),
 			Converter.bytesToBase64(seed)
 		);
 	}
 
 	/**
-	 * Get the addresses for the requested range.
-	 * @param identity The identity of the user to access the vault keys.
+	 * Get the addresses for the identity.
+	 * @param identity The identity to get the addresses for.
 	 * @param accountIndex The account index to get the addresses for.
 	 * @param startAddressIndex The start index for the addresses.
 	 * @param count The number of addresses to generate.
-	 * @returns The list of addresses.
+	 * @param isInternal Whether the addresses are internal.
+	 * @returns The addresses.
 	 */
 	public async getAddresses(
 		identity: string,
 		accountIndex: number,
 		startAddressIndex: number,
-		count: number
+		count: number,
+		isInternal?: boolean
 	): Promise<string[]> {
+		Guards.stringValue(this.CLASS_NAME, nameof(identity), identity);
+
+		const seed = await Iota.getSeed(this._config, this._vaultConnector, identity);
+
 		return Iota.getAddresses(
-			this._config,
-			this._vaultConnector,
-			identity,
+			seed,
+			this._config.coinType ?? Iota.DEFAULT_COIN_TYPE,
 			accountIndex,
 			startAddressIndex,
-			count
+			count,
+			isInternal
 		);
 	}
 
 	/**
-	 * Get the balance for an address in a wallet.
+	 * Get the balance for the given address.
 	 * @param identity The identity of the user to access the vault keys.
-	 * @param address The bech32 encoded address.
-	 * @returns The balance of the wallet address.
+	 * @param address The address to get the balance for.
+	 * @returns The balance.
 	 */
 	public async getBalance(identity: string, address: string): Promise<bigint> {
 		Guards.stringValue(this.CLASS_NAME, nameof(identity), identity);
 		Guards.stringValue(this.CLASS_NAME, nameof(address), address);
 
-		const client = new Client(this._config.clientOptions);
+		const balance = await this._client.getBalance({
+			owner: address
+		});
 
-		const outputIds = await client.basicOutputIds([
-			{ address },
-			{ hasExpiration: false },
-			{ hasTimelock: false },
-			{ hasStorageDepositReturn: false }
-		]);
-
-		const outputs = await client.getOutputs(outputIds.items);
-
-		let totalAmount = BigInt(0);
-		for (const output of outputs) {
-			totalAmount += output.output.getAmount();
-		}
-
-		return totalAmount;
+		return BigInt(balance.totalBalance);
 	}
 
 	/**
-	 * Ensure the balance for an address in a wallet.
+	 * Ensure the balance for the given address is at least the given amount.
 	 * @param identity The identity of the user to access the vault keys.
-	 * @param address The bech32 encoded address.
-	 * @param ensureBalance The balance to ensure on the address.
-	 * @param timeoutInSeconds The timeout in seconds to wait for the funding to complete.
-	 * @returns True if the balance has been ensured.
+	 * @param address The address to ensure the balance for.
+	 * @param ensureBalance The minimum balance to ensure.
+	 * @param timeoutInSeconds Optional timeout in seconds, defaults to 10 seconds.
+	 * @returns True if the balance is at least the given amount, false otherwise.
 	 */
 	public async ensureBalance(
 		identity: string,
@@ -172,12 +168,10 @@ export class IotaWalletConnector implements IWalletConnector {
 					timeoutInSeconds
 				);
 				if (addedBalance === 0n) {
-					// The balance has not increased, so return.
 					return false;
 				}
 				currentBalance += addedBalance;
 				if (currentBalance < ensureBalance) {
-					// The balance has increased but is still not enough, wait a second and try again.
 					await new Promise(resolve => setTimeout(resolve, 1000));
 					retryCount--;
 				}
@@ -189,12 +183,12 @@ export class IotaWalletConnector implements IWalletConnector {
 	}
 
 	/**
-	 * Transfer funds to an address.
+	 * Transfer an amount from one address to another.
 	 * @param identity The identity of the user to access the vault keys.
-	 * @param addressSource The bech32 encoded address to send the funds from.
-	 * @param addressDest The bech32 encoded address to send the funds to.
+	 * @param addressSource The source address to transfer from.
+	 * @param addressDest The destination address to transfer to.
 	 * @param amount The amount to transfer.
-	 * @returns An identifier for the transfer if there was one.
+	 * @returns The transaction digest.
 	 */
 	public async transfer(
 		identity: string,
@@ -208,25 +202,19 @@ export class IotaWalletConnector implements IWalletConnector {
 		Guards.bigint(this.CLASS_NAME, nameof(amount), amount);
 
 		try {
-			const client = new Client(this._config.clientOptions);
-
-			const inputs = await client.findInputs([addressSource], amount);
-
-			const blockDetails = await Iota.prepareAndPostTransaction(
+			const result = await Iota.prepareAndPostTransaction(
 				this._config,
 				this._vaultConnector,
 				identity,
-				client,
+				this._client,
 				{
-					inputs,
-					output: {
-						address: addressDest,
-						amount: amount.toString()
-					}
+					source: addressSource,
+					amount,
+					recipient: addressDest
 				}
 			);
 
-			return blockDetails.blockId;
+			return result.digest;
 		} catch (error) {
 			throw new GeneralError(
 				this.CLASS_NAME,

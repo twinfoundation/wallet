@@ -61,7 +61,7 @@ export function buildCommandFaucet(): Command {
  * @param opts.faucet The faucet URL.
  * @param opts.connector The connector to perform the operations with.
  * @param opts.node The node URL.
- * @param opts.network The network to use for rebased connector.
+ * @param opts.network The network to use for the connector.
  * @param opts.explorer The explorer URL.
  */
 export async function actionCommandFaucet(opts: {
@@ -73,13 +73,13 @@ export async function actionCommandFaucet(opts: {
 	explorer: string;
 }): Promise<void> {
 	const address: string =
-		opts.connector === WalletConnectorTypes.IotaRebased
+		opts.connector === WalletConnectorTypes.Iota
 			? Converter.bytesToHex(CLIParam.hex("address", opts.address), true)
 			: CLIParam.bech32("address", opts.address);
 	const faucetEndpoint: string = CLIParam.url("faucet", opts.faucet);
 	const nodeEndpoint: string = CLIParam.url("node", opts.node);
 	const network: string | undefined =
-		opts.connector === WalletConnectorTypes.IotaRebased
+		opts.connector === WalletConnectorTypes.Iota
 			? CLIParam.stringValue("network", opts.network)
 			: undefined;
 	const explorerEndpoint: string = CLIParam.url("explorer", opts.explorer);
@@ -135,7 +135,7 @@ export async function actionCommandFaucet(opts: {
 
 	CLIDisplay.value(
 		I18n.formatMessage("commands.common.labels.explore"),
-		opts.connector === WalletConnectorTypes.IotaRebased
+		opts.connector === WalletConnectorTypes.Iota
 			? `${StringHelper.trimTrailingSlashes(explorerEndpoint)}/address/${address}?network=${network}`
 			: `${StringHelper.trimTrailingSlashes(explorerEndpoint)}/addr/${address}`
 	);

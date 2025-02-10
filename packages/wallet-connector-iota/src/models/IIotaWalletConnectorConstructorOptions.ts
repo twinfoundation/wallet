@@ -3,18 +3,16 @@
 import type { IIotaWalletConnectorConfig } from "./IIotaWalletConnectorConfig";
 
 /**
- * Options for the IOTA Wallet Connector.
+ * Options for the IOTA Wallet connector.
  */
 export interface IIotaWalletConnectorConstructorOptions {
 	/**
-	 * Vault connector to use for wallet secrets.
-	 * @default vault
+	 * Optional vault connector to use for wallet secrets.
 	 */
 	vaultConnectorType?: string;
 
 	/**
-	 * Optional faucet for requesting funds.
-	 * @default faucet
+	 * Optional faucet connector for requesting funds.
 	 */
 	faucetConnectorType?: string;
 

@@ -1,0 +1,13 @@
+{
+	"error": {
+		"iotaStardustWalletConnector": {
+			"transferFailed": "The wallet transfer failed.",
+			"inclusionFailed": "The transaction generated was not included in a reasonable amount of time",
+			"insufficientFunds": "There were insufficient funds to complete the operation"
+		},
+		"iotaStardustFaucetConnector": {
+			"fundingFailed": "Fund the address from faucet failed",
+			"insufficientFunds": "There were insufficient funds to complete the operation"
+		}
+	}
+}

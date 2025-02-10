@@ -1,14 +1,7 @@
 // Copyright 2024 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
-import { Bip44, KeyType } from "@twin.org/crypto";
-import {
-	TEST_BECH32_HRP,
-	TEST_CLIENT_OPTIONS,
-	TEST_COIN_TYPE,
-	TEST_IDENTITY_ID,
-	TEST_SEED,
-	setupTestEnv
-} from "./setupTestEnv";
+import { Ed25519Keypair } from "@iota/iota-sdk/keypairs/ed25519";
+import { TEST_CLIENT_OPTIONS, TEST_IDENTITY_ID, TEST_NETWORK, setupTestEnv } from "./setupTestEnv";
 import { IotaFaucetConnector } from "../src/iotaFaucetConnector";
 import type { IIotaFaucetConnectorConfig } from "../src/models/IIotaFaucetConnectorConfig";
 
@@ -50,7 +43,9 @@ describe("IotaFaucetConnector", () => {
 	test("can fail to construct a faucet with no config client options", () => {
 		expect(
 			() =>
-				new IotaFaucetConnector({ config: {} } as unknown as { config: IIotaFaucetConnectorConfig })
+				new IotaFaucetConnector({ config: {} } as unknown as {
+					config: IIotaFaucetConnectorConfig;
+				})
 		).toThrow(
 			expect.objectContaining({
 				name: "GuardError",
@@ -85,6 +80,7 @@ describe("IotaFaucetConnector", () => {
 		const faucet = new IotaFaucetConnector({
 			config: {
 				clientOptions: TEST_CLIENT_OPTIONS,
+				network: TEST_NETWORK,
 				endpoint: process.env.TEST_FAUCET_ENDPOINT ?? ""
 			}
 		});
@@ -92,26 +88,19 @@ describe("IotaFaucetConnector", () => {
 	});
 
 	test("can fund an address from the faucet", async () => {
-		// Use a random address which has not yet been used
-		const addressKeyPair = Bip44.addressBech32(
-			TEST_SEED,
-			KeyType.Ed25519,
-			TEST_BECH32_HRP,
-			TEST_COIN_TYPE,
-			0,
-			false,
-			Math.floor(Math.random() * 100000000) + 1000
-		);
+		const keypair = Ed25519Keypair.deriveKeypair(process.env.TEST_MNEMONIC ?? "");
+		const address = keypair.getPublicKey().toIotaAddress();
 
 		const faucet = new IotaFaucetConnector({
 			config: {
 				clientOptions: TEST_CLIENT_OPTIONS,
+				network: TEST_NETWORK,
 				endpoint: process.env.TEST_FAUCET_ENDPOINT ?? ""
 			}
 		});
 
-		const amountAdded = await faucet.fundAddress(TEST_IDENTITY_ID, addressKeyPair.address);
+		const amountAdded = await faucet.fundAddress(TEST_IDENTITY_ID, address);
 
-		expect(amountAdded).toBeGreaterThan(0);
+		expect(amountAdded).toBeGreaterThan(0n);
 	});
 });

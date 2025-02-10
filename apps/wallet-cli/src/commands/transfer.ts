@@ -71,7 +71,7 @@ export function buildCommandTransfer(): Command {
  * @param opts.amount The amount of funds to transfer.
  * @param opts.connector The connector to perform the operations with.
  * @param opts.node The node URL.
- * @param opts.network The network to use for rebased connector.
+ * @param opts.network The network to use for the connector.
  * @param opts.explorer The explorer URL.
  */
 export async function actionCommandTransfer(opts: {
@@ -86,17 +86,17 @@ export async function actionCommandTransfer(opts: {
 }): Promise<void> {
 	const seed: Uint8Array = CLIParam.hexBase64("seed", opts.seed);
 	const address: string =
-		opts.connector === WalletConnectorTypes.IotaRebased
+		opts.connector === WalletConnectorTypes.Iota
 			? Converter.bytesToHex(CLIParam.hex("address", opts.address), true)
 			: CLIParam.bech32("address", opts.address);
 	const destAddress: string =
-		opts.connector === WalletConnectorTypes.IotaRebased
+		opts.connector === WalletConnectorTypes.Iota
 			? Converter.bytesToHex(CLIParam.hex("destAddress", opts.destAddress), true)
 			: CLIParam.bech32("destAddress", opts.destAddress);
 	const amount: bigint = CLIParam.bigint("amount", opts.amount, false, 0n);
 	const nodeEndpoint: string = CLIParam.url("node", opts.node);
 	const network: string | undefined =
-		opts.connector === WalletConnectorTypes.IotaRebased
+		opts.connector === WalletConnectorTypes.Iota
 			? CLIParam.stringValue("network", opts.network)
 			: undefined;
 	const explorerEndpoint: string = CLIParam.url("explorer", opts.explorer);
@@ -138,7 +138,7 @@ export async function actionCommandTransfer(opts: {
 
 	CLIDisplay.value(
 		I18n.formatMessage("commands.common.labels.explore"),
-		opts.connector === WalletConnectorTypes.IotaRebased
+		opts.connector === WalletConnectorTypes.Iota
 			? `${StringHelper.trimTrailingSlashes(explorerEndpoint)}/txblock/${blockId}?network=${network}`
 			: `${StringHelper.trimTrailingSlashes(explorerEndpoint)}/block/${blockId}`
 	);

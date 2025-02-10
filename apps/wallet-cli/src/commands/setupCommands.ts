@@ -12,11 +12,11 @@ import {
 import { VaultConnectorFactory } from "@twin.org/vault-models";
 import { IotaFaucetConnector, IotaWalletConnector } from "@twin.org/wallet-connector-iota";
 import {
-	IotaRebasedFaucetConnector,
-	IotaRebasedWalletConnector
-} from "@twin.org/wallet-connector-iota-rebased";
+	IotaStardustFaucetConnector,
+	IotaStardustWalletConnector
+} from "@twin.org/wallet-connector-iota-stardust";
 import type { IFaucetConnector, IWalletConnector } from "@twin.org/wallet-models";
-import type { WalletConnectorTypes } from "../models/walletConnectorTypes";
+import { WalletConnectorTypes } from "../models/walletConnectorTypes";
 
 /**
  * Setup the vault for use in the CLI commands.
@@ -58,8 +58,8 @@ export function setupWalletConnector(
 ): IWalletConnector {
 	connector ??= "iota";
 
-	if (connector === "iota-rebased") {
-		return new IotaRebasedWalletConnector({
+	if (connector === WalletConnectorTypes.Iota) {
+		return new IotaWalletConnector({
 			config: {
 				clientOptions: {
 					url: options.nodeEndpoint
@@ -69,7 +69,7 @@ export function setupWalletConnector(
 			}
 		});
 	}
-	return new IotaWalletConnector({
+	return new IotaStardustWalletConnector({
 		config: {
 			clientOptions: {
 				nodes: [options.nodeEndpoint],
@@ -96,8 +96,8 @@ export function setupFaucetConnector(
 ): IFaucetConnector {
 	connector ??= "iota";
 
-	if (connector === "iota-rebased") {
-		return new IotaRebasedFaucetConnector({
+	if (connector === WalletConnectorTypes.Iota) {
+		return new IotaFaucetConnector({
 			config: {
 				clientOptions: {
 					url: options.nodeEndpoint
@@ -108,7 +108,7 @@ export function setupFaucetConnector(
 			}
 		});
 	}
-	return new IotaFaucetConnector({
+	return new IotaStardustFaucetConnector({
 		config: {
 			clientOptions: {
 				nodes: [options.nodeEndpoint],

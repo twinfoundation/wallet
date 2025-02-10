@@ -7,7 +7,7 @@ import type { IIotaConfig } from "@twin.org/dlt-iota";
  */
 export interface IIotaFaucetConnectorConfig extends IIotaConfig {
 	/**
-	 * The endpoint for the faucet.
+	 * The faucet endpoint URL.
 	 */
 	endpoint: string;
 }
