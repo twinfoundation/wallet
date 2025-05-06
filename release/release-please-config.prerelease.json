@@ -24,11 +24,6 @@
 			"changelog-path": "docs/changelog.md",
 			"extra-files": ["src/index.ts"]
 		},
-		"packages/wallet-connector-iota-stardust": {
-			"package-name": "wallet-connector-iota-stardust",
-			"changelog-path": "docs/changelog.md",
-			"extra-files": ["src/index.ts"]
-		},
 		"apps/wallet-cli": {
 			"package-name": "wallet-cli",
 			"changelog-path": "docs/changelog.md",
@@ -44,7 +39,6 @@
 				"wallet-models",
 				"wallet-connector-entity-storage",
 				"wallet-connector-iota",
-				"wallet-connector-iota-stardust",
 				"wallet-cli"
 			]
 		}

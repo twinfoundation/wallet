@@ -2,6 +2,5 @@
 	"packages/wallet-models": "0.0.1",
 	"packages/wallet-connector-entity-storage": "0.0.1",
 	"packages/wallet-connector-iota": "0.0.1",
-	"packages/wallet-connector-iota-stardust": "0.0.1",
 	"apps/wallet-cli": "0.0.1"
 }

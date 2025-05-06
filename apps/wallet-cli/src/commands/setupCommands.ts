@@ -11,12 +11,8 @@ import {
 } from "@twin.org/vault-connector-entity-storage";
 import { VaultConnectorFactory } from "@twin.org/vault-models";
 import { IotaFaucetConnector, IotaWalletConnector } from "@twin.org/wallet-connector-iota";
-import {
-	IotaStardustFaucetConnector,
-	IotaStardustWalletConnector
-} from "@twin.org/wallet-connector-iota-stardust";
 import type { IFaucetConnector, IWalletConnector } from "@twin.org/wallet-models";
-import { WalletConnectorTypes } from "../models/walletConnectorTypes";
+import type { WalletConnectorTypes } from "../models/walletConnectorTypes";
 
 /**
  * Setup the vault for use in the CLI commands.
@@ -58,23 +54,12 @@ export function setupWalletConnector(
 ): IWalletConnector {
 	connector ??= "iota";
 
-	if (connector === WalletConnectorTypes.Iota) {
-		return new IotaWalletConnector({
-			config: {
-				clientOptions: {
-					url: options.nodeEndpoint
-				},
-				network: options.network ?? "",
-				vaultSeedId: options.vaultSeedId
-			}
-		});
-	}
-	return new IotaStardustWalletConnector({
+	return new IotaWalletConnector({
 		config: {
 			clientOptions: {
-				nodes: [options.nodeEndpoint],
-				localPow: true
+				url: options.nodeEndpoint
 			},
+			network: options.network ?? "",
 			vaultSeedId: options.vaultSeedId
 		}
 	});
@@ -96,25 +81,13 @@ export function setupFaucetConnector(
 ): IFaucetConnector {
 	connector ??= "iota";
 
-	if (connector === WalletConnectorTypes.Iota) {
-		return new IotaFaucetConnector({
-			config: {
-				clientOptions: {
-					url: options.nodeEndpoint
-				},
-				endpoint: options.endpoint,
-				network: options.network ?? "",
-				vaultSeedId: options.vaultSeedId
-			}
-		});
-	}
-	return new IotaStardustFaucetConnector({
+	return new IotaFaucetConnector({
 		config: {
 			clientOptions: {
-				nodes: [options.nodeEndpoint],
-				localPow: true
+				url: options.nodeEndpoint
 			},
 			endpoint: options.endpoint,
+			network: options.network ?? "",
 			vaultSeedId: options.vaultSeedId
 		}
 	});

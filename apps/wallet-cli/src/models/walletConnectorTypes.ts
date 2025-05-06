@@ -9,12 +9,7 @@ export const WalletConnectorTypes = {
 	/**
 	 * IOTA.
 	 */
-	Iota: "iota",
-
-	/**
-	 * IOTA Stardust.
-	 */
-	IotaStardust: "iota-stardust"
+	Iota: "iota"
 } as const;
 
 /**

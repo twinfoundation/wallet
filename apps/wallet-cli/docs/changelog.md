@@ -13,7 +13,6 @@
 * The following workspace dependencies were updated
   * dependencies
     * @twin.org/wallet-connector-iota bumped from 0.0.1-next.18 to 0.0.1-next.19
-    * @twin.org/wallet-connector-iota-stardust bumped from 0.0.1-next.18 to 0.0.1-next.19
     * @twin.org/wallet-models bumped from 0.0.1-next.18 to 0.0.1-next.19
 
 ## [0.0.1-next.18](https://github.com/twinfoundation/wallet/compare/wallet-cli-v0.0.1-next.17...wallet-cli-v0.0.1-next.18) (2025-03-28)
@@ -29,7 +28,6 @@
 * The following workspace dependencies were updated
   * dependencies
     * @twin.org/wallet-connector-iota bumped from 0.0.1-next.17 to 0.0.1-next.18
-    * @twin.org/wallet-connector-iota-stardust bumped from 0.0.1-next.17 to 0.0.1-next.18
     * @twin.org/wallet-models bumped from 0.0.1-next.17 to 0.0.1-next.18
 
 ## v0.0.1-next.17
