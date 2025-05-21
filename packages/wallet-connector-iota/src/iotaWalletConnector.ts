@@ -202,16 +202,15 @@ export class IotaWalletConnector implements IWalletConnector {
 		Guards.bigint(this.CLASS_NAME, nameof(amount), amount);
 
 		try {
-			const result = await Iota.prepareAndPostTransaction(
+			const result = await Iota.prepareAndPostValueTransaction(
 				this._config,
 				this._vaultConnector,
+				undefined,
 				identity,
 				this._client,
-				{
-					source: addressSource,
-					amount,
-					recipient: addressDest
-				}
+				addressSource,
+				amount,
+				addressDest
 			);
 
 			return result.digest;
