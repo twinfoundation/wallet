@@ -52,5 +52,8 @@
 		"packages/wallet-connector-iota",
 		"apps/wallet-cli"
 	],
-	"type": "module"
+	"type": "module",
+	"dependencies": {
+		"@twin.org/dlt-iota": "^0.0.1-next.3"
+	}
 }

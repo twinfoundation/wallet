@@ -1,6 +1,6 @@
-# Interface: IIotaFaucetConnectorConfig
+# Interface: IIotaGasStationFaucetConnectorConfig
 
-Configuration for the IOTA Faucet Connector.
+Configuration for the IOTA Gas Station Faucet Connector.
 
 ## Extends
 
@@ -122,8 +122,53 @@ The length of time to wait for the inclusion of a transaction in seconds.
 
 ***
 
-### endpoint
+### gasStationUrl
 
-> **endpoint**: `string`
+> **gasStationUrl**: `string`
 
-The faucet endpoint URL.
+The gas station service URL.
+
+***
+
+### gasStationAuthToken
+
+> **gasStationAuthToken**: `string`
+
+The authentication token for the gas station API.
+
+***
+
+### identityPkgId?
+
+> `optional` **identityPkgId**: `string`
+
+The package ID for the identity contract on the network.
+If not provided, a default value will be used based on the detected network type.
+
+***
+
+### gasBudget?
+
+> `optional` **gasBudget**: `number`
+
+The gas budget for transactions.
+
+#### Default
+
+```ts
+50000000
+```
+
+***
+
+### walletAddressIndex?
+
+> `optional` **walletAddressIndex**: `number`
+
+The wallet address index to use for identity operations.
+
+#### Default
+
+```ts
+0
+```
