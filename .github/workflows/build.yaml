@@ -42,7 +42,7 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y jq
 
       # Setup any services required for tests here
-      
+
       # Start Redis for gas station storage
       - name: Start Redis
         run: |
@@ -102,10 +102,10 @@ jobs:
             -H "Content-Type: application/json" \
             -H "Authorization: Bearer qEyCL6d9BKKFl/tfDGAKeGFkhUlf7FkqiGV7Xw4JUsI=" \
             -d '{"gas_budget": 10000000, "reserve_duration_secs": 10}')
-          
+
           SPONSOR_ADDRESS=$(echo "$SPONSOR_RESPONSE" | jq -r '.result.sponsor_address')
           echo "Sponsor address: $SPONSOR_ADDRESS"
-          
+
           if [ "$SPONSOR_ADDRESS" != "null" ] && [ -n "$SPONSOR_ADDRESS" ]; then
             echo "Funding sponsor address with IOTA faucet..."
             # Fund the sponsor address using IOTA testnet faucet
