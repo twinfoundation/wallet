@@ -17,6 +17,8 @@ jobs:
       TEST_MNEMONIC: ${{ secrets.TEST_MNEMONIC }}
       TEST_2_MNEMONIC: ${{ secrets.TEST_2_MNEMONIC }}
       TEST_NODE_MNEMONIC: ${{ secrets.TEST_NODE_MNEMONIC }}
+      TEST_GAS_STATION_ENDPOINT: ${{ vars.TEST_GAS_STATION_ENDPOINT || 'http://localhost:9527' }}
+      TEST_GAS_STATION_AUTH_TOKEN: ${{ secrets.TEST_GAS_STATION_AUTH_TOKEN }}
 
     steps:
       # Get the code
@@ -33,9 +35,13 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      # Setup any services required for tests here
-
-      # End setup for tests
+      # Setup test environment
+      - name: Setup test environment
+        uses: ./.github/actions/setup-test-environment
+        with:
+          test-node-endpoint: ${{ vars.TEST_NODE_ENDPOINT || 'https://api.testnet.iota.cafe' }}
+          test-faucet-endpoint: ${{ vars.TEST_FAUCET_ENDPOINT || 'https://faucet.testnet.iota.cafe/gas' }}
+          gas-station-auth: 'qEyCL6d9BKKFl/tfDGAKeGFkhUlf7FkqiGV7Xw4JUsI='
 
       # Run Lint and Dist
       - name: Run Lint and Dist
