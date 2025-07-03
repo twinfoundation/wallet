@@ -5,7 +5,7 @@
 
 ### Features
 
-* github action simplification, readme update and tests inclution ([#33](https://github.com/twinfoundation/wallet/issues/33)) ([685bf01](https://github.com/twinfoundation/wallet/commit/685bf010c4276a37cb85c22762cbdbe3fe7cdc1a))
+* github action simplification, readme update and tests inclusion ([#33](https://github.com/twinfoundation/wallet/issues/33)) ([685bf01](https://github.com/twinfoundation/wallet/commit/685bf010c4276a37cb85c22762cbdbe3fe7cdc1a))
 
 
 ### Dependencies
