@@ -1,5 +1,23 @@
 # @twin.org/wallet-cli - Changelog
 
+## [0.0.1-next.24](https://github.com/twinfoundation/wallet/compare/wallet-cli-v0.0.1-next.23...wallet-cli-v0.0.1-next.24) (2025-07-03)
+
+
+### Features
+
+* add publish workflows ([a4ce48e](https://github.com/twinfoundation/wallet/commit/a4ce48ecaa83a182fb927631a5a4e6a9929b4ccc))
+* iota rebased release ([d0c617d](https://github.com/twinfoundation/wallet/commit/d0c617d894f3663f7c80f7d53d2da858a0bd64f0))
+* update dependencies ([4b47a7d](https://github.com/twinfoundation/wallet/commit/4b47a7d900d72d1502d6db54cb391a954818478b))
+* use shared store mechanism ([#27](https://github.com/twinfoundation/wallet/issues/27)) ([2ba7861](https://github.com/twinfoundation/wallet/commit/2ba7861a2a610cf83396a3285c7bbaebe5a31551))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @twin.org/wallet-connector-iota bumped from 0.0.1-next.23 to 0.0.1-next.24
+    * @twin.org/wallet-models bumped from 0.0.1-next.23 to 0.0.1-next.24
+
 ## [0.0.1-next.23](https://github.com/twinfoundation/wallet/compare/wallet-cli-v0.0.1-next.22...wallet-cli-v0.0.1-next.23) (2025-07-03)
 
 
