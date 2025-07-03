@@ -104,27 +104,27 @@ describe("IotaWalletConnector Gas Station Tests", () => {
 		expect(balance).toBeGreaterThanOrEqual(0n);
 	});
 
-	test("can ensure balance with gas station funding", async () => {
+	test("can ensure balance with faucet funding while gas station is configured", async () => {
 		const addresses = await walletConnector.getAddresses(TEST_IDENTITY, 0, 0, 1);
 		const address = addresses[0];
 
-		// Get initial balance
 		const initialBalance = await walletConnector.getBalance(TEST_IDENTITY, address);
 
-		// Ensure a higher balance (should trigger gas station funding)
+		// Ensure a higher balance (should trigger faucet funding)
+		// Note: Gas station is for sponsoring transaction fees, not for funding addresses
 		const targetBalance = initialBalance + 1000000000n; // 1 IOTA
 
-		// Note: This test may fail if gas station funding is not fully implemented
-		// In that case, it should fall back to faucet funding
+		// This test verifies that ensureBalance works correctly with gas station configuration
+		// The funding should come from the faucet, not the gas station
 		const result = await walletConnector.ensureBalance(TEST_IDENTITY, address, targetBalance, 30);
 
 		if (result) {
 			const finalBalance = await walletConnector.getBalance(TEST_IDENTITY, address);
 			expect(finalBalance).toBeGreaterThanOrEqual(targetBalance);
 		} else {
-			// If funding failed, that's acceptable for now as gas station may not be fully operational
+			// If funding failed, it's likely due to faucet availability issues
 			console.warn(
-				"Gas station funding test failed - this may be expected if gas station is not operational"
+				"Faucet funding test failed - this may be expected if faucet is not operational"
 			);
 		}
 	});
@@ -170,29 +170,46 @@ describe("IotaWalletConnector Gas Station Tests", () => {
 		expect(typeof result).toBe("boolean");
 	});
 
+	// This test verifies that wallet connector with gas station config can perform basic operations
 	test("gas station can sponsor gas for transactions", async () => {
-		// This test verifies that gas station integration works
-		// by checking that we can get addresses and balances with gas station config
 		const addresses = await walletConnector.getAddresses(TEST_IDENTITY, 0, 0, 2);
-		const fromAddress = addresses[0];
+		const address = addresses[0];
 
-		// Get balance - this works with gas station
-		const balance = await walletConnector.getBalance(TEST_IDENTITY, fromAddress);
-		expect(typeof balance).toBe("bigint");
+		// Check that we can get a balance with gas station config
+		const initialBalance = await walletConnector.getBalance(TEST_IDENTITY, address);
 
-		// Try to ensure balance - this will use faucet if available
-		// Gas station is for sponsoring gas, not for providing transfer funds
-		const ensureResult = await walletConnector.ensureBalance(
-			TEST_IDENTITY,
-			fromAddress,
-			100000000n, // Small amount
-			10
-		);
+		const minimumRequired = 1000000000n; // 1 IOTA
 
-		// Result depends on whether faucet funding is available
-		// The important thing is that gas station config doesn't break these operations
-		expect(typeof ensureResult).toBe("boolean");
-		console.log(`Gas station integration test: ensureBalance result = ${ensureResult}`);
+		const faucetConnector = FaucetConnectorFactory.get("faucet");
+		expect(faucetConnector).toBeDefined();
+
+		if (initialBalance < minimumRequired) {
+			// Fund the address directly through the faucet
+			await faucetConnector.fundAddress(TEST_IDENTITY, address, 60);
+
+			await new Promise(resolve => setTimeout(resolve, 5000));
+
+			const balanceAfterFunding = await walletConnector.getBalance(TEST_IDENTITY, address);
+
+			// Verify funding worked
+			expect(balanceAfterFunding).toBeGreaterThan(initialBalance);
+			expect(balanceAfterFunding).toBeGreaterThanOrEqual(minimumRequired);
+		}
+	});
+
+	test("gas station integration preserves wallet connector functionality", async () => {
+		// Test that basic wallet operations still work with gas station config
+		const addresses = await walletConnector.getAddresses(TEST_IDENTITY, 0, 0, 3);
+		expect(addresses.length).toBe(3);
+
+		// All addresses should be valid
+		for (const address of addresses) {
+			expect(address).toMatch(/^0x[\dA-Fa-f]+$/);
+
+			// Should be able to get balance for each address
+			const balance = await walletConnector.getBalance(TEST_IDENTITY, address);
+			expect(balance).toBeGreaterThanOrEqual(0n);
+		}
 	});
 
 	test("gas station integration preserves wallet connector functionality", async () => {

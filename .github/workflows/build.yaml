@@ -41,7 +41,7 @@ jobs:
         with:
           test-node-endpoint: ${{ vars.TEST_NODE_ENDPOINT || 'https://api.testnet.iota.cafe' }}
           test-faucet-endpoint: ${{ vars.TEST_FAUCET_ENDPOINT || 'https://faucet.testnet.iota.cafe/gas' }}
-          gas-station-auth: ${{ secrets.TEST_GAS_STATION_AUTH_TOKEN }}
+          gas-station-auth: 'qEyCL6d9BKKFl/tfDGAKeGFkhUlf7FkqiGV7Xw4JUsI='
 
       # Run Lint and Dist
       - name: Run Lint and Dist

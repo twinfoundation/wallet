@@ -76,50 +76,51 @@ runs:
     - name: Fund Gas Station Sponsor
       shell: bash
       run: |
-        echo "Getting sponsor address from gas station..."
+        set -e  # Exit on error for critical failures
 
-        # Get sponsor address from gas station
+        echo "Getting sponsor address from gas station..."
         SPONSOR_RESPONSE=$(curl -s -X POST http://localhost:9527/v1/reserve_gas \
           -H "Content-Type: application/json" \
           -H "Authorization: Bearer ${{ inputs.gas-station-auth }}" \
           -d '{"gas_budget": 10000000, "reserve_duration_secs": 10}')
 
-        echo "Gas station response: $SPONSOR_RESPONSE"
-
-        # Check if the response contains an error (like 401 Unauthorized)
-        if echo "$SPONSOR_RESPONSE" | grep -q '"error".*"Invalid authorization token"'; then
-          echo "⚠️ Gas station authorization failed. This is expected if TEST_GAS_STATION_AUTH_TOKEN secret is not set."
-          echo "Tests will still work using faucet funding only."
-          exit 0
+        # Check for basic connectivity/auth issues first
+        ERROR_MSG=$(echo "$SPONSOR_RESPONSE" | jq -r '.error // empty')
+        if [ -n "$ERROR_MSG" ] && [ "$ERROR_MSG" != "null" ]; then
+          echo "❌ Gas station error: $ERROR_MSG"
+          echo "Response: $SPONSOR_RESPONSE"
+          exit 1  # Fail fast on auth/connectivity issues
         fi
 
-        # Try to extract sponsor address
-        SPONSOR_ADDRESS=$(echo "$SPONSOR_RESPONSE" | sed -n 's/.*"sponsor_address":"\([^"]*\)".*/\1/p')
+        SPONSOR_ADDRESS=$(echo "$SPONSOR_RESPONSE" | jq -r '.result.sponsor_address')
+        echo "Sponsor address: $SPONSOR_ADDRESS"
 
-        if [ -n "$SPONSOR_ADDRESS" ] && [ "$SPONSOR_ADDRESS" != "null" ]; then
-          echo "✅ Sponsor address: $SPONSOR_ADDRESS"
-          
-          echo "Funding sponsor address with IOTA faucet..."
-          curl -X POST "${{ inputs.test-faucet-endpoint }}" \
-            -H "Content-Type: application/json" \
-            -d "{\"FixedAmountRequest\":{\"recipient\":\"$SPONSOR_ADDRESS\"}}" || echo "Faucet funding may have failed, but continuing..."
-          
-          echo "Waiting 10 seconds for funding to process..."
-          sleep 10
-          
-          echo "Verifying gas station can reserve gas after funding..."
-          TEST_RESPONSE=$(curl -s -X POST http://localhost:9527/v1/reserve_gas \
-            -H "Content-Type: application/json" \
-            -H "Authorization: Bearer ${{ inputs.gas-station-auth }}" \
-            -d '{"gas_budget": 50000000, "reserve_duration_secs": 30}')
-          
-          if echo "$TEST_RESPONSE" | grep -q '"sponsor_address"'; then
-            echo "✅ Gas station successfully funded and operational!"
-          else
-            echo "⚠️ Gas station may not be properly funded, but continuing..."
-            echo "Response: $TEST_RESPONSE"
-          fi
+        if [ "$SPONSOR_ADDRESS" = "null" ] || [ -z "$SPONSOR_ADDRESS" ]; then
+          echo "❌ Failed to get sponsor address from gas station"
+          echo "Response: $SPONSOR_RESPONSE"
+          exit 1  # Fail fast if we can't get sponsor address
+        fi
+
+        # From here, allow graceful degradation for funding issues
+        set +e
+
+        echo "Funding sponsor address with IOTA faucet..."
+        curl -X POST "${{ inputs.test-faucet-endpoint }}" \
+          -H "Content-Type: application/json" \
+          -d "{\"FixedAmountRequest\":{\"recipient\":\"$SPONSOR_ADDRESS\"}}" || echo "⚠️ Faucet funding may have failed, but continuing..."
+
+        echo "Waiting 10 seconds for funding to process..."
+        sleep 10
+
+        echo "Verifying gas station can reserve gas after funding..."
+        TEST_RESPONSE=$(curl -s -X POST http://localhost:9527/v1/reserve_gas \
+          -H "Content-Type: application/json" \
+          -H "Authorization: Bearer ${{ inputs.gas-station-auth }}" \
+          -d '{"gas_budget": 50000000, "reserve_duration_secs": 30}')
+
+        if echo "$TEST_RESPONSE" | jq -e '.result' > /dev/null; then
+          echo "✅ Gas station successfully funded and operational!"
         else
-          echo "⚠️ Failed to get sponsor address from gas station response"
-          echo "Tests will still work using faucet funding only."
+          echo "⚠️ Gas station may not be properly funded, but continuing..."
+          echo "Response: $TEST_RESPONSE"
         fi
