@@ -1,5 +1,19 @@
 # @twin.org/wallet-connector-iota - Changelog
 
+## [0.0.1-next.23](https://github.com/twinfoundation/wallet/compare/wallet-connector-iota-v0.0.1-next.22...wallet-connector-iota-v0.0.1-next.23) (2025-07-03)
+
+
+### Features
+
+* github action simplification, readme update and tests inclution ([#33](https://github.com/twinfoundation/wallet/issues/33)) ([685bf01](https://github.com/twinfoundation/wallet/commit/685bf010c4276a37cb85c22762cbdbe3fe7cdc1a))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @twin.org/wallet-models bumped from 0.0.1-next.22 to 0.0.1-next.23
+
 ## [0.0.1-next.22](https://github.com/twinfoundation/wallet/compare/wallet-connector-iota-v0.0.1-next.21...wallet-connector-iota-v0.0.1-next.22) (2025-06-12)
 
 

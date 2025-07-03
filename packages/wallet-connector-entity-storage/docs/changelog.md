@@ -1,5 +1,19 @@
 # @twin.org/wallet-connector-entity-storage - Changelog
 
+## [0.0.1-next.23](https://github.com/twinfoundation/wallet/compare/wallet-connector-entity-storage-v0.0.1-next.22...wallet-connector-entity-storage-v0.0.1-next.23) (2025-07-03)
+
+
+### Miscellaneous Chores
+
+* **wallet-connector-entity-storage:** Synchronize repo versions
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @twin.org/wallet-models bumped from 0.0.1-next.22 to 0.0.1-next.23
+
 ## [0.0.1-next.22](https://github.com/twinfoundation/wallet/compare/wallet-connector-entity-storage-v0.0.1-next.21...wallet-connector-entity-storage-v0.0.1-next.22) (2025-06-12)
 
 
