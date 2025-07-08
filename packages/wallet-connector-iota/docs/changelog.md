@@ -1,5 +1,42 @@
 # @twin.org/wallet-connector-iota - Changelog
 
+## [0.0.1-next.24](https://github.com/twinfoundation/wallet/compare/wallet-connector-iota-v0.0.1-next.23...wallet-connector-iota-v0.0.1-next.24) (2025-07-03)
+
+
+### Features
+
+* github action simplification, readme update and tests inclusion ([#33](https://github.com/twinfoundation/wallet/issues/33)) ([685bf01](https://github.com/twinfoundation/wallet/commit/685bf010c4276a37cb85c22762cbdbe3fe7cdc1a))
+* iota rebased release ([d0c617d](https://github.com/twinfoundation/wallet/commit/d0c617d894f3663f7c80f7d53d2da858a0bd64f0))
+* update dependencies ([4b47a7d](https://github.com/twinfoundation/wallet/commit/4b47a7d900d72d1502d6db54cb391a954818478b))
+* use new dlt features ([8c2433d](https://github.com/twinfoundation/wallet/commit/8c2433dff71a8b49861d21809808abebb724ad4a))
+* use shared store mechanism ([#27](https://github.com/twinfoundation/wallet/issues/27)) ([2ba7861](https://github.com/twinfoundation/wallet/commit/2ba7861a2a610cf83396a3285c7bbaebe5a31551))
+
+
+### Bug Fixes
+
+* missing env on gha ([#35](https://github.com/twinfoundation/wallet/issues/35)) ([4667d0d](https://github.com/twinfoundation/wallet/commit/4667d0d09d3af8b5bb29beca718fa6fad4ab9ed0))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @twin.org/wallet-models bumped from 0.0.1-next.23 to 0.0.1-next.24
+
+## [0.0.1-next.23](https://github.com/twinfoundation/wallet/compare/wallet-connector-iota-v0.0.1-next.22...wallet-connector-iota-v0.0.1-next.23) (2025-07-03)
+
+
+### Features
+
+* github action simplification, readme update and tests inclusion ([#33](https://github.com/twinfoundation/wallet/issues/33)) ([685bf01](https://github.com/twinfoundation/wallet/commit/685bf010c4276a37cb85c22762cbdbe3fe7cdc1a))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @twin.org/wallet-models bumped from 0.0.1-next.22 to 0.0.1-next.23
+
 ## [0.0.1-next.22](https://github.com/twinfoundation/wallet/compare/wallet-connector-iota-v0.0.1-next.21...wallet-connector-iota-v0.0.1-next.22) (2025-06-12)
 
 
