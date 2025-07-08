@@ -1,5 +1,12 @@
 # @twin.org/wallet-models - Changelog
 
+## 0.0.1 (2025-07-08)
+
+
+### Features
+
+* release to production ([4631961](https://github.com/twinfoundation/wallet/commit/4631961bf9c8cf82ffd0c8dd2a7d750456bbab39))
+
 ## [0.0.1-next.24](https://github.com/twinfoundation/wallet/compare/wallet-models-v0.0.1-next.23...wallet-models-v0.0.1-next.24) (2025-07-03)
 
 
