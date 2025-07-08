@@ -1,0 +1,87 @@
+{
+	"commands": {
+		"faucet": {
+			"summary": "Request funds from the faucet.",
+			"description": "Request funds from the faucet for the supplied address.",
+			"options": {
+				"address": {
+					"param": "--address '<'address'>'",
+					"description": "The address to fill from the faucet either bech32 or hex format, or start with ! to read environment variable."
+				},
+				"faucet": {
+					"param": "--faucet '<'url'>'",
+					"description": "The url for the faucet endpoint, or an environment variable name containing the url."
+				}
+			},
+			"progress": {
+				"requestingFunds": "Requesting Funds",
+				"requestingBalance": "Requesting Balance"
+			},
+			"labels": {
+				"faucet": "Faucet",
+				"fundsAdded": "Funds Added"
+			},
+			"messages": {
+				"noFundsAdded": "No funds were added to the address."
+			}
+		},
+		"transfer": {
+			"summary": "Transfer funds from one address to another.",
+			"description": "Transfer funds from one address to another.",
+			"options": {
+				"address": {
+					"param": "--address '<'address'>'",
+					"description": "The address to send the funds from either in bech32 format, or start with ! to read environment variable."
+				},
+				"dest-address": {
+					"param": "--dest-address '<'address'>'",
+					"description": "The address to send the funds to either in bech32 format, or start with ! to read environment variable."
+				},
+				"amount": {
+					"param": "--amount '<'amount'>'",
+					"description": "The amount of funds to send."
+				},
+				"seed": {
+					"param": "--seed '<'seed'>'",
+					"description": "The seed for the source address in hex or base64 used to sign the transfer, or start with ! to read environment variable."
+				}
+			},
+			"progress": {
+				"transferringFunds": "Transferring"
+			},
+			"labels": {
+				"destAddress": "Destination Address",
+				"amount": "Amount"
+			}
+		},
+		"common": {
+			"options": {
+				"connector": {
+					"param": "--connector '<'connector'>'",
+					"description": "The connector to use for the wallet operation."
+				},
+				"node": {
+					"param": "--node '<'url'>'",
+					"description": "The url for the node endpoint, or an environment variable name containing the url."
+				},
+				"network": {
+					"param": "--network '<'network'>'",
+					"description": "The network to use for the identity operation."
+				},
+				"explorer": {
+					"param": "--explorer '<'url'>'",
+					"description": "The url for the explorer endpoint, or an environment variable name containing the url."
+				}
+			},
+			"labels": {
+				"address": "Address",
+				"balance": "Balance",
+				"node": "Node",
+				"explorer": "Explorer",
+				"explore": "Explore",
+				"connector": "Connector",
+				"network": "Network"
+			}
+		}
+	}
+}

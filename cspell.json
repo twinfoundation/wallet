@@ -6,15 +6,36 @@
 		"**/coverage/**",
 		"**/dist/**",
 		"**/docs/reference/**",
+		"**/docs/open-api/**",
 		"**/tests/**",
+		"*.yaml",
 		"package.json",
 		"rollup.config.mjs",
-		"vitest.config.ts",
+		"vitest.config.*",
 		"tsconfig.json",
 		"typedoc.json",
 		".eslintrc.cjs",
-		"**/wordlists/**"
+		"**/wordlists/**",
+		"changelog.md"
 	],
-	"words": ["bech", "faucet", "faucets", "gtsc", "nameof", "Stiftung", "Timelock"],
-	"ignoreRegExpList": ["/from\\s+(['\"]).*\\1/", "/eslint-disable.*/"]
+	"words": [
+		"abbrev",
+		"autorelease",
+		"bech",
+		"faucet",
+		"faucets",
+		"nameof",
+		"Secp",
+		"Stiftung",
+		"Timelock",
+		"txblock",
+		"UTXO"
+	],
+	"ignoreRegExpList": [
+		"/from\\s+(['\"]).*\\1/",
+		"/eslint-disable.*/",
+		"/^```shell[\\s\\S]*?```$/gm",
+		"/^```json[\\s\\S]*?```$/gm",
+		"/tst1.*/"
+	]
 }
