@@ -14,6 +14,8 @@ import { beforeAll, describe, expect, test } from "vitest";
 import {
 	TEST_CLIENT_OPTIONS,
 	TEST_COIN_TYPE,
+	TEST_GAS_STATION_AUTH_TOKEN,
+	TEST_GAS_STATION_ENDPOINT,
 	TEST_MNEMONIC_NAME,
 	TEST_NETWORK
 } from "./setupTestEnv";
@@ -72,9 +74,8 @@ beforeAll(async () => {
 		vaultSeedId: "test-seed-gas-station",
 		coinType: TEST_COIN_TYPE,
 		gasStation: {
-			gasStationUrl: process.env.TEST_GAS_STATION_ENDPOINT ?? "http://localhost:9527",
-			gasStationAuthToken:
-				process.env.TEST_GAS_STATION_AUTH_TOKEN ?? "qEyCL6d9BKKFl/tfDGAKeGFkhUlf7FkqiGV7Xw4JUsI="
+			gasStationUrl: TEST_GAS_STATION_ENDPOINT,
+			gasStationAuthToken: TEST_GAS_STATION_AUTH_TOKEN
 		}
 	};
 
@@ -87,8 +88,8 @@ beforeAll(async () => {
 
 describe("IotaWalletConnector Gas Station Tests", () => {
 	test("should have gas station configuration", () => {
-		expect(process.env.TEST_GAS_STATION_ENDPOINT).toBeDefined();
-		expect(process.env.TEST_GAS_STATION_AUTH_TOKEN).toBeDefined();
+		expect(TEST_GAS_STATION_ENDPOINT).toBeDefined();
+		expect(TEST_GAS_STATION_AUTH_TOKEN).toBeDefined();
 	});
 
 	test("can get addresses with gas station config", async () => {

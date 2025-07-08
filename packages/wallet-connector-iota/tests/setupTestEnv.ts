@@ -30,6 +30,12 @@ Guards.stringValue("TestEnv", "TEST_FAUCET_ENDPOINT", process.env.TEST_FAUCET_EN
 Guards.stringValue("TestEnv", "TEST_COIN_TYPE", process.env.TEST_COIN_TYPE);
 Guards.stringValue("TestEnv", "TEST_EXPLORER_URL", process.env.TEST_EXPLORER_URL);
 Guards.stringValue("TestEnv", "TEST_NETWORK", process.env.TEST_NETWORK);
+Guards.stringValue("TestEnv", "TEST_GAS_STATION_ENDPOINT", process.env.TEST_GAS_STATION_ENDPOINT);
+Guards.stringValue(
+	"TestEnv",
+	"TEST_GAS_STATION_AUTH_TOKEN",
+	process.env.TEST_GAS_STATION_AUTH_TOKEN
+);
 
 if (!Is.stringValue(process.env.TEST_MNEMONIC)) {
 	// eslint-disable-next-line no-restricted-syntax
@@ -51,6 +57,8 @@ export const TEST_CLIENT_OPTIONS = {
 export const TEST_NETWORK = process.env.TEST_NETWORK;
 export const TEST_SEED = Bip39.mnemonicToSeed(process.env.TEST_MNEMONIC);
 export const TEST_COIN_TYPE = Number.parseInt(process.env.TEST_COIN_TYPE, 10);
+export const TEST_GAS_STATION_ENDPOINT = process.env.TEST_GAS_STATION_ENDPOINT;
+export const TEST_GAS_STATION_AUTH_TOKEN = process.env.TEST_GAS_STATION_AUTH_TOKEN;
 
 const config: IIotaFaucetConnectorConfig = {
 	clientOptions: TEST_CLIENT_OPTIONS,
