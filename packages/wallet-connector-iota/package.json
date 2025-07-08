@@ -1,6 +1,6 @@
 {
 	"name": "@twin.org/wallet-connector-iota",
-	"version": "0.0.0",
+	"version": "0.0.1",
 	"description": "Wallet connector implementation using IOTA",
 	"repository": {
 		"type": "git",
@@ -35,7 +35,7 @@
 		"@twin.org/crypto": "^0.0.1",
 		"@twin.org/nameof": "^0.0.1",
 		"@twin.org/vault-models": "^0.0.1",
-		"@twin.org/wallet-models": "^0.0.0",
+		"@twin.org/wallet-models": "^0.0.1",
 		"@twin.org/dlt-iota": "^0.0.1"
 	},
 	"devDependencies": {

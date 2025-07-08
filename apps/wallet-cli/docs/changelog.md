@@ -1,5 +1,20 @@
 # @twin.org/wallet-cli - Changelog
 
+## 0.0.1 (2025-07-08)
+
+
+### Features
+
+* release to production ([4631961](https://github.com/twinfoundation/wallet/commit/4631961bf9c8cf82ffd0c8dd2a7d750456bbab39))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @twin.org/wallet-connector-iota bumped from ^0.0.0 to ^0.0.1
+    * @twin.org/wallet-models bumped from ^0.0.0 to ^0.0.1
+
 ## [0.0.1-next.24](https://github.com/twinfoundation/wallet/compare/wallet-cli-v0.0.1-next.23...wallet-cli-v0.0.1-next.24) (2025-07-03)
 
 
