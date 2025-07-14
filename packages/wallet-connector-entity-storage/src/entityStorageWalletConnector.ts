@@ -40,10 +40,10 @@ export class EntityStorageWalletConnector implements IWalletConnector {
 	private static readonly _DEFAULT_COIN_TYPE: number = 9999;
 
 	/**
-	 * Default bech32 hrp.
+	 * Default network name.
 	 * @internal
 	 */
-	private static readonly _DEFAULT_BECH32_HRP: string = "ent";
+	private static readonly _DEFAULT_NETWORK_NAME: string = "ent";
 
 	/**
 	 * Runtime name for the class.
@@ -88,7 +88,7 @@ export class EntityStorageWalletConnector implements IWalletConnector {
 		);
 		this._config = options?.config ?? {};
 		this._config.coinType ??= EntityStorageWalletConnector._DEFAULT_COIN_TYPE;
-		this._config.bech32Hrp ??= EntityStorageWalletConnector._DEFAULT_BECH32_HRP;
+		this._config.networkName ??= EntityStorageWalletConnector._DEFAULT_NETWORK_NAME;
 	}
 
 	/**
@@ -128,10 +128,9 @@ export class EntityStorageWalletConnector implements IWalletConnector {
 		const keyPairs: string[] = [];
 
 		for (let i = startAddressIndex; i < startAddressIndex + count; i++) {
-			const addressKeyPair = Bip44.addressBech32(
+			const addressKeyPair = Bip44.address(
 				seed,
 				KeyType.Ed25519,
-				this._config.bech32Hrp ?? EntityStorageWalletConnector._DEFAULT_BECH32_HRP,
 				this._config.coinType ?? EntityStorageWalletConnector._DEFAULT_COIN_TYPE,
 				accountIndex,
 				false,
@@ -147,7 +146,7 @@ export class EntityStorageWalletConnector implements IWalletConnector {
 	/**
 	 * Get the balance for an address in a wallet.
 	 * @param identity The identity of the user to access the vault keys.
-	 * @param address The bech32 encoded address.
+	 * @param address The hex encoded address.
 	 * @returns The balance of the wallet address.
 	 */
 	public async getBalance(identity: string, address: string): Promise<bigint> {
@@ -161,7 +160,7 @@ export class EntityStorageWalletConnector implements IWalletConnector {
 	/**
 	 * Ensure the balance for an address in a wallet.
 	 * @param identity The identity of the user to access the vault keys.
-	 * @param address The bech32 encoded address.
+	 * @param address The hex encoded address.
 	 * @param ensureBalance The balance to ensure on the address.
 	 * @param timeoutInSeconds The timeout in seconds to wait for the funding to complete.
 	 * @returns True if the balance has been ensured.
@@ -206,8 +205,8 @@ export class EntityStorageWalletConnector implements IWalletConnector {
 	/**
 	 * Transfer funds to an address.
 	 * @param identity The identity of the user to access the vault keys.
-	 * @param addressSource The bech32 encoded address to send the funds from.
-	 * @param addressDest The bech32 encoded address to send the funds to.
+	 * @param addressSource The hex encoded address to send the funds from.
+	 * @param addressDest The hex encoded address to send the funds to.
 	 * @param amount The amount to transfer.
 	 * @returns An identifier for the transfer if there was one.
 	 */

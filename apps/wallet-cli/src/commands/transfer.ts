@@ -85,14 +85,11 @@ export async function actionCommandTransfer(opts: {
 	explorer: string;
 }): Promise<void> {
 	const seed: Uint8Array = CLIParam.hexBase64("seed", opts.seed);
-	const address: string =
-		opts.connector === WalletConnectorTypes.Iota
-			? Converter.bytesToHex(CLIParam.hex("address", opts.address), true)
-			: CLIParam.bech32("address", opts.address);
-	const destAddress: string =
-		opts.connector === WalletConnectorTypes.Iota
-			? Converter.bytesToHex(CLIParam.hex("destAddress", opts.destAddress), true)
-			: CLIParam.bech32("destAddress", opts.destAddress);
+	const address: string = Converter.bytesToHex(CLIParam.hex("address", opts.address), true);
+	const destAddress: string = Converter.bytesToHex(
+		CLIParam.hex("destAddress", opts.destAddress),
+		true
+	);
 	const amount: bigint = CLIParam.bigint("amount", opts.amount, false, 0n);
 	const nodeEndpoint: string = CLIParam.url("node", opts.node);
 	const network: string | undefined =

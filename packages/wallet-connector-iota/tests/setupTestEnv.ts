@@ -54,7 +54,9 @@ export const TEST_CLIENT_OPTIONS = {
 	url: process.env.TEST_NODE_ENDPOINT
 };
 
+export const TEST_MNEMONIC = process.env.TEST_MNEMONIC;
 export const TEST_NETWORK = process.env.TEST_NETWORK;
+export const TEST_FAUCET_ENDPOINT = process.env.TEST_FAUCET_ENDPOINT;
 export const TEST_SEED = Bip39.mnemonicToSeed(process.env.TEST_MNEMONIC);
 export const TEST_COIN_TYPE = Number.parseInt(process.env.TEST_COIN_TYPE, 10);
 export const TEST_GAS_STATION_ENDPOINT = process.env.TEST_GAS_STATION_ENDPOINT;

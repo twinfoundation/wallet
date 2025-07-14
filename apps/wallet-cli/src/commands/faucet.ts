@@ -72,10 +72,7 @@ export async function actionCommandFaucet(opts: {
 	network?: string;
 	explorer: string;
 }): Promise<void> {
-	const address: string =
-		opts.connector === WalletConnectorTypes.Iota
-			? Converter.bytesToHex(CLIParam.hex("address", opts.address), true)
-			: CLIParam.bech32("address", opts.address);
+	const address: string = Converter.bytesToHex(CLIParam.hex("address", opts.address), true);
 	const faucetEndpoint: string = CLIParam.url("faucet", opts.faucet);
 	const nodeEndpoint: string = CLIParam.url("node", opts.node);
 	const network: string | undefined =

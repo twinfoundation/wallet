@@ -18,9 +18,7 @@ The simplest way to set up the testing environment using our unified container:
 
 ```shell
 # Start the unified container with Redis + Gas Station
-docker run -d --name twin-gas-station-test \
-  -p 6379:6379 -p 9527:9527 -p 9184:9184 \
-  twinfoundation/twin-gas-station-test:latest
+docker run -d --name twin-gas-station-test -p 6379:6379 -p 9527:9527 -p 9184:9184 twinfoundation/twin-gas-station-test:latest
 
 # Wait a moment for services to start, then verify
 docker exec twin-gas-station-test redis-cli ping  # Should return: PONG

@@ -14,6 +14,7 @@ import { beforeAll, describe, expect, test } from "vitest";
 import {
 	TEST_CLIENT_OPTIONS,
 	TEST_COIN_TYPE,
+	TEST_FAUCET_ENDPOINT,
 	TEST_GAS_STATION_AUTH_TOKEN,
 	TEST_GAS_STATION_ENDPOINT,
 	TEST_MNEMONIC_NAME,
@@ -56,7 +57,7 @@ beforeAll(async () => {
 	// Setup faucet connector for funding
 	const faucetConfig: IIotaFaucetConnectorConfig = {
 		clientOptions: TEST_CLIENT_OPTIONS,
-		endpoint: process.env.TEST_FAUCET_ENDPOINT ?? "https://faucet.testnet.iota.cafe",
+		endpoint: TEST_FAUCET_ENDPOINT,
 		network: TEST_NETWORK,
 		coinType: TEST_COIN_TYPE
 	};
@@ -184,18 +185,16 @@ describe("IotaWalletConnector Gas Station Tests", () => {
 		const faucetConnector = FaucetConnectorFactory.get("faucet");
 		expect(faucetConnector).toBeDefined();
 
-		if (initialBalance < minimumRequired) {
-			// Fund the address directly through the faucet
-			await faucetConnector.fundAddress(TEST_IDENTITY, address, 60);
+		// Fund the address directly through the faucet
+		await faucetConnector.fundAddress(TEST_IDENTITY, address, 60);
 
-			await new Promise(resolve => setTimeout(resolve, 5000));
+		await new Promise(resolve => setTimeout(resolve, 5000));
 
-			const balanceAfterFunding = await walletConnector.getBalance(TEST_IDENTITY, address);
+		const balanceAfterFunding = await walletConnector.getBalance(TEST_IDENTITY, address);
 
-			// Verify funding worked
-			expect(balanceAfterFunding).toBeGreaterThan(initialBalance);
-			expect(balanceAfterFunding).toBeGreaterThanOrEqual(minimumRequired);
-		}
+		// Verify funding worked
+		expect(balanceAfterFunding).toBeGreaterThan(initialBalance);
+		expect(balanceAfterFunding).toBeGreaterThanOrEqual(minimumRequired);
 	});
 
 	test("gas station integration preserves wallet connector functionality", async () => {
