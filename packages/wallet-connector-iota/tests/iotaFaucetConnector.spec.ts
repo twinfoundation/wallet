@@ -1,6 +1,7 @@
 // Copyright 2024 IOTA Stiftung.
 // SPDX-License-Identifier: Apache-2.0.
 import { Ed25519Keypair } from "@iota/iota-sdk/keypairs/ed25519";
+import { BaseError } from "@twin.org/core";
 import {
 	TEST_CLIENT_OPTIONS,
 	TEST_FAUCET_ENDPOINT,
@@ -106,7 +107,17 @@ describe("IotaFaucetConnector", () => {
 			}
 		});
 
-		const amountAdded = await faucet.fundAddress(TEST_IDENTITY_ID, address);
-		expect(amountAdded).toBeGreaterThan(0n);
+		try {
+			const amountAdded = await faucet.fundAddress(TEST_IDENTITY_ID, address);
+			expect(amountAdded).toBeGreaterThan(0n);
+		} catch (error) {
+			if (BaseError.fromError(error).message === "iotaFaucetConnector.faucetRateLimit") {
+				console.warn(
+					"Faucet rate limit exceeded, skipping test that requires funding from faucet."
+				);
+			} else {
+				throw error;
+			}
+		}
 	});
 });

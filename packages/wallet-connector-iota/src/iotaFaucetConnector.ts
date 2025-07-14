@@ -103,6 +103,19 @@ export class IotaFaucetConnector implements IFaucetConnector {
 				}
 			}
 		} catch (error) {
+			const payloadError = Iota.extractPayloadError(error);
+			if (
+				payloadError.message.includes(
+					"Too many requests from this client have been sent to the faucet"
+				)
+			) {
+				throw new GeneralError(
+					this.CLASS_NAME,
+					"faucetRateLimit",
+					undefined,
+					Iota.extractPayloadError(error)
+				);
+			}
 			throw new GeneralError(
 				this.CLASS_NAME,
 				"fundingFailed",
