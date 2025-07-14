@@ -56,8 +56,6 @@ jobs:
       TEST_MNEMONIC: ${{ secrets.TEST_MNEMONIC }}
       TEST_2_MNEMONIC: ${{ secrets.TEST_2_MNEMONIC }}
       TEST_NODE_MNEMONIC: ${{ secrets.TEST_NODE_MNEMONIC }}
-      TEST_GAS_STATION_ENDPOINT: ${{ vars.TEST_GAS_STATION_ENDPOINT || 'http://localhost:9527' }}
-      TEST_GAS_STATION_AUTH_TOKEN: ${{ secrets.TEST_GAS_STATION_AUTH_TOKEN }}
 
     # Use a matrix strategy to process each package pattern in parallel
     # but limit to one at a time for controlled publishing order

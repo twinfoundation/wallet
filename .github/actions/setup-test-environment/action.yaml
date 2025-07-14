@@ -13,6 +13,7 @@ inputs:
   gas-station-auth:
     description: 'Gas station authentication token'
     required: true
+    default: 'qEyCL6d9BKKFl/tfDGAKeGFkhUlf7FkqiGV7Xw4JUsI='
 
 outputs:
   gas-station-url:
