@@ -25,7 +25,7 @@ jobs:
     outputs:
       # This output will be consumed by the publish job's matrix
       packages: ${{ steps.read-workspaces.outputs.packages }}
-      branch: ${{ steps.set-branch.outputs.branch }}
+      branch: ${{ needs.set-branch.outputs.branch }}
 
     steps:
       # Set branch variable based on release type
@@ -86,7 +86,7 @@ jobs:
       max-parallel: 1 # Process one package at a time (important for interdependent packages)
       matrix:
         package: ${{ fromJson(needs.read-workspaces.outputs.packages) }} # Each pattern becomes a separate job
-        branch: ${{ steps.set-branch.outputs.branch }}
+        branch: ${{ needs.set-branch.outputs.branch }}
 
     steps:
       # Get the code from the repository
