@@ -11,6 +11,7 @@ runs:
   using: 'composite'
   steps:
     - name: Download IOTA CLI
+      if: inputs.package == 'packages/wallet-connector-iota' || inputs.package == 'all'
       shell: bash
       run: |
         cd ..
@@ -22,6 +23,7 @@ runs:
         iota --version
 
     - name: Start Twin Gas Station Test Environment
+      if: inputs.package == 'packages/wallet-connector-iota' || inputs.package == 'all'
       shell: bash
       run: |
         echo "Starting Twin Gas Station Test Environment (includes Redis + Gas Station)..."
@@ -32,6 +34,7 @@ runs:
           twinfoundation/twin-gas-station-test:latest
 
     - name: Wait for Services to be Ready
+      if: inputs.package == 'packages/wallet-connector-iota' || inputs.package == 'all'
       shell: bash
       run: |
         echo "Waiting for Redis and Gas Station to start..."
@@ -59,6 +62,7 @@ runs:
         echo "✅ All services are ready!"
 
     - name: Fund Gas Station Sponsor
+      if: inputs.package == 'packages/wallet-connector-iota' || inputs.package == 'all'
       shell: bash
       run: |
         echo "Getting sponsor address from gas station..."
