@@ -62,7 +62,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.GHA_RELEASE_TOKEN }} # Use admin PAT instead of GITHUB_TOKEN
-          ref: ${{ needs.read-workspaces.outputs.branch }} # Checkout the calculated branch
+          ref: ${{ steps.set-branch.outputs.branch }} # Checkout the calculated branch
           fetch-depth: 0 # Fetch all history for accurate versioning
 
       # Set up Node.js environment for running npm commands
@@ -131,15 +131,15 @@ jobs:
         id: release-please # ID allows referencing this step later
         run: |
           # Select configuration files based on release type (prerelease vs production)
-          CONFIG_FILE=release/release-please-config.${{ needs.read-workspaces.outputs.branch == 'next' && 'prerelease' || 'prod' }}.json
-          MANIFEST_FILE=release/release-please-manifest.${{ needs.read-workspaces.outputs.branch == 'next' && 'prerelease' || 'prod' }}.json
+          CONFIG_FILE=release/release-please-config.${{ steps.set-branch.outputs.branch == 'next' && 'prerelease' || 'prod' }}.json
+          MANIFEST_FILE=release/release-please-manifest.${{ steps.set-branch.outputs.branch == 'next' && 'prerelease' || 'prod' }}.json
 
           # Execute release-please and capture its output
           OUTPUT=$(node_modules/.bin/release-please release-pr \
             --config-file=${CONFIG_FILE} \
             --manifest-file=${MANIFEST_FILE} \
             --repo-url=${{ github.repository }} \
-            --target-branch=${{ needs.read-workspaces.outputs.branch }} \
+            --target-branch=${{ steps.set-branch.outputs.branch }} \
             --token=${{ secrets.GITHUB_TOKEN }})
 
           echo "Release-please output: $OUTPUT"
