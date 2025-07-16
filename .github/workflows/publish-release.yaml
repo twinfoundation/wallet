@@ -72,7 +72,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       id-token: write # Needed for npm provenance
-    needs: read-workspaces # Wait for the read-workspaces job to complete
+    needs: [set-branch, read-workspaces] # Wait for the set-branch and read-workspaces job to complete
 
     # Add env vars for tests
     env:
